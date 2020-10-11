@@ -2,12 +2,20 @@
 
 ## Introduction
 
-For our demo, we used the following setup:
+Setting up GNS3 in Ubuntu and Debian is pretty simple: check out [https://docs.gns3.com/docs/getting-started/installation/linux](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install")
+
+For our demo, however, we will use CentOS and the following setup:
 
 - Oracle VirtualBox Virtual Machine (VM) Manager(using 6.0.6)
 - CentOS Linux 7 (using 3.10.0-957.e17.x86_84)
 - GNOME Desktop Version 3.28.2
 - Python 3 Programming Language Interpreter (using version 3.6.8)
+
+We did this, not because we're masochists, but because...
+
+1. Many companies, especially government entities, use Red Hat Linux, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
+
+2. While there were good posts and articles on how to do this, each of them were slightly different, so we distilled them into one set of instructions.
 
 ----------
 
@@ -53,6 +61,12 @@ If you want to connect to the Internet using an existing WiFi access point, inst
     [gns3user@localhost ~]$ nmtui
 
 The TUI should appear. Select "Activate a Connection" and find your AP. Enter your password; you should then be connected.
+
+![Using nmtui](images/centos01.png)
+
+----------
+
+![Using nmtui](images/centos02.png)
 
 Next, update the system and add CentOS' development tools using the following commands in the CLI:
 
