@@ -1,0 +1,86 @@
+Install xterm:
+
+    sudo yum -y install xterm
+
+Install bridge (may already be installed):
+
+    sudo yum -y install bridge-utils
+
+Add a tap/loopback interface in Linux:
+
+    sudo ip tuntap add tap0 mode tap # Add the tap device
+sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
+sudo ifconfig enp0s3 0.0.0.0 promisc up # Configure the default Ethernet connection (may be eth0)
+sudo brctl addbr br0 # Create the bridge
+sudo brctl addif br0 tap0 # Add the tap to the bridge
+sudo brctl addif br0 enp0s3 # Add the Ethernet connection to the bridge
+sudo ifconfig br0 up # Start the bridge
+sudo ifconfig br0 192.168.1.99/24 # Configure the device
+sudo route add default gw 192.168.1.254 # Setup the default gateway
+ifconfig # Verify the devices exist
+
+br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.99  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 aa11:bb22:cc33:dd44:ee55:ff66  prefixlen 64  scopeid 0x20<link>
+        ether a1:b2:c3:d4:e5:f6  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 30  bytes 3964 (3.8 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+enp0s3: flags=4419<UP,BROADCAST,RUNNING,PROMISC,MULTICAST>  mtu 1500
+        inet6 ff66::ee55:dd44:cc33:bb22:aa11  prefixlen 64  scopeid 0x20<link>
+        ether f6:e5:d4:c3:b2:a1  txqueuelen 1000  (Ethernet)
+        RX packets 232  bytes 18561 (18.1 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 334  bytes 28584 (27.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 76  bytes 6728 (6.5 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 76  bytes 6728 (6.5 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+tap0: flags=4355<UP,BROADCAST,PROMISC,MULTICAST>  mtu 1500
+        ether a1:f6:b2:e5:c3:d4  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+sudo brctl show # Verify the bridge is set up
+
+bridge name bridge id         STP enabled interfaces
+br0	        8000.xxxxxxxxxxxx no          enp0s3
+                              tap0
+
+Start GNS3
+Add a cloud
+Add a router
+---
+R1#ping 192.168.1.99 # Ping host from GNS3 router
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.99, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 8/10/12 ms
+---
+$ ping -c 4 192.168.1.1 # Ping GNS3 router from Terminal
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=255 time=2.05 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=255 time=5.16 ms
+64 bytes from 192.168.1.1: icmp_seq=3 ttl=255 time=10.7 ms
+64 bytes from 192.168.1.1: icmp_seq=4 ttl=255 time=5.30 ms
+
+--- 192.168.1.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3006ms
+rtt min/avg/max/mdev = 2.050/5.830/10.797/3.150 ms
+
+
+Thanks to 
+David Bombal at https://www.youtube.com/playlist?list=PLhfrWIlLOoKPn7T9FtvbOWX8GxgsFFNwn
+Sudheer Vishwakarma at https://www.youtube.com/watch?v=nFIsisg3uvg&ab_channel=SudheerVishwakarma
