@@ -8,7 +8,7 @@ Install bridge (may already be installed):
 
 Add a tap/loopback interface in Linux:
 
-    sudo ip tuntap add tap0 mode tap # Add the tap device
+sudo ip tuntap add tap0 mode tap # Add the tap device
 sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
 sudo ifconfig enp0s3 0.0.0.0 promisc up # Configure the default Ethernet connection (may be eth0)
 sudo brctl addbr br0 # Create the bridge
@@ -61,6 +61,19 @@ br0	        8000.xxxxxxxxxxxx no          enp0s3
 Start GNS3
 Add a cloud
 Add a router
+
+Don't forget, or no telnet:
+R1#configure terminal
+R1(config)#enable password cisco
+R1(config)#line vty 0 4 # virtual teletype with 0 to 4 connections
+R1(config-line)#password cisco
+R1(config-line)#end
+%SYS-5-CONFIG_I: Configured from console by console
+Router#write memory
+Building configuration...
+[OK]
+R1#
+
 ---
 R1#ping 192.168.1.99 # Ping host from GNS3 router
 
@@ -84,3 +97,11 @@ rtt min/avg/max/mdev = 2.050/5.830/10.797/3.150 ms
 Thanks to 
 David Bombal at https://www.youtube.com/playlist?list=PLhfrWIlLOoKPn7T9FtvbOWX8GxgsFFNwn
 Sudheer Vishwakarma at https://www.youtube.com/watch?v=nFIsisg3uvg&ab_channel=SudheerVishwakarma
+
+Get applicances (example):
+wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/catalysts/cat3750/c3750-ipbasek9-mz.122-25.SEE2.bin
+
+http://tfr.org/cisco-ios/37xx/3725/c3725-adventerprisek9-mz.124-25d.bin
+http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
+
+http://www.gns3.xyz/files/Downloads/
