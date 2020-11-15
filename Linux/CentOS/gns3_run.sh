@@ -19,11 +19,12 @@ sudo ifconfig br0 up # Start the bridge
 sudo ifconfig br0 192.168.1.99/24 # Configure the bridge
 sudo route add default gw 192.168.1.254 # Setup the default gateway
 ifconfig # Verify the devices exist
+sudo brctl show # Verify the bridge is set up
 gns3 # Start GNS3
 # Upon exit from GNS3, reset the default Ethernet connection to access the Internet
 sudo ifconfig br0 down # Stop the bridge
 sudo brctl delif br0 $org_interface # Remove the default Ethernet connection from the bridge
-sudo brctl delif br0 tap # Remove the tap from the bridge
+sudo brctl delif br0 tap0 # Remove the tap from the bridge
 sudo brctl delbr br0 # Delete the bridge
 # Reset the default Ethernet connection
 sudo ifconfig $org_interface -promisc

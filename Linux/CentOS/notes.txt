@@ -1,4 +1,10 @@
-Install xterm:
+Network: 192.168.1.0/24 255.255.255.0 (256 available IPs)
+Router: 192.168.1.1
+Cloud: 192.168.1.99
+
+Install CentOS and GNS3
+
+Install xterm if needed (can use PuTTY instead):
 
     sudo yum -y install xterm
 
@@ -6,82 +12,90 @@ Install bridge (may already be installed):
 
     sudo yum -y install bridge-utils
 
-Add a tap/loopback interface in Linux:
+Add a tap/loopback interface in Linux (see gns3_run.py script for latest and greatest)
 
-sudo ip tuntap add tap0 mode tap # Add the tap device
-sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
-sudo ifconfig enp0s3 0.0.0.0 promisc up # Configure the default Ethernet connection (may be eth0)
-sudo brctl addbr br0 # Create the bridge
-sudo brctl addif br0 tap0 # Add the tap to the bridge
-sudo brctl addif br0 enp0s3 # Add the Ethernet connection to the bridge
-sudo ifconfig br0 up # Start the bridge
-sudo ifconfig br0 192.168.1.99/24 # Configure the device
-sudo route add default gw 192.168.1.254 # Setup the default gateway
-ifconfig # Verify the devices exist
+Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):
+wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
 
-br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.1.99  netmask 255.255.255.0  broadcast 192.168.1.255
-        inet6 aa11:bb22:cc33:dd44:ee55:ff66  prefixlen 64  scopeid 0x20<link>
-        ether a1:b2:c3:d4:e5:f6  txqueuelen 1000  (Ethernet)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 30  bytes 3964 (3.8 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+More C3745 info:
+md5sum c3745-adventerprisek9-mz.124-25d.bin
+563797308a3036337c3dee9b4ab54649  c3745-adventerprisek9-mz.124-25d.bin
 
-enp0s3: flags=4419<UP,BROADCAST,RUNNING,PROMISC,MULTICAST>  mtu 1500
-        inet6 ff66::ee55:dd44:cc33:bb22:aa11  prefixlen 64  scopeid 0x20<link>
-        ether f6:e5:d4:c3:b2:a1  txqueuelen 1000  (Ethernet)
-        RX packets 232  bytes 18561 (18.1 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 334  bytes 28584 (27.9 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+Filename:c3745-adventerprisek9-mz.124-25d.bin
+File size:38,986,688 Bytes
+Checksum type:MD5 SHA1 SHA-256
+File checksum:563797308A3036337C3DEE9B4AB54649
 
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 76  bytes 6728 (6.5 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 76  bytes 6728 (6.5 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+C3745#
+The c3745 has 2 FastEthernet interfaces on its motherboard (GT96100-FE), 3 subslots for WICs (maximum of 6 serial ports) and 4 Network Module slots (maximum of 32 FastEthernet ports or 16 serial ports).
 
-tap0: flags=4355<UP,BROADCAST,PROMISC,MULTICAST>  mtu 1500
-        ether a1:f6:b2:e5:c3:d4  txqueuelen 1000  (Ethernet)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 0  bytes 0 (0.0 B)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+IOS version 12.4.25d (Mainline)#
+File name: c3745-adventerprisek9-mz.124-25d.bin MD5: 563797308a3036337c3dee9b4ab54649 Minimum RAM: 256MB Proposed idle-PC value: 0x60aa1da0
 
-sudo brctl show # Verify the bridge is set up
+You can also use:
+http://tfr.org/cisco-ios/37xx/3725/c3725-adventerprisek9-mz.124-15.T14.bin
+http://tfr.org/cisco-ios/catalysts/cat3750/c3750-ipbasek9-mz.122-25.SEE2.bin
 
-bridge name bridge id         STP enabled interfaces
-br0	        8000.xxxxxxxxxxxx no          enp0s3
-                              tap0
+Need to research:
+http://www.gns3.xyz/files/Downloads/
+https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/
 
-Start GNS3
-Add a cloud
-Add a router
+Start GNS3 (need to explain)
+Add the router to the templates (need to explain: https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/#using-a-c3725-as-an-etherswitch-router)
+Don't forget to set PCMCIA disk0: 1 MiB
+Use FastEthernet0/0 or FastEthernet0/1 (they are routed ports, not switchports)
 
-Don't forget, or no telnet:
-R1#configure terminal
+
+Add a cloud -> Configure -> Tap Interfaces -> tap0
+Add a router (Cisco 3745 124-25d)
+Connect cloud (tap0) to router (FastEthernet0/0)
+
+
+Configure the router:
+Start the router node, right click and open a console:
+
+Router>enable ! en
+Router#show ip interface ! Should not be empty
+Router#show ip interface FastEthernet0/0 ! show ip int f0/0
+FastEthernet0/0 is administratively down, line protocol is down
+  Internet protocol processing disabled
+Router#configure terminal ! conf t
+Enter configuration commands, one per line. End with CNTL/Z.
+Router(config)#hostname R1 ! May already be named R1
+R1(config)#interface FastEthernet0/0 ! int f0/0
+R1(config-if)#ip address 192.168.1.1 255.255.255.0
+R1(config-if)#no shutdown ! no shut
+R1(config-if)#
+MMM DD HH:MM:SSS.SSS: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up 
+MMM DD HH:MM:SSS.SSS: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+R1(config-if)#end
+R1#
+MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
+R1#conf t
+
 R1(config)#enable password cisco
-R1(config)#line vty 0 4 # virtual teletype with 0 to 4 connections
+R1(config)#line vty 0 4 ! Virtual teletype with 0 to 4 connections
 R1(config-line)#password cisco
 R1(config-line)#end
-%SYS-5-CONFIG_I: Configured from console by console
-Router#write memory
+MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
+R1#write memory ! wr / May have to use "copy running config to startup config" or "copy run start" on newer devices
 Building configuration...
 [OK]
-R1#
-
----
-R1#ping 192.168.1.99 # Ping host from GNS3 router
+R1#show ip int f0/0 ! Optional; just checking that everything went through
+FastEthernet0/0 is up, line protocol is up
+  Internet address is 192.168.1.1
+  ...
+  WCCP Redirect exclude is disabled
+R1#ping 192.168.1.99 ! Ping host from GNS3 router
 
 Type escape sequence to abort.
 Sending 5, 100-byte ICMP Echos to 192.168.1.99, timeout is 2 seconds:
 .!!!!
 Success rate is 80 percent (4/5), round-trip min/avg/max = 8/10/12 ms
----
+R1#exit
+
+Close the console and open a terminal. Attempt to ping the router...
+
 $ ping -c 4 192.168.1.1 # Ping GNS3 router from Terminal
 PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
 64 bytes from 192.168.1.1: icmp_seq=1 ttl=255 time=2.05 ms
@@ -93,15 +107,24 @@ PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
 4 packets transmitted, 4 received, 0% packet loss, time 3006ms
 rtt min/avg/max/mdev = 2.050/5.830/10.797/3.150 ms
 
+Next, telnet into the router:
+$ telnet 192.168.1.1
+Trying 192.168.1.1
+Escape character is '^]'.
+
+
+User Access Verification
+
+Password: (enter "cisco")
+R1> (enter "exit" to quit)
+Connection closed by foreign host.
+
+
+Note for Lab 3: Any issues, use vi to remove all reference to 192.168.1.1 in /home/wrsuser1/.ssh/known_hosts
+
+
 
 Thanks to 
 David Bombal at https://www.youtube.com/playlist?list=PLhfrWIlLOoKPn7T9FtvbOWX8GxgsFFNwn
 Sudheer Vishwakarma at https://www.youtube.com/watch?v=nFIsisg3uvg&ab_channel=SudheerVishwakarma
 
-Get applicances (example):
-wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/catalysts/cat3750/c3750-ipbasek9-mz.122-25.SEE2.bin
-
-http://tfr.org/cisco-ios/37xx/3725/c3725-adventerprisek9-mz.124-25d.bin
-http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
-
-http://www.gns3.xyz/files/Downloads/
