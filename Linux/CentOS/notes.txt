@@ -52,6 +52,15 @@ Connect cloud (tap0) to router (FastEthernet0/0)
 
 
 Configure the router:
+Method 1 (auto)
+Right click on the router -> Import config
+File to import? configs/il_startup-config.cfg -> OK
+Find and select R1_3745_il_startup-config.cfg -> Open
+Right click on the router -> Start
+Wait 60 seconds
+Go to "Ping the Router"
+
+Method 2 (manual)
 Start the router node, right click and open a console:
 
 Router>enable ! en
@@ -72,11 +81,10 @@ R1(config-if)#end
 R1#
 MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
 R1#conf t
-
 R1(config)#enable password cisco
-R1(config)#line vty 0 4 ! Virtual teletype with 0 to 4 connections
-R1(config-line)#password cisco
-R1(config-line)#end
+R1(config)#line vty 0 15 ! Virtual teletype with 0 to 15 connections
+R1(config-line)#username admin password cisco
+R1(config)#end
 MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
 R1#write memory ! wr / May have to use "copy running config to startup config" or "copy run start" on newer devices
 Building configuration...
@@ -121,6 +129,7 @@ Connection closed by foreign host.
 
 
 Note for Lab 3: Any issues, use vi to remove all reference to 192.168.1.1 in /home/wrsuser1/.ssh/known_hosts
+    Also, access the router from the terminal using "ssh admin@192.168.1.1"; password is "cisco"
 
 
 
