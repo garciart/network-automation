@@ -137,3 +137,136 @@ Thanks to
 David Bombal at https://www.youtube.com/playlist?list=PLhfrWIlLOoKPn7T9FtvbOWX8GxgsFFNwn
 Sudheer Vishwakarma at https://www.youtube.com/watch?v=nFIsisg3uvg&ab_channel=SudheerVishwakarma
 
+-------
+
+You can also create a user during installation, or later using the Terminal, to avoid using the root user:
+
+    [root@localhost ~]# adduser gns3user
+    [root@localhost ~]# passwd gns3user
+    Changing password for user gns3user.
+    New password: ************
+    Retype new password: ************
+    passwd: all authentication tokens updated successfully.
+    [root@localhost ~]# gpasswd -a gns3user wheel
+    Adding user gns3user to group wheel
+    [root@localhost ~]# su - gns3user
+    [gns3user@localhost ~]$
+
+You can also connect to the Internet during setup, or if you want to use the Terminal to connect using an existing WiFi access point, instead of an ethernet cable, use the Network Manager Text User Interface (nmtuui):
+
+    [gns3user@localhost ~]$ chkconfig NetworkManager on
+    Note: Forwarding request to 'systemctl enable NetworkManager.service'.
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-unit-files ===
+    Authentication is required to manage system services or unit files.
+    Authenticating as: gns3user
+    Password: ************ 
+    ==== AUTHENTICATION COMPLETE ===
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.reload-daemon ===
+    Authentication is required to reload the systemd state.
+    Authenticating as: gns3user
+    Password: ************
+    ==== AUTHENTICATION COMPLETE ===
+    [gns3user@localhost ~]$ service NetworkManager start
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+    Authentication is required to manage system services or units.
+    Authenticating as: gns3user
+    Password: ************
+    ==== AUTHENTICATION COMPLETE ===
+    [gns3user@localhost ~]$ nmtui
+
+The TUI should appear. Select "Activate a Connection" and find your AP. Enter your password; you should then be connected.
+
+![Using nmtui](images/centos03.png)
+
+----------
+
+![Using nmtui](images/centos04.png)
+
+
+Group: System Administration Tools
+ Group-Id: system-admin-tools
+ Description: Utilities useful in system administration.
+ Default Packages:
+    lsscsi
+ Optional Packages:
+   conman
+   crypto-utils
+   dump
+   expect
+   hardlink
+   mc
+   mgetty
+   pexpect
+   rdist
+   rear
+   rrdtool
+   screen
+   scrub
+   snapper
+   symlinks
+   system-storage-manager
+   tree
+   xdelta
+
+
+Group: Development Tools
+ Group-Id: development
+ Description: A basic development environment.
+ Mandatory Packages:
+    autoconf
+    automake
+    binutils
+    bison
+    flex
+    gcc
+    gcc-c++
+    gettext
+    libtool
+    make
+    patch
+    pkgconfig
+    redhat-rpm-config
+    rpm-build
+    rpm-sign
+ Default Packages:
+    byacc
+    cscope
+    ctags
+    diffstat
+    doxygen
+    elfutils
+    gcc-gfortran
+    git
+    indent
+    intltool
+    patchutils
+    rcs
+    subversion
+    swig
+    systemtap
+ Optional Packages:
+   ElectricFence
+   ant
+   babel
+   bzr
+   chrpath
+   cmake
+   compat-gcc-44
+   compat-gcc-44-c++
+   cvs
+   dejagnu
+   expect
+   gcc-gnat
+   gcc-objc
+   gcc-objc++
+   imake
+   javapackages-tools
+   ksc
+   mercurial
+   mod_dav_svn
+   nasm
+   perltidy
+   rpmdevtools
+   rpmlint
+   systemtap-sdt-devel
+   systemtap-server
