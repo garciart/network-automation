@@ -1,0 +1,41 @@
+On Linux-3.10.0-1160.6.1.el7.x86_64-x86_64-with-centos-7.9.2009-Core
+
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
+sudo yum -y update
+sudo reboot now
+sudo yum -y install python3 # Also installs python3-setuptools
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m ensurepip
+sudo yum -y install python3-devel
+sudo yum -y install python3-tools
+sudo yum -y install elfutils-libelf-devel
+sudo yum -y install libpcap-devel
+sudo yum -y install cmake
+sudo yum -y install glibc-static
+sudo yum -y install qemu # Not qemu-kvm / get from epel
+sudo yum -y install telnet
+sudo yum -y install putty # Get from epel
+sudo yum -y install qt5-qtbase
+sudo yum -y install qt5-qtbase-devel
+sudo yum -y install qt5-qtsvg
+sudo yum -y install qt5-qtsvg-devel
+sudo python3 -m pip install gns3-server
+sudo python3 -m pip install gns3-gui
+sudo python3 -m pip install sip
+sudo python3 -m pip install pyqt5
+
+cd /tmp
+git clone https://github.com/GNS3/dynamips.git
+cd dynamips
+mkdir build
+cd build/
+cmake .. -DDYNAMIPS_CODE=stable
+make
+sudo make install
+
+cd /tmp
+git clone https://github.com/GNS3/ubridge.git
+cd ubridge
+make
+sudo make install
+
