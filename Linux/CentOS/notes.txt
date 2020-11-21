@@ -12,7 +12,7 @@ Install bridge (may already be installed):
 
     sudo yum -y install bridge-utils
 
-Add a tap/loopback interface in Linux (see gns3_run.py script for latest and greatest)
+Add a tap/loopback interface in Linux (see gns3_run.sh script for latest and greatest)
 
 Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):
 wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
@@ -56,7 +56,7 @@ Method 1 (auto)
 Right click on the router -> Import config
 File to import? configs/il_startup-config.cfg -> OK
 Find and select R1_3745_il_startup-config.cfg -> Open
-Right click on the router -> Start
+Right click on the router -> Start (DO NOT RELOAD)
 Wait 60 seconds
 Go to "Ping the Router"
 
@@ -89,6 +89,11 @@ MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
 R1#write memory ! wr / May have to use "copy running config to startup config" or "copy run start" on newer devices
 Building configuration...
 [OK]
+
+
+
+PING ROUTER
+
 R1#show ip int f0/0 ! Optional; just checking that everything went through
 FastEthernet0/0 is up, line protocol is up
   Internet address is 192.168.1.1
