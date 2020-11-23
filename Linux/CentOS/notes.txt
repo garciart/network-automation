@@ -7,6 +7,8 @@ Install CentOS and GNS3
 Install xterm if needed (can use PuTTY instead):
 
     sudo yum -y install xterm
+    vi ~/.Xresources # Add  "xterm*faceName: Monospace" and "xterm*faceSize: 12"
+    sudo xrdb -merge ~/.Xresources
 
 Install bridge (may already be installed):
 
