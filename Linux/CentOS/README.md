@@ -18,7 +18,7 @@ As we just said, we'll be using CentOS Linux 7 in VirtualBox for this demo, but 
 
 ----------
 
-![Setting RAM size during VB setup...](images/centos01.png "Setting RAM size during VB setup...")
+![Setting RAM size during VB setup...](Linux/CentOS/images/centos01.png "Setting RAM size during VB setup...")
 ![Setting RAM size after VB setup...](images/centos01a.png "Setting RAM size after VB setup...")
 
 ----------
