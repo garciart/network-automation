@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# Research using ip or ifconfig, but not both
 echo -e "Setting up GNS3..."
 # Get and save the original IP address that can connect to the Internet (should be enp0s3 or eth0)
 org_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
@@ -42,7 +43,7 @@ sudo ifconfig $org_interface $org_ip up
 sudo ifconfig $org_interface netmask $org_netmask
 sudo ifconfig $org_interface broadcast $org_broadcast
 # sudo /etc/init.d/network restart
-sudo systemctl restart network
+sudo systemctl restart network # Check your OS; may use service networking restart 
 sleep 30
 sudo systemctl status network
 ifconfig # Verify the result
