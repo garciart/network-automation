@@ -1,0 +1,279 @@
+Network: 192.168.1.0/24 255.255.255.0 (256 available IPs)
+Router: 192.168.1.1
+Cloud: 192.168.1.99
+
+Install CentOS and GNS3
+
+Install xterm if needed (can use PuTTY instead):
+
+    sudo yum -y install xterm
+    vi ~/.Xresources # Add  "xterm*faceName: Monospace" and "xterm*faceSize: 12"
+    sudo xrdb -merge ~/.Xresources
+
+Install bridge (may already be installed):
+
+    sudo yum -y install bridge-utils
+
+Add a tap/loopback interface in Linux (see gns3_run.sh script for latest and greatest)
+
+Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):
+wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
+
+More C3745 info:
+md5sum c3745-adventerprisek9-mz.124-25d.bin
+563797308a3036337c3dee9b4ab54649  c3745-adventerprisek9-mz.124-25d.bin
+
+Filename:c3745-adventerprisek9-mz.124-25d.bin
+File size:38,986,688 Bytes
+Checksum type:MD5 SHA1 SHA-256
+File checksum:563797308A3036337C3DEE9B4AB54649
+
+C3745#
+The c3745 has 2 FastEthernet interfaces on its motherboard (GT96100-FE), 3 subslots for WICs (maximum of 6 serial ports) and 4 Network Module slots (maximum of 32 FastEthernet ports or 16 serial ports).
+
+IOS version 12.4.25d (Mainline)#
+File name: c3745-adventerprisek9-mz.124-25d.bin MD5: 563797308a3036337c3dee9b4ab54649 Minimum RAM: 256MB Proposed idle-PC value: 0x60aa1da0
+
+You can also use:
+http://tfr.org/cisco-ios/37xx/3725/c3725-adventerprisek9-mz.124-15.T14.bin
+http://tfr.org/cisco-ios/catalysts/cat3750/c3750-ipbasek9-mz.122-25.SEE2.bin
+
+Need to research:
+http://www.gns3.xyz/files/Downloads/
+https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/
+
+Start GNS3 (need to explain)
+Add the router to the templates (need to explain: https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/#using-a-c3725-as-an-etherswitch-router)
+Don't forget to set PCMCIA disk0: 1 MiB
+Use FastEthernet0/0 or FastEthernet0/1 (they are routed ports, not switchports)
+
+
+Add a cloud -> Configure -> Tap Interfaces -> tap0
+Add a router (Cisco 3745 124-25d)
+Connect cloud (tap0) to router (FastEthernet0/0)
+
+
+Configure the router:
+Method 1 (auto)
+Right click on the router -> Import config
+File to import? configs/il_startup-config.cfg -> OK
+Find and select R1_3745_il_startup-config.cfg -> Open
+Right click on the router -> Start (DO NOT RELOAD)
+Wait 60 seconds
+Go to "Ping the Router"
+
+Method 2 (manual)
+Start the router node, right click and open a console:
+
+Router>enable ! en
+Router#show ip interface ! Should not be empty
+Router#show ip interface FastEthernet0/0 ! show ip int f0/0
+FastEthernet0/0 is administratively down, line protocol is down
+  Internet protocol processing disabled
+Router#configure terminal ! conf t
+Enter configuration commands, one per line. End with CNTL/Z.
+Router(config)#hostname R1 ! May already be named R1
+R1(config)#interface FastEthernet0/0 ! int f0/0
+R1(config-if)#ip address 192.168.1.1 255.255.255.0
+R1(config-if)#no shutdown ! no shut
+R1(config-if)#
+MMM DD HH:MM:SSS.SSS: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up 
+MMM DD HH:MM:SSS.SSS: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+R1(config-if)#end
+R1#
+MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
+R1#conf t
+R1(config)#enable password cisco
+R1(config)#line vty 0 15 ! Virtual teletype with 0 to 15 connections
+R1(config-line)#username admin password cisco
+R1(config)#end
+MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
+R1#write memory ! wr / May have to use "copy running config to startup config" or "copy run start" on newer devices
+Building configuration...
+[OK]
+
+
+
+PING ROUTER
+
+R1#show ip int f0/0 ! Optional; just checking that everything went through
+FastEthernet0/0 is up, line protocol is up
+  Internet address is 192.168.1.1
+  ...
+  WCCP Redirect exclude is disabled
+R1#ping 192.168.1.99 ! Ping host from GNS3 router
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.99, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 8/10/12 ms
+R1#exit
+
+Close the console and open a terminal. Attempt to ping the router...
+
+$ ping -c 4 192.168.1.1 # Ping GNS3 router from Terminal
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=255 time=2.05 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=255 time=5.16 ms
+64 bytes from 192.168.1.1: icmp_seq=3 ttl=255 time=10.7 ms
+64 bytes from 192.168.1.1: icmp_seq=4 ttl=255 time=5.30 ms
+
+--- 192.168.1.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3006ms
+rtt min/avg/max/mdev = 2.050/5.830/10.797/3.150 ms
+
+Next, telnet into the router:
+$ telnet 192.168.1.1
+Trying 192.168.1.1
+Escape character is '^]'.
+
+
+User Access Verification
+
+Password: (enter "cisco")
+R1> (enter "exit" to quit)
+Connection closed by foreign host.
+
+
+Note for Lab 3: Any issues, use vi to remove all reference to 192.168.1.1 in /home/wrsuser1/.ssh/known_hosts
+    Also, access the router from the terminal using "ssh admin@192.168.1.1"; password is "cisco"
+
+
+
+Thanks to 
+David Bombal at https://www.youtube.com/playlist?list=PLhfrWIlLOoKPn7T9FtvbOWX8GxgsFFNwn
+Sudheer Vishwakarma at https://www.youtube.com/watch?v=nFIsisg3uvg&ab_channel=SudheerVishwakarma
+
+-------
+
+You can also create a user during installation, or later using the Terminal, to avoid using the root user:
+
+    [root@localhost ~]# adduser gns3user
+    [root@localhost ~]# passwd gns3user
+    Changing password for user gns3user.
+    New password: ************
+    Retype new password: ************
+    passwd: all authentication tokens updated successfully.
+    [root@localhost ~]# gpasswd -a gns3user wheel
+    Adding user gns3user to group wheel
+    [root@localhost ~]# su - gns3user
+    [gns3user@localhost ~]$
+
+You can also connect to the Internet during setup, or if you want to use the Terminal to connect using an existing WiFi access point, instead of an ethernet cable, use the Network Manager Text User Interface (nmtuui):
+
+    [gns3user@localhost ~]$ chkconfig NetworkManager on
+    Note: Forwarding request to 'systemctl enable NetworkManager.service'.
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-unit-files ===
+    Authentication is required to manage system services or unit files.
+    Authenticating as: gns3user
+    Password: ************ 
+    ==== AUTHENTICATION COMPLETE ===
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.reload-daemon ===
+    Authentication is required to reload the systemd state.
+    Authenticating as: gns3user
+    Password: ************
+    ==== AUTHENTICATION COMPLETE ===
+    [gns3user@localhost ~]$ service NetworkManager start
+    ==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+    Authentication is required to manage system services or units.
+    Authenticating as: gns3user
+    Password: ************
+    ==== AUTHENTICATION COMPLETE ===
+    [gns3user@localhost ~]$ nmtui
+
+The TUI should appear. Select "Activate a Connection" and find your AP. Enter your password; you should then be connected.
+
+![Using nmtui](images/centos03.png)
+
+----------
+
+![Using nmtui](images/centos04.png)
+
+
+Group: System Administration Tools
+ Group-Id: system-admin-tools
+ Description: Utilities useful in system administration.
+ Default Packages:
+    lsscsi
+ Optional Packages:
+   conman
+   crypto-utils
+   dump
+   expect
+   hardlink
+   mc
+   mgetty
+   pexpect
+   rdist
+   rear
+   rrdtool
+   screen
+   scrub
+   snapper
+   symlinks
+   system-storage-manager
+   tree
+   xdelta
+
+
+Group: Development Tools
+ Group-Id: development
+ Description: A basic development environment.
+ Mandatory Packages:
+    autoconf
+    automake
+    binutils
+    bison
+    flex
+    gcc
+    gcc-c++
+    gettext
+    libtool
+    make
+    patch
+    pkgconfig
+    redhat-rpm-config
+    rpm-build
+    rpm-sign
+ Default Packages:
+    byacc
+    cscope
+    ctags
+    diffstat
+    doxygen
+    elfutils
+    gcc-gfortran
+    git
+    indent
+    intltool
+    patchutils
+    rcs
+    subversion
+    swig
+    systemtap
+ Optional Packages:
+   ElectricFence
+   ant
+   babel
+   bzr
+   chrpath
+   cmake
+   compat-gcc-44
+   compat-gcc-44-c++
+   cvs
+   dejagnu
+   expect
+   gcc-gnat
+   gcc-objc
+   gcc-objc++
+   imake
+   javapackages-tools
+   ksc
+   mercurial
+   mod_dav_svn
+   nasm
+   perltidy
+   rpmdevtools
+   rpmlint
+   systemtap-sdt-devel
+   systemtap-server
