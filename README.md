@@ -8,7 +8,17 @@
 
 ## Introduction
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Recently, for personal and professional reasons (CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device, you must connect to them physically, via a serial or Ethernet cable, access their command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+
+This is fine if you have one switch or router, but if you have dozens or hundreds, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device; upload a configuration; reboot the device; and then test the device to ensure it is properly configured? The answer is you can write such a script, especially in Python, using modules such as subprocess and pexpect.
+
+The bad news is that to test the program, you still need a physical device. You just can't download an Internetwork Operating System (IOS) image and interact with it using a hypervisor like VirtualBox. However, there are some great tools, like the Graphical Network Simulator-3 (GNS3), which can virtualize IOS images, and, with a little tweaking, can let you test your application.
+
+This tutorial is broken down into three parts:
+
+- Installing GNS3
+- Connecting the host to the simulated device
+- Labs to interact with the device
 
 ## Setup
 
