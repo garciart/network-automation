@@ -14,12 +14,12 @@ sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
 sudo yum -y install glibc-static # For VCPS
-sudo yum -y install telnet
+sudo yum -y install telnet # Yes, we will use Telnet
 sudo yum -y install qt5-qtbase
 sudo yum -y install qt5-qtbase-devel
 sudo yum -y install qt5-qtsvg
 sudo yum -y install qt5-qtsvg-devel
-sudo yum -y install xterm # Console used by GNS
+sudo yum -y install xterm # One of the consoles used by GNS
 # Install GNS3
 sudo python3 -m pip install gns3-server
 sudo python3 -m pip install gns3-gui
