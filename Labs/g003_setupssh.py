@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Script 3: Telnet into the device and set up SSH.
 Make sure GNS3 is running first (gns3_run.sh)
