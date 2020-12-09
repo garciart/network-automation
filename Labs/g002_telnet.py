@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Script 2: Telnet into the device and ping the host.
 Make sure GNS3 is running first (gns3_run.sh)

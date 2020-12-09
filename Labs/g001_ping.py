@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 Script 1: Ping the device from the host.
 Make sure GNS3 is running first (gns3_run.sh)
