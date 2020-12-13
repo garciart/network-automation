@@ -20,12 +20,14 @@ sudo yum -y install qt5-qtbase-devel
 sudo yum -y install qt5-qtsvg
 sudo yum -y install qt5-qtsvg-devel
 sudo yum -y install xterm # One of the consoles used by GNS
+echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
+sudo xrdb -merge ~/.Xresources
 # Install GNS3
 sudo python3 -m pip install gns3-server
 sudo python3 -m pip install gns3-gui
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
 sudo yum -y install qemu # Not qemu-kvm / get from epel
 # Install the Dynamips Cisco Emulator
@@ -52,11 +54,13 @@ make
 sudo make install
 # Get router image and configuration file
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
-wget -P ~/Documents https://raw.githubusercontent.com/garciart/Automation/master/Linux/GNS3/R1_3745_i1_startup-config.cfg
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/catalysts/cat3750e/c3750e-universalk9-mz.122-44.SE1.bin
+wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/Linux/GNS3/R1_3745_i1_startup-config.cfg
 # Used to create Tap interface between host and GNS3
 sudo yum -y install bridge-utils
 # Create a tap/loopback interface in Linux using the gns3_run.sh script
 wget -P ~/Documents https://raw.githubusercontent.com/garciart/Automation/master/Linux/CentOS/gns3_run.sh
 chmod +x gns3_run.sh
+echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 echo -e "Setup complete. Rebooting now..."
 sudo reboot now

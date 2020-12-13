@@ -36,7 +36,7 @@ However, GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (R
 
 2. Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
-We used Centos 7 for the labs and demos in this repository. While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos.sh "CentOS Setup Script").
+We used Centos 7 for the labs and demos in this repository. While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos.sh "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos.sh "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
 
 ### Windows
 
@@ -45,3 +45,32 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 -----
 
 ## Setting up the environment
+
+In order to use 
+
+For our devices, we will use the following addresses:
+
+- Router IP Address: 192.168.1.1
+- Cloud/Host IP Address: 192.168.1.99
+
+Here's the subnet info for the network, courtesy of [Calculator.net](https://www.calculator.net/ip-subnet-calculator.html "IP Subnet Calculator"):
+
+- IP Address: 192.168.1.1
+- Network Address: 192.168.1.0
+- Usable Host IP Range: 192.168.1.1 - 192.168.1.254
+- Broadcast Address: 192.168.1.255
+- Total Number of Hosts: 256
+- Number of Usable Hosts: 254
+- Subnet Mask: 255.255.255.0
+- Wildcard Mask: 0.0.0.255
+- Binary Subnet Mask: 11111111.11111111.11111111.00000000
+- IP Class: C
+- CIDR Notation: /24
+- IP Type: Private
+- Short: 192.168.1.1 /24
+- Binary ID: 11000000101010000000000100000001
+- Integer ID: 3232235777
+- Hex ID: 0xc0a80101
+- in-addr.arpa: 1.1.168.192.in-addr.arpa
+- IPv4 Mapped Address: ::ffff:c0a8.0101
+- 6to4 Prefix: 2002:c0a8.0101::/48
