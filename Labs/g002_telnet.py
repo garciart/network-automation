@@ -16,8 +16,8 @@ def main():
     print("Script 2: Telnet login test...")
     try:
         # Initialize default values
-        device_ip = "192.168.1.1"
-        cloud_ip = "192.168.1.99"
+        cloud_ip = "192.168.1.1"
+        device_ip = "192.168.1.10"
         telnet_pw = "cisco"
         device_pw = "cisco"
 

@@ -14,7 +14,7 @@ def main():
     """Function to ping the device from the host."""
     try:
         print("Script 1: Ping test...")
-        address = "192.168.1.1"
+        address = "192.168.1.10"
         result = subprocess.call(["ping", "-c", "4", address])
         if result == 0:
             print("Ping successful: Received a reply from %s." % (address))
