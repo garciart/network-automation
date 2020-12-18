@@ -46,18 +46,15 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 
 ## Setting up the environment
 
-In order to use 
-
-For our devices, we will use the following addresses:
-
-- Router IP Address: 192.168.1.1
-- Cloud/Host IP Address: 192.168.1.99
+In order for your code to interact with the switch, you will need to connect your host computer with the virtual device in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
 
 Here's the subnet info for the network, courtesy of [Calculator.net](https://www.calculator.net/ip-subnet-calculator.html "IP Subnet Calculator"):
 
-- IP Address: 192.168.1.1
-- Network Address: 192.168.1.0
+- Network Address: 192.168.1.0/24
 - Usable Host IP Range: 192.168.1.1 - 192.168.1.254
+- Cloud/Host IP Address: 192.168.1.1/32
+- Device IP Addresses: 192.168.1.10 - 192.168.1.20
+- Gateway: 192.168.1.254
 - Broadcast Address: 192.168.1.255
 - Total Number of Hosts: 256
 - Number of Usable Hosts: 254

@@ -14,9 +14,9 @@ import telnetlib
 
 
 # Initialize default values
-device_ip = "192.168.1.1"
+cloud_ip = "192.168.1.1"
+device_ip = "192.168.1.10"
 device_netmask = "255.255.255.0"
-cloud_ip = "192.168.1.99"
 telnet_pw = "cisco"
 device_pw = "cisco"
 
