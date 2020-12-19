@@ -48,26 +48,24 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 
 In order for your code to interact with the switch, you will need to connect your host computer with the virtual device in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
 
-Here's the subnet info for the network, courtesy of [Calculator.net](https://www.calculator.net/ip-subnet-calculator.html "IP Subnet Calculator"):
+Here's the subnet info for the network:
 
 - Network Address: 192.168.1.0/24
-- Usable Host IP Range: 192.168.1.1 - 192.168.1.254
-- Cloud/Host IP Address: 192.168.1.1/32
-- Device IP Addresses: 192.168.1.10 - 192.168.1.20
-- Gateway: 192.168.1.254
-- Broadcast Address: 192.168.1.255
+- Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
 - Total Number of Hosts: 256
 - Number of Usable Hosts: 254
-- Subnet Mask: 255.255.255.0
+- Usable IP Range: 192.168.1.1 - 192.168.1.254
+- GNS3 Host Device IP Address: 192.168.1.1/32
+- First Virtual Device IP Address: 192.168.1.10/32
+- Gateway: 192.168.1.254
+- Broadcast Address: 192.168.1.255
 - Wildcard Mask: 0.0.0.255
 - Binary Subnet Mask: 11111111.11111111.11111111.00000000
-- IP Class: C
+- IP Class and Type: C (Private)
 - CIDR Notation: /24
-- IP Type: Private
-- Short: 192.168.1.1 /24
-- Binary ID: 11000000101010000000000100000001
-- Integer ID: 3232235777
-- Hex ID: 0xc0a80101
+- Binary TCP/IP Address: 11000000101010000000000100000001
+- Decimal TCP/IP Address: 3232235777
+- Hexadecimal TCP/IP Address: 0xc0a80101
 - in-addr.arpa: 1.1.168.192.in-addr.arpa
 - IPv4 Mapped Address: ::ffff:c0a8.0101
 - 6to4 Prefix: 2002:c0a8.0101::/48
