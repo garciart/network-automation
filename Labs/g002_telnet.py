@@ -23,6 +23,7 @@ def main():
 
         # Attempt to connect to device on port 23 and time out after 30 seconds
         tn_conn = telnetlib.Telnet(device_ip, 23, 30)
+        # Manual note: [Return] to reach the router prompt
         print(tn_conn.read_until("Password: ", 30))
         # OPTIONAL: Ask for a password
         # telnet_pw = getpass.getpass()
@@ -39,6 +40,7 @@ def main():
         print(tn_conn.read_until(" ms", 30))
         tn_conn.write("exit\n")
         print(tn_conn.read_all())
+        # Manual note: Press [CTRL] + []] to reach the Telnet prompt, then input [q] to exit Telnet
         print("Script complete. have a nice day.")
     except BaseException as ex:
         print("Oops! Something went wrong:", ex)

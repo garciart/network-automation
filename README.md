@@ -48,15 +48,15 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 
 In order for your code to interact with the switch, you will need to connect your host computer with the virtual device in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
 
-Here's the subnet info for the network:
+Before we start, here's the subnet info for the network:
 
-- Network Address: 192.168.1.0/24
-- Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
+- **Network Address: 192.168.1.0/24**
+- **Subnet Mask: 255.255.255.0 (ff:ff:ff:00)**
 - Total Number of Hosts: 256
 - Number of Usable Hosts: 254
 - Usable IP Range: 192.168.1.1 - 192.168.1.254
-- GNS3 Host Device IP Address: 192.168.1.1/32
-- First Virtual Device IP Address: 192.168.1.10/32
+- **GNS3 Host Device IP Address: 192.168.1.1/32**
+- **First Virtual Device IP Address: 192.168.1.10/32**
 - Gateway: 192.168.1.254
 - Broadcast Address: 192.168.1.255
 - Wildcard Mask: 0.0.0.255
@@ -69,3 +69,7 @@ Here's the subnet info for the network:
 - in-addr.arpa: 1.1.168.192.in-addr.arpa
 - IPv4 Mapped Address: ::ffff:c0a8.0101
 - 6to4 Prefix: 2002:c0a8.0101::/48
+
+### Linux
+
+In gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices.
