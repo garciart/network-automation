@@ -29,6 +29,7 @@ sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
+# QEMU: type 2 hypervisor that runs in user space / KVM (e.g., QEMU-KVM): Type 1 hypervisor that runs in kernel space
 sudo yum -y install qemu # Not qemu-kvm / get from epel
 # Install the Dynamips Cisco Emulator
 cd /tmp
@@ -58,9 +59,10 @@ wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/catalysts/cat3750e/c3750e-uni
 wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/Linux/GNS3/R1_3745_i1_startup-config.cfg
 # Used to create Tap interface between host and GNS3
 sudo yum -y install bridge-utils
-# Create a tap/loopback interface in Linux using the gns3_run.sh script
+# Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P ~/Documents https://raw.githubusercontent.com/garciart/Automation/master/Linux/CentOS/gns3_run.sh
 chmod +x gns3_run.sh
+# Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 echo -e "Setup complete. Rebooting now..."
 sudo reboot now

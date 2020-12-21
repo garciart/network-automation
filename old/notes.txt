@@ -1,8 +1,3 @@
-Network: 192.168.1.0/24 255.255.255.0 (256 available IPs)
-Cloud: 192.168.1.1
-Router: 192.168.1.10
-
-
 Install CentOS and GNS3
 
 Install xterm if needed (can use PuTTY instead):
