@@ -1,11 +1,5 @@
 # Adventures in Network Automation
 
-## *Add*
-
-- *WINDOWS_SETUP.md - Explain how to setup a loopback interface in Windows*
-- *LINUX_SETUP.md - Explains how to setup a TAP interface in Linux*
-- *CENTOS_INSTALL.md - Explain how to install GNS3 on Red Hat Enterprise Linux 7 (Maipo)/CentOS 7*
-
 ## Introduction
 
 Recently, for personal and professional reasons (CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access its command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
@@ -72,4 +66,4 @@ Before we start, here's the subnet info for the network:
 
 ### Linux
 
-In gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices.
+On lines 63 and 64 in gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices.

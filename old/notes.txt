@@ -1,15 +1,5 @@
 Install CentOS and GNS3
 
-Install xterm if needed (can use PuTTY instead):
-
-    sudo yum -y install xterm
-    vi ~/.Xresources # Add  "xterm*faceName: Monospace" and "xterm*faceSize: 12"
-    sudo xrdb -merge ~/.Xresources
-
-Install bridge (may already be installed):
-
-    sudo yum -y install bridge-utils
-
 Add a tap/loopback interface in Linux (see gns3_run.sh script for latest and greatest)
 
 Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):

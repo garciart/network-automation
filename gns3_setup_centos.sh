@@ -4,22 +4,25 @@ echo -e "Using:"
 cat /etc/centos-release
 echo -e "Updating CentOS"
 sudo yum -y update
-# Install GNS3 dependencies
+# Install Python 3 and pip
 sudo yum -y install python3 # Also installs python3-setuptools
 sudo python3 -m pip install --upgrade pip
 sudo python3 -m ensurepip
 sudo yum -y install python3-devel
 sudo yum -y install python3-tools
+# Install GNS3 dependencies
 sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
 sudo yum -y install glibc-static # For VCPS
 sudo yum -y install telnet # Yes, we will use Telnet
+# Install Qt GUI library
 sudo yum -y install qt5-qtbase
 sudo yum -y install qt5-qtbase-devel
 sudo yum -y install qt5-qtsvg
 sudo yum -y install qt5-qtsvg-devel
-sudo yum -y install xterm # One of the consoles used by GNS
+# Install xterm, one of the consoles used by GNS, and resize its output
+sudo yum -y install xterm
 echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
 sudo xrdb -merge ~/.Xresources
 # Install GNS3
@@ -30,7 +33,7 @@ sudo python3 -m pip install pyqt5
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
 # QEMU: type 2 hypervisor that runs in user space / KVM (e.g., QEMU-KVM): Type 1 hypervisor that runs in kernel space
-sudo yum -y install qemu # Not qemu-kvm / get from epel
+sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
 # Install the Dynamips Cisco Emulator
 cd /tmp
 git clone https://github.com/GNS3/dynamips.git
@@ -61,6 +64,7 @@ wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/mas
 sudo yum -y install bridge-utils
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P ~/Documents https://raw.githubusercontent.com/garciart/Automation/master/Linux/CentOS/gns3_run.sh
+# Make the script executable
 chmod +x gns3_run.sh
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
