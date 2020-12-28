@@ -1,5 +1,9 @@
 # Adventures in Network Automation
 
+***Disclaimer: Many experts (and the creators of GNS3 themselves) no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to automating network device configuration using Python, we will use the freely-available Dynamips images.***
+
+***In addition, Cisco Packet Tracer, while an excellent tool, is not suitable for our purposes, since it cannot interact with its host or integrated development environments (IDEs).***
+
 ## Introduction
 
 Recently, for personal and professional reasons (CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access its command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
@@ -40,7 +44,7 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 
 ## Setting up the environment
 
-In order for your code to interact with the switch, you will need to connect your host computer with the virtual device in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
+In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
 
 Before we start, here's the subnet info for the network:
 
@@ -66,4 +70,9 @@ Before we start, here's the subnet info for the network:
 
 ### Linux
 
-On lines 63 and 64 in gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices.
+On lines 63 and 64 in gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
+
+Open the gns3_run.sh file. This script does the following:
+
+1. Identifies the Ethernet interface and its IP address (if assigned).
+2. Creates the 
