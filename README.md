@@ -44,7 +44,7 @@ Installing GNS3 on windows is also relatively simple; check out [https://docs.gn
 
 ## Setting up the environment
 
-In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do this in Windows, you will need to create a Loopback interface. To do this in Linux, you will need to create a TUN/TAP interface.
+In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Windows, you will need to create a Loopback interface. To do so in Linux, you will need to create a TUN/TAP interface.
 
 Before we start, here's the subnet info for the network:
 
@@ -75,4 +75,10 @@ On lines 63 and 64 in gns3_setup_centos.sh, you installed bridge-utils, a utilit
 Open the gns3_run.sh file. This script does the following:
 
 1. Identifies the Ethernet interface and its IP address (if assigned).
-2. Creates the 
+2. Creates a network TAP interface: GNS3 devices will connect to this interface. By the way, ```ethtool -i tap0``` and ```ip link show type tap``` will both report the tap (Layer 2) is a tun (Layer 3), but ```ip tuntap show``` will report the interface correctly as a tap. Check out [Paul Gorman's Linux Bridges and Virtual Networking](https://paulgorman.org/technical/linux-bridges-and-virtual-networking.txt.html "Paul Gorman's Linux Bridges and Virtual Networking") for more details.
+3. Creates a network bridge that connects the host machine to the tap interface.
+4. Starts GNS3.
+
+>**NOTE** - You will not be able to connect to the Internet through your Ethernet interface until you exit GNS3
+
+When you exit GNS3, the script will close the bridge and tap, and reset the network, which will allow you to econnect to the Internet, etc.
