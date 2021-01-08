@@ -100,10 +100,5 @@ def log_message(msg, level=logging.INFO):
 
 
 if __name__ == "__main__":
-    """
-    try:
-        raise RuntimeError("What?")
-    except RuntimeError:
-        log_error(sys.exc_info())
-    log_message("Hello, world!")
-    """
+    log_message("Script {0} cannot be run independently from this application.".format(sys.argv[0]))
+    raise RuntimeError("Script {0} cannot be run independently from this application.".format(sys.argv[0]))
