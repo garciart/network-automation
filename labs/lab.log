@@ -1,0 +1,10 @@
+2021-01-06 03:24:28,220UTC: ERROR:root:(<type 'exceptions.RuntimeError'>, RuntimeError('What?',), <traceback object at 0x00000000035F6788>)
+2021-01-06 03:24:28,221UTC: INFO:root:Hello, world!
+2021-01-06 03:25:43,901UTC: INFO:root:What's up?
+2021-01-07 01:05:46,673UTC: DEBUG:root:Hello, world!
+2021-01-07 01:07:59,378UTC: DEBUG:root:Hello, world!
+2021-01-07 01:10:24,746UTC: ERROR:root:Type RuntimeError: What? in c:\Users\Rob\source\repos\Automation\Labs\lab_utils.py at line 104.
+2021-01-07 01:10:24,747UTC: DEBUG:root:Hello, world!
+2021-01-07 01:11:21,882UTC: DEBUG:root:Hello, world!
+2021-01-07 01:15:52,240UTC: ERROR:root:Type RuntimeError: What? in c:\Users\Rob\source\repos\Automation\Labs\lab_utils.py at line 104.
+2021-01-07 01:15:52,242UTC: DEBUG:root:Hello, world!
