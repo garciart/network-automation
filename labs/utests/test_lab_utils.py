@@ -10,7 +10,7 @@ Requirements:
 import sys
 import unittest
 
-import labs.lab_utils as ut
+import labs.lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
         """A NULL log message should return FAIL.
         """
         arg = None
-        result = ut.log_message(arg)
+        result = lu.log_message(arg)
         self.assertEqual(result, self.FAIL)
 
 

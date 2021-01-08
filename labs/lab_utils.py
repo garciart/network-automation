@@ -1,4 +1,3 @@
-#!python
 # -*- coding: utf-8 -*-
 """Static utility functions and variables to support labs.
 

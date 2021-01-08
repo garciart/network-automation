@@ -27,22 +27,22 @@ def main():
         print(tn_conn.read_until("Password: ", 30))
         # OPTIONAL: Ask for a password
         # telnet_pw = getpass.getpass()
-        tn_conn.write("%s\n" % telnet_pw)
+        tn_conn.write("{0}\n".format(telnet_pw))
         print(tn_conn.read_until("R1>", 30))
         tn_conn.write("enable\n")
         print(tn_conn.read_until("Password: ", 30))
         # device_pw = getpass.getpass()
-        tn_conn.write("%s\n" % device_pw)
+        tn_conn.write("{0}\n".format(device_pw))
         print(tn_conn.read_until("R1#", 30))
 
         # Ping the host from the device to test the connection
-        tn_conn.write("ping %s\n" % cloud_ip)
+        tn_conn.write("ping {0}\n".format(cloud_ip))
         print(tn_conn.read_until(" ms", 30))
         tn_conn.write("exit\n")
         print(tn_conn.read_all())
         # Manual note: Press [CTRL] + []] to reach the Telnet prompt, then input [q] to exit Telnet
         print("Script complete. have a nice day.")
-    except BaseException as ex:
+    except RuntimeError as ex:
         print("Oops! Something went wrong:", ex)
 
 
