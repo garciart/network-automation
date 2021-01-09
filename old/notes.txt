@@ -2,6 +2,9 @@ Install CentOS and GNS3
 
 Add a tap/loopback interface in Linux (see gns3_run.sh script for latest and greatest)
 
+IMPORTANT! Setup GNS3 server (see gns3_setup.png)
+File -> Preferences -> Server -> Host binding: -> 192.168.1.1
+
 Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):
 wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
 
