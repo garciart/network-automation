@@ -14,14 +14,14 @@ import time
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
-__copyright__ = "Copyright 2019-2020, Rob Garcia"
+__copyright__ = "Copyright 2020-2021, Rob Garcia"
 __email__ = "rgarcia@rgprogramming.com"
 __license__ = "MIT"
 
 # Enable error and exception logging
 logging.Formatter.converter = time.gmtime
 logging.basicConfig(level=logging.NOTSET,
-                    filename="Labs/lab.log",
+                    filename="labs.log",
                     format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
 # Set to True during development and to False during production
@@ -59,7 +59,7 @@ def log_error(exc_info, level=logging.ERROR):
                                                              e_traceback.tb_frame.f_code.co_filename,
                                                              e_traceback.tb_lineno)
             if DISPLAY_ERRORS:
-                print("Oops! Something went wrong:", msg)
+                print("Houston, we've had a problem:", msg)
 
             if level == logging.WARNING:
                 logging.warning(msg)
@@ -69,7 +69,7 @@ def log_error(exc_info, level=logging.ERROR):
                 logging.error(msg)
             rval = SUCCESS
         except RuntimeError as ex:
-            print("Something went wrong again!", ex)
+            print("We are venting something out into space.", ex)
             rval = ERROR
     return rval
 

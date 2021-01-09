@@ -1,19 +1,35 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-Script 2: Telnet into the device and ping the host.
+"""Lab 2: Telnet into the device and ping the host.
 Make sure GNS3 is running first (gns3_run.sh)
 
-Using Python 2.7.5
+Project: Automation
+
+Requirements:
+- Python 2.7.5
 """
 from __future__ import print_function
+
+# Module metadata dunders
+__author__ = "Rob Garcia"
+__copyright__ = "Copyright 2020-2021, Rob Garcia"
+__email__ = "rgarcia@rgprogramming.com"
+__license__ = "MIT"
+
 # import getpass
+import sys
 import telnetlib
+
+import lab_utils as lu
 
 
 def main():
-    """Function to telnet into the device and ping the host."""
-    print("Script 2: Telnet login test...")
+    """Function to telnet into the device and ping the host.
+
+    :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
+    :rtype: int
+    """
+    rval = lu.FAIL
     try:
         # Initialize default values
         cloud_ip = "192.168.1.1"
@@ -41,10 +57,14 @@ def main():
         tn_conn.write("exit\n")
         print(tn_conn.read_all())
         # Manual note: Press [CTRL] + []] to reach the Telnet prompt, then input [q] to exit Telnet
-        print("Script complete. have a nice day.")
-    except RuntimeError as ex:
-        print("Oops! Something went wrong:", ex)
+        rval = lu.SUCCESS
+        print("Lab complete. Have a nice day.")
+    except RuntimeError:
+        lu.log_error(sys.exc_info())
+        rval = lu.ERROR
+    return rval
 
 
 if __name__ == "__main__":
+    print("Lab 2: Telnet into device...")
     main()
