@@ -25,3 +25,7 @@ M
 old/notes.txt,6/2/6247b288ec3cc984bb46027cfb8262f0c91d0bf5
 ;
 gns3_run.sh,e/f/ef78cf2e48177062f5d2ffba916ef71befb23921
+D
+gns3_setup_centos.sh,4/5/45cf685a2f12d9b231204d521bf7c320a36bec11
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d

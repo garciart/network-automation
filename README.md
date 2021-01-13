@@ -14,9 +14,9 @@ The bad news is that to test the program, you will still need a physical device.
 
 This tutorial is broken down into three parts:
 
-- Installing GNS3
-- Setting up the environment
-- Overview of the Labs
+- [Installing GNS3](#installing-gns3 "Installing GNS3")
+- [Setting up the environment](#setting-up-the-environment "Setting up the environment")
+- [Running the Labs](#running-the-labs "Running the Labs")
 
 Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup:).
 
@@ -70,9 +70,9 @@ Before we start, here's the subnet info for the network:
 
 ### Linux
 
-On lines 63 and 64 in gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
+In gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
 
-Open the gns3_run.sh file. This script does the following:
+The gns3_run.sh script sets up your environment, runs GNS3, and resets your environment when you exit GNS3. Please open the gns3_run.sh file and examine it. This script does the following:
 
 1. Identifies the Ethernet interface and its IP address (if assigned).
 2. Creates a network TAP interface: GNS3 devices will connect to this interface. By the way, ```ethtool -i tap0``` and ```ip link show type tap``` will both report the tap (Layer 2) is a tun (Layer 3), but ```ip tuntap show``` will report the interface correctly as a tap. Check out [Paul Gorman's Linux Bridges and Virtual Networking](https://paulgorman.org/technical/linux-bridges-and-virtual-networking.txt.html "Paul Gorman's Linux Bridges and Virtual Networking") for more details.
@@ -82,3 +82,69 @@ Open the gns3_run.sh file. This script does the following:
 >**NOTE** - You will not be able to connect to the Internet through your Ethernet interface until you exit GNS3
 
 When you exit GNS3, the script will close the bridge and tap, and reset the network, which will allow you to econnect to the Internet, etc.
+
+### Windows
+
+(Info on how to create a loopback interface)
+
+## Running the Labs
+
+Start GNS3 by either running ```sudo ./gns3_run.sh``` in Linux or clicking the GNS3 icon in Windows.
+
+>**NOTE** - In Linux, you must run the script. Do not run GNS3 from the Application menu or clicking the GNS3 icon.
+
+When GNS3 starts, you will see a dialog asking you to create a new project. Enter "g001_ping" in the ***Name*** textbox and click the **OK** button.
+
+![Project dialog](images/gns3_01.png)
+
+In the main menu, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is "192.168.1.1":
+
+![Preferences dialog](images/gns3_02.png)
+
+Once again, look on the left-hand menu in the **Preferences** window, and select **Dynamips -> IOS Routers:**
+
+![Preferences dialog](images/gns3_03.png)
+
+When the **New IOS Router Template window** appears, ensure ***New Image*** is selected, and then click **Browse**:
+
+![Preferences dialog](images/gns3_04.png)
+
+When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the file window appears:
+
+![Preferences dialog](images/gns3_05.png)
+
+When asked, "Would like to decompress this IOS image?", click **Yes**:
+
+![Preferences dialog](images/gns3_06.png)
+
+Back in the **New IOS Router Template window**, click **Next >:**
+
+![Preferences dialog](images/gns3_07.png)
+
+When it comes to customizing the router's details, use the default values for both the name and memory and click on **Next >** for each:
+
+![Preferences dialog](images/gns3_08.png)
+
+![Preferences dialog](images/gns3_09.png)
+
+The 3745 has 2 FastEthernet interfaces on its motherboard (GT96100-FE), 3 subslots for WICs (maximum of 6 serial ports) and 4 Network Module slots (maximum of 32 FastEthernet ports or 16 serial ports). For Network adapters, you have three options; we want all three for training. Place an option in each of the first open slots:
+
+![Preferences dialog](images/gns3_10.png)
+
+For WAN Interface Cards (WICs), we have two options. Once again, place an option in each of the first open slots:
+
+![Preferences dialog](images/gns3_11.png)
+
+Finally, accept the default Idle-PC value and click **Finish:** 
+
+![Preferences dialog](images/gns3_12.png)
+
+The IOS template's details appear. Note the memory for PCMCIA disk0; click on **Edit**, and set the PCMCIA disk0 to 1 MiB:
+
+![Preferences dialog](images/gns3_13.png)
+
+Click **OK**:
+
+![Preferences dialog](images/gns3_14.png)
+
+![Preferences dialog](images/gns3_15.png)
