@@ -35,38 +35,37 @@ sudo yum -y install putty # Get from epel
 # QEMU: type 2 hypervisor that runs in user space / KVM (e.g., QEMU-KVM): Type 1 hypervisor that runs in kernel space
 sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
 # Install the Dynamips Cisco Emulator
-cd /tmp
+cd /tmp || exit
 git clone https://github.com/GNS3/dynamips.git
-cd dynamips
+cd dynamips || exit
 mkdir build
-cd build/
+cd build/ || exit
 cmake .. -DDYNAMIPS_CODE=stable
 make
 sudo make install
 # Install the Virtual PC Simulator (vpcs)
-cd /tmp
+cd /tmp || exit
 sudo yum -y install svn
 svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
-cd vpcs/src
+cd vpcs/src || exit
 ./mk.sh 64
 sudo install -m 755 vpcs /usr/local/bin
 # Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
-cd /tmp
+cd /tmp || exit
 git clone https://github.com/GNS3/ubridge.git
-cd ubridge
+cd ubridge || exit
 make
 sudo make install
 # Get router image and configuration file
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/catalysts/cat3750e/c3750e-universalk9-mz.122-44.SE1.bin
-wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/Linux/GNS3/R1_3745_i1_startup-config.cfg
+wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/R1_3745_i1_startup-config.cfg
 # Used to create Tap interface between host and GNS3
 sudo yum -y install bridge-utils
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
-wget -P ~/Documents https://raw.githubusercontent.com/garciart/Automation/master/Linux/CentOS/gns3_run.sh
+wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run.sh
 # Make the script executable
-chmod +x gns3_run.sh
+sudo chmod +x ~/gns3_run.sh
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
-echo -e "Setup complete. Rebooting now..."
-sudo reboot now
+echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."

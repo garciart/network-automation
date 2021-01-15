@@ -18,7 +18,7 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
-Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup:).
+Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
 
 -----
 
@@ -38,7 +38,7 @@ We used Centos 7 for the labs and demos in this repository. While there were a l
 
 ### Windows
 
-Installing GNS3 on windows is also relatively simple; check out [https://docs.gns3.com/docs/getting-started/installation/windows/](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"). David Bombal also has a [great video sereis on using GNS3](https://www.youtube.com/watch?v=Ibe3hgP8gCA&list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6&index=1&ab_channel=DavidBombal "GNS3 Installation - David Bombal"), starting with installation; highly recommended!
+Installing GNS3 on windows is also relatively simple; check out [https://docs.gns3.com/docs/getting-started/installation/windows/](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"). David Bombal also has a [great video series on using GNS3](https://www.youtube.com/watch?v=Ibe3hgP8gCA&list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6&index=1&ab_channel=DavidBombal "GNS3 Installation - David Bombal"), starting with installation; highly recommended!
 
 -----
 
@@ -139,12 +139,16 @@ Finally, accept the default Idle-PC value and click **Finish:**
 
 ![Preferences dialog](images/gns3_12.png)
 
-The IOS template's details appear. Note the memory for PCMCIA disk0; click on **Edit**, and set the PCMCIA disk0 to 1 MiB:
+The IOS template's details appear. Note the memory for Personal Computer Memory Card International Association (PCMCIA) slot disk0; click on **Edit**:
 
 ![Preferences dialog](images/gns3_13.png)
 
-Click **OK**:
+Set the PCMCIA disk0 to 1 MiB and click **OK**:
 
 ![Preferences dialog](images/gns3_14.png)
 
+This brings you back to the template details page; click **OK** to return to the main window:
+
 ![Preferences dialog](images/gns3_15.png)
+
+
