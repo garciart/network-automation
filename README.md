@@ -151,4 +151,21 @@ This brings you back to the template details page; click **OK** to return to the
 
 ![Preferences dialog](images/gns3_15.png)
 
+Once you blah, blah, blah...
+
+![Preferences dialog](images/gns3_16.png)
+
+![Preferences dialog](images/gns3_17.png)
+
+![Preferences dialog](images/gns3_18.png)
+
+![Preferences dialog](images/gns3_19.png)
+
+![Preferences dialog](images/gns3_20.png)
+
+![Preferences dialog](images/gns3_21.png)
+
+![Preferences dialog](images/gns3_22.png)
+
+![Preferences dialog](images/gns3_23.png)
 
