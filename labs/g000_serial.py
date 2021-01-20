@@ -14,10 +14,23 @@ Using /dev/ttyS0
 from __future__ import print_function
 
 import sys
+
 import lab_utils as lu
+
+# Module metadata dunders
+__author__ = "Rob Garcia"
+__copyright__ = "Copyright 2020-2021, Rob Garcia"
+__email__ = "rgarcia@rgprogramming.com"
+__license__ = "MIT"
 
 
 def main():
+    """Function to connect to the device from the host using a serial connection.
+
+    :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
+    :rtype: int
+    :raises ex: raises a runtime error
+    """
     rval = lu.FAIL
     try:
         print("Hello, friend.")

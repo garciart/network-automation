@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Recently, for personal and professional reasons (CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access its command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, for personal and professional reasons (Cisco, CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access its command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
 
 This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device; upload a configuration; reboot the device; and then test the device to ensure it is properly configured? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
 
@@ -48,6 +48,7 @@ In order for your code to interact with the switch, you will need to connect you
 
 Before we start, here's the subnet info for the network:
 
+```
 - **Network Address: 192.168.1.0/24**
 - **Subnet Mask: 255.255.255.0 (ff:ff:ff:00)**
 - Total Number of Hosts: 256
@@ -67,12 +68,13 @@ Before we start, here's the subnet info for the network:
 - in-addr.arpa: 1.1.168.192.in-addr.arpa
 - IPv4 Mapped Address: ::ffff:c0a8.0101
 - 6to4 Prefix: 2002:c0a8.0101::/48
+```
 
 ### Linux
 
-In gns3_setup_centos.sh, you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
+In [gns3_setup_centos.sh](gns3_setup_centos.sh "CentOS Setup Script"), you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
 
-The gns3_run.sh script sets up your environment, runs GNS3, and resets your environment when you exit GNS3. Please open the gns3_run.sh file and examine it. This script does the following:
+The [gns3_run.sh](gns3_run.sh "CentOS Run Script") script sets up your environment, runs GNS3, and resets your environment when you exit GNS3. Please open the gns3_run.sh file and examine it. This script does the following:
 
 1. Identifies the Ethernet interface and its IP address (if assigned).
 2. Creates a network TAP interface: GNS3 devices will connect to this interface. By the way, ```ethtool -i tap0``` and ```ip link show type tap``` will both report the tap (Layer 2) is a tun (Layer 3), but ```ip tuntap show``` will report the interface correctly as a tap. Check out [Paul Gorman's Linux Bridges and Virtual Networking](https://paulgorman.org/technical/linux-bridges-and-virtual-networking.txt.html "Paul Gorman's Linux Bridges and Virtual Networking") for more details.

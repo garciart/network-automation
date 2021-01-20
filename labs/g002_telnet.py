@@ -10,17 +10,17 @@ Requirements:
 """
 from __future__ import print_function
 
-# Module metadata dunders
-__author__ = "Rob Garcia"
-__copyright__ = "Copyright 2020-2021, Rob Garcia"
-__email__ = "rgarcia@rgprogramming.com"
-__license__ = "MIT"
-
 # import getpass
 import sys
 import telnetlib
 
 import lab_utils as lu
+
+# Module metadata dunders
+__author__ = "Rob Garcia"
+__copyright__ = "Copyright 2020-2021, Rob Garcia"
+__email__ = "rgarcia@rgprogramming.com"
+__license__ = "MIT"
 
 
 def main():
@@ -28,6 +28,7 @@ def main():
 
     :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
     :rtype: int
+    :raises ex: raises a runtime error
     """
     rval = lu.FAIL
     try:
