@@ -1,12 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-Script 63: Transfer files to flash using tftp (port 69).
+"""Lab 63: Transfer files to flash using tftp (port 69).
 Make sure GNS3 is running first (gns3_run.sh)
 
 Also check that no 192.168.1.X addresses are in your ~/.ssh/known_hosts file.
 
-Using Python 2.7.5
+Project: Automation
+
+Requirements:
+- Python 2.7.5
 """
 
 """
