@@ -28,6 +28,7 @@ def main():
 
     :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
     :rtype: int
+
     :raises ex: raises a runtime error
     """
     rval = lu.FAIL

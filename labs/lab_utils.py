@@ -44,9 +44,13 @@ def log_error(exc_info, level=logging.ERROR):
         ERROR for exceptions that close the application;
         CRITICAL for exceptions that halt the application,
         defaults to logging.ERROR.
-    :type level: int, optional
+    :type level: int
+
     :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
     :rtype: int
+
+    :raises ex: RuntimeError for any exceptions or errors.
+
     .. seealso:: https://docs.python.org/2/library/sys.html#sys.exc_info
     .. seealso:: https://docs.python.org/2/library/logging.html
     """
@@ -79,13 +83,18 @@ def log_message(msg, level=logging.INFO):
 
     :param msg: Message for log.
     :type msg: str
-    :param level: Use DEBUG or INFO as needed, defaults to logging.INFO
-    :type level: int, optional
+    :param level: Use DEBUG or INFO as needed, defaults to logging.INFO.
+    :type level: int
+
     :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
     :rtype: int
+
+    :raises ex: RuntimeError for any exceptions or errors.
+
     .. seealso:: https://docs.python.org/2/library/logging.html
     """
     rval = FAIL
+    # This works: stop playing with it, dang it!
     if msg is not None and msg.strip() and ((level % 10 == 0) and (20 >= level >= 0)):
         try:
             if DISPLAY_MESSAGES:
