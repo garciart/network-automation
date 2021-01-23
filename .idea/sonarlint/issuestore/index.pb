@@ -29,3 +29,5 @@ D
 gns3_setup_centos.sh,4/5/45cf685a2f12d9b231204d521bf7c320a36bec11
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+=
+labs/labs.log,4/a/4a97ca950d90be50b92e1773f0a7cdfe9648a9cf
