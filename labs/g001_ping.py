@@ -93,8 +93,13 @@ def ping_using_pexpect(cmd, timeout=30):
 
 
 if __name__ == "__main__":
-    print("Lab 1a: Pinging the device at {0} from the host using subprocess...".format(DEVICE_ADDRESS))
-    print("rval =", ping_using_subprocess("ping -c 4 {0}".format(DEVICE_ADDRESS)))
-    print("Lab 1b: Pinging the device at {0} from the host using pexpect...".format(DEVICE_ADDRESS))
-    print("rval =", ping_using_pexpect("ping -c 4 {0}".format(DEVICE_ADDRESS)))
-    print("Lab complete. Have a nice day.")
+    print("Lab 1: Ping another device...")
+    result = lu.simple_cli_call("pgrep gns3server")
+    if int(result[0]) == 0 and int(result[1]) > 0:
+        print("Lab 1a: Pinging the device at {0} from the host using subprocess...".format(DEVICE_ADDRESS))
+        print("rval =", ping_using_subprocess("ping -c 4 {0}".format(DEVICE_ADDRESS)))
+        print("Lab 1b: Pinging the device at {0} from the host using pexpect...".format(DEVICE_ADDRESS))
+        print("rval =", ping_using_pexpect("ping -c 4 {0}".format(DEVICE_ADDRESS)))
+        print("Lab complete. Have a nice day.")
+    else:
+        print("Cannot run program: GNS3 is not running.")
