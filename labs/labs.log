@@ -299,3 +299,16 @@ From 192.168.1.1 icmp_seq=4 Destination Host Unreachable
 --- 8.8.8.8 ping statistics ---
 4 packets transmitted, 0 received, +4 errors, 100% packet loss, time 3035ms
 pipe 4
+2021-01-29 03:05:06,540UTC: DEBUG:root:ping -c 4 8.8.8.8: Error: PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+From 192.168.1.1 icmp_seq=1 Destination Host Unreachable
+From 192.168.1.1 icmp_seq=2 Destination Host Unreachable
+From 192.168.1.1 icmp_seq=3 Destination Host Unreachable
+From 192.168.1.1 icmp_seq=4 Destination Host Unreachable
+
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 0 received, +4 errors, 100% packet loss, time 3000ms
+pipe 4
+2021-01-29 03:09:48,479UTC: DEBUG:root:pgrep gns3server: Error: 
+2021-01-29 03:51:05,373UTC: DEBUG:root:pgrep gns3server: Error: 
+2021-01-29 03:54:16,668UTC: DEBUG:root:pgrep gns3server: Error: 
+2021-01-29 03:54:44,542UTC: DEBUG:root:pgrep gns3server: Error: 

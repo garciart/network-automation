@@ -69,4 +69,9 @@ def main():
 
 if __name__ == "__main__":
     print("Lab 2: Telnet into device...")
-    main()
+    result = lu.simple_cli_call("pgrep gns3server")
+    if int(result[0]) == 0 and int(result[1]) > 0:
+        main()
+        print("Lab complete. Have a nice day.")
+    else:
+        print("Cannot run program: GNS3 is not running.")

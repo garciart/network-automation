@@ -31,3 +31,8 @@ D
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 =
 labs/labs.log,4/a/4a97ca950d90be50b92e1773f0a7cdfe9648a9cf
+:
+
+.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
+=
+labs/xtest.py,7/c/7cbec54d56850b75461e6e8a9865dbeebe1b2405
