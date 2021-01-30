@@ -3,8 +3,6 @@
 .env,3/c/3c84dcdc6bbe3d7817c49dcdc327b926fea1808a
 @
 labs/__init__.py,5/0/50f8012e79029649e67fae28e8174be01e6f8fc8
-C
-labs/g000_serial.py,d/7/d7ec16dd6334c6c0046ffd303b2f22f692ea4b23
 A
 labs/g001_ping.py,6/a/6aa7bf8cf5a2a778e402d64e134c8be815342f4f
 E
@@ -36,3 +34,7 @@ D
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
 =
 labs/xtest.py,7/c/7cbec54d56850b75461e6e8a9865dbeebe1b2405
+C
+labs/g999_serial.py,f/9/f9348403f6fc57f63d8aabb357df5f3b79681433
+C
+labs/g000_simple.py,d/f/df032e2d8d0d246ca4a361e9b4370e685ec47839
