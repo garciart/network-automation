@@ -121,8 +121,8 @@ def simple_cli_call(cmd, fail_content=None, pass_content=None, timeout=30):
     :param timeout: Time limit to complete the command in seconds.
     :type timeout: int
 
-    :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
-    :rtype: int
+    :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error, as well as the text as a string.
+    :rtype: tuple
 
     :raises ex: RuntimeError for any exceptions or errors.
     """

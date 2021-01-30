@@ -26,8 +26,8 @@ __email__ = "rgarcia@rgprogramming.com"
 __license__ = "MIT"
 
 # Global variables and constants
-# DEVICE_ADDRESS = "192.168.1.10"
-DEVICE_ADDRESS = "8.8.8.8"
+DEVICE_ADDRESS = "192.168.1.10"
+# DEVICE_ADDRESS = "8.8.8.8"
 
 
 def ping_using_subprocess(cmd):
@@ -43,22 +43,23 @@ def ping_using_subprocess(cmd):
     :raises cpe: CalledProcessError to catch non-zero return values from subprocess.
     :raises ex: RuntimeError for any other exceptions or errors.
     """
-    rval = lu.FAIL, result = None
+    sp_result = None
+    rval = lu.FAIL, sp_result
     try:
         sanitized_cmd = shlex.split(cmd)  # ["ping", "-c", "4", DEVICE_ADDRESS]
         # subprocess.call returns a returncode
         # subprocess.check_call returns a returncode of 0 for success or a CalledProcessError for a non-zero value
         # subprocess.check_output returns output or a CalledProcessError with a returncode and output
         try:
-            result = subprocess.check_output(sanitized_cmd)
+            sp_result = subprocess.check_output(sanitized_cmd)
             print("{0}: Ping successful - Received a reply from {1}.".format(cmd, DEVICE_ADDRESS))
-            rval = lu.SUCCESS, result
+            rval = lu.SUCCESS, sp_result
         except subprocess.CalledProcessError as cpe:
             lu.log_message("{0}: Error - Code {1}, Output {2}.".format(cmd, cpe.returncode, cpe.output))
             rval = lu.ERROR, cpe.output
     except RuntimeError:
         lu.log_error(sys.exc_info())
-        rval = lu.ERROR, result
+        rval = lu.ERROR, sp_result
     return rval
 
 
@@ -75,7 +76,8 @@ def ping_using_pexpect(cmd, timeout=30):
 
     :raises ex: RuntimeError for any exceptions or errors.
     """
-    rval = lu.FAIL, child_result = None
+    child_result = None
+    rval = lu.FAIL, child_result
     try:
         child_result, child_exitstatus = pexpect.run(cmd, timeout=timeout, withexitstatus=True)
         if child_exitstatus is None:

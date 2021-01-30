@@ -38,8 +38,11 @@ def setup_ssh(tn_conn):
     """Function to enable SSH on the device
 
     :param tn_conn: the Telnet connection
+    :type tn_conn: class:Telnet
+
     :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
     :rtype: int
+
     :raises ex: raises a runtime error
     """
     rval = lu.FAIL
@@ -75,7 +78,6 @@ def setup_ssh(tn_conn):
         tn_conn.write("exit\n")
         print(tn_conn.read_all())
         rval = lu.SUCCESS
-        print("Lab complete. Have a nice day.")
     except RuntimeError:
         lu.log_error(sys.exc_info())
         rval = lu.ERROR
@@ -84,7 +86,7 @@ def setup_ssh(tn_conn):
 
 def main():
     """Function to telnet into the device and set up SSH."""
-    print("Script 3: Setup SSH through Telnet...")
+    print("Lab 3: Setup SSH through Telnet...")
     rval = lu.FAIL
     try:
         # Attempt to connect to device on port 23 and time out after 30 seconds
@@ -110,4 +112,11 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Lab 1: Ping another device...")
+    result = lu.simple_cli_call("pgrep gns3server")
+    if int(result[0]) == 0 and int(result[1]) > 0:
+        main()
+        print("Lab complete. Have a nice day.")
+    else:
+        print("Cannot run program: GNS3 is not running.")
     main()
