@@ -1,16 +1,16 @@
 # Adventures in Network Automation
 
-***Disclaimer: Many experts (and the creators of GNS3 themselves) no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to automating network device configuration using Python, we will use the freely-available Dynamips images.***
+***Disclaimer: Many experts (and the creators of GNS3 themselves) no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely-available Dynamips images.***
 
-***In addition, Cisco Packet Tracer, while an excellent tool, is not suitable for our purposes, since it cannot interact with its host or integrated development environments (IDEs).***
+***In addition, Cisco Packet Tracer, while an excellent tool, is not suitable for our purposes, since it cannot interact with it's host or integrated development environments (IDEs) on those hosts.***
 
 ## Introduction
 
-Recently, for personal and professional reasons (Cisco, CompTIA, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access its command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, for personal and professional reasons (CCNA and CompTIA training, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
 
-This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device; upload a configuration; reboot the device; and then test the device to ensure it is properly configured? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
+This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device and enter the commands for you? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
 
-The bad news is that to test the program, you will still need a physical device. You just can't download an Internetwork Operating System (IOS) image, and then interact with it using a hypervisor like VirtualBox. However, there are some great tools, like the Graphical Network Simulator-3 (GNS3), which can virtualize IOS images, and, with a little tweaking, can let you test your code against a network device.
+The bad news is that, normally, to test the script, you will need a physical device. You just can't download an Internetwork Operating System (IOS) image, and then interact with it using a hypervisor like VirtualBox. However, there are some great tools, like the Graphical Network Simulator-3 (GNS3), which can virtualize IOS images, and, with a little tweaking, they can let you test your code against a virtual network device.
 
 This tutorial is broken down into three parts:
 
@@ -18,7 +18,7 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
-Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
+BTW, the focus of this tutorial is to use GNS3 to test our scripts, so we won't get into installing operating systems or creating virtual machines; there's already tons of web sites dedicated to setting up OS's and VM's. In addition, many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
 
 -----
 
