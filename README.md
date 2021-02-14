@@ -72,6 +72,13 @@ Before we start, here's the subnet info for the network:
 
 ### Linux
 
+>**NOTE** - We will use nmap and other CLI tools in this tutorial. Therefore, open a terminal and ensure the following packages are installed:
+> ```
+> - sudo yum -y install net-tools
+> - sudo yum -y install nmap
+> - sudo yum -y install lsof
+> ```
+
 In [gns3_setup_centos.sh](gns3_setup_centos.sh "CentOS Setup Script"), you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
 
 The [gns3_run.sh](gns3_run.sh "CentOS Run Script") script sets up your environment, runs GNS3, and resets your environment when you exit GNS3. Please open the gns3_run.sh file and examine it. This script does the following:
@@ -166,6 +173,10 @@ Once you blah, blah, blah...
 ![Preferences dialog](images/gns3_20.png)
 
 ![Preferences dialog](images/gns3_21.png)
+
+One way to detect hosts on your subnet is to run ```nmap -sP 192.168.1.1-255```:
+
+![Preferences dialog](images/gns3_21a.png)
 
 ![Preferences dialog](images/gns3_22.png)
 

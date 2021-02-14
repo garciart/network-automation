@@ -25,15 +25,13 @@ def main():
     try:
         print("Hello, friend.")
         # child = pexpect.spawn("pgrep gns3server")
-        child_result, child_exitstatus = pexpect.run("ls -l", timeout=30, withexitstatus=True)
-        if child_exitstatus == 0:
-            print(child_exitstatus, child_result.decode().strip())
         child_result, child_exitstatus = pexpect.run("pgrep gns3server", timeout=30, withexitstatus=True)
         if child_exitstatus == 0:
             print(child_exitstatus, child_result.decode().strip())
             print("GNS3 server is running; process number {0}.".format(child_result.decode().strip()))
+
         else:
-            print("GNS3 is not running.")
+            print("GNS3 is not running. Please run ./gns3_run.sh to start GNS3.")
     except BaseException as ex:
         raise ex
 
