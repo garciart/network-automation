@@ -71,6 +71,9 @@ MMM DD HH:MM:SSS.SSS: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthern
 R1(config-if)#end
 R1#
 MMM DD HH:MM:SSS.SSS: %SYS-5-CONFIG_I: Configured from console by console
+
+
+*** SAVE THIS FOR A LAB ***
 R1#conf t
 R1(config)#enable password cisco
 R1(config)#line vty 0 15 ! Virtual teletype with 0 to 15 connections

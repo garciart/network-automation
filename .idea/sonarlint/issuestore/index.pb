@@ -44,3 +44,5 @@ C
 labs/labs101.py,7/0/70d354fb701c40d352bb012ac8de69dd2b317634
 H
 labs/pexpect_tutorial.py,f/f/ff886ea45539e2a51ad894b41709b864d36019ed
+J
+labs/cisco3745_startup.cfg,0/a/0adf27800005310dd2c31fd3aa4ce1eccd30cb94

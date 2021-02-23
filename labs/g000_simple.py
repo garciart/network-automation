@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Lab 00: Simple demo of subprocess and pexpect without verification or validation (e.g., unit testing, etc.).
+"""Lab 00: Simple demo.
 
 Project: Automation
 
@@ -9,11 +9,11 @@ Requirements:
 """
 from __future__ import print_function
 
-import subprocess
+import logging
+import sys
+import time
 
 import pexpect
-
-import lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -21,30 +21,68 @@ __copyright__ = "Copyright 2020-2021, Rob Garcia"
 __email__ = "rgarcia@rgprogramming.com"
 __license__ = "MIT"
 
+# Enable error and exception logging
+logging.Formatter.converter = time.gmtime
+logging.basicConfig(level=logging.NOTSET,
+                    filename="labs.log",
+                    format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
-def main():
-    """Function to display contents of the current folder.
 
-    :return: 0 if the function succeeded, 1 if it failed, or 2 if there was an error.
-    :rtype: int
+class Ramon3745(object):
+    @property
+    def host_ip_address(self):
+        return self._host_ip_address
 
-    :raises ex: RuntimeError for any exceptions or errors.
-    """
-    rval = lu.FAIL
-    try:
-        print("List files using subprocess first...")
-        result = subprocess.run(["ls", "-l"])
-        print(result, '\n')
+    @host_ip_address.setter
+    def host_ip_address(self, host_ip_address):
+        pass
 
-        print("Now listing files using pexpect...")
-        child_result = pexpect.run("ls -l")
-        print(child_result.decode())
+    @property
+    def device_ip_address(self):
+        return self._device_ip_address
 
-        rval = lu.SUCCESS
-    except RuntimeError:
-        rval = lu.ERROR
-    return rval
+    @property
+    def subnet_mask(self):
+        return self._subnet_mask
+
+    @property
+    def start_up_config_file(self):
+        return self._start_up_config_file
+
+    def __init__(self, host_ip_address, device_ip_address, subnet_mask, start_up_config_file):
+        self._host_ip_address = host_ip_address
+        self._device_ip_address = device_ip_address
+        self._subnet_mask = subnet_mask
+        self._start_up_config_file = start_up_config_file
+
+    def run(self):
+        try:
+            print("Hello from Cisco Ramon!")
+            if self._is_gns3_running():
+                print("Good to go!")
+
+        except BaseException:
+            print(sys.exc_info())
+
+    @staticmethod
+    def _is_gns3_running():
+        child_result, child_exitstatus = pexpect.run("pgrep gns3server", timeout=30, withexitstatus=True)
+        if child_exitstatus == 0:
+            return True
+        else:
+            raise RuntimeError("GNS3 is not running. " +
+                               "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+
+    def _connect_to_device(self):
+        child = pexpect.spawn("telnet {0}".format(self._device_ip_address))
+
+    def _enable_tftp(self):
+        pass
+
+    def _disbale_tftp(self):
+        pass
 
 
 if __name__ == "__main__":
-    main()
+    r3745 = Ramon3745("192.168.1.100", "192.168.1.10", "255.255.255.0", "")
+    r3745.run()
