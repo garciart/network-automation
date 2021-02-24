@@ -57,9 +57,9 @@ cd ubridge || exit
 make
 sudo make install
 # Get router image and configuration file
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/catalysts/cat3750e/c3750e-universalk9-mz.122-44.SE1.bin
-wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/R1_3745_i1_startup-config.cfg
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
+# wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/R1_3745_i1_startup-config.cfg
 # Used to create Tap interface between host and GNS3
 sudo yum -y install bridge-utils
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3

@@ -36,8 +36,6 @@ D
 labs/xtest.py,7/c/7cbec54d56850b75461e6e8a9865dbeebe1b2405
 C
 labs/g999_serial.py,f/9/f9348403f6fc57f63d8aabb357df5f3b79681433
-C
-labs/g000_simple.py,d/f/df032e2d8d0d246ca4a361e9b4370e685ec47839
 @
 requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
 ?
@@ -46,3 +44,9 @@ H
 labs/pexpect_tutorial.py,f/f/ff886ea45539e2a51ad894b41709b864d36019ed
 J
 labs/cisco3745_startup.cfg,0/a/0adf27800005310dd2c31fd3aa4ce1eccd30cb94
+M
+default_il_startup-config.cfg,1/8/18a6a8d46626eb60c13d2c0f83feaa065ee201ea
+@
+labs/g00_demo.py,1/1/1156d3003f4baa1f9315ef61940712642cf1953b
+;
+old/DEMO.md,3/f/3f3f56ec73d27961ad84c8727ad8e0ed18f1345f
