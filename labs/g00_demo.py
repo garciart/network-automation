@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Lab 00: Simple demo.
+To run this lab:
+* Start GNS3 by executing "./gn3_run.sh" in a Terminal window.
+* Select Lab00 from the Projects library.
+* Start all devices.
+
+If Lab00 does not exist, follow the instructions in DEMO.md to create the lab.
 
 Project: Automation
 
@@ -58,9 +64,10 @@ class Ramon3745(object):
     def run(self):
         try:
             print("Hello from Cisco Ramon!")
-            if self._is_gns3_running():
-                print("Good to go!")
-
+            #if self._is_gns3_running():
+                #print("GNS3 is running: Check")
+            if self._is_the_lab_loaded():
+                print("Lab 0 is loaded and started: Check")
         except BaseException:
             print(sys.exc_info())
 
@@ -72,6 +79,15 @@ class Ramon3745(object):
         else:
             raise RuntimeError("GNS3 is not running. " +
                                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+
+    def _is_the_lab_loaded(self):
+        child_result, child_exitstatus = pexpect.run("ping -c 4 {0}".format(self._device_ip_address),
+                                                     timeout=30, withexitstatus=True)
+        if child_exitstatus == 0:
+            return True
+        else:
+            raise RuntimeError("Unable to reach device." +
+                               "Please load Lab 0 in GNS3 and start all devices before executing this script.")
 
     def _connect_to_device(self):
         child = pexpect.spawn("telnet {0}".format(self._device_ip_address))
