@@ -1,75 +1,92 @@
 # Lab 00 - Demo
 
-This demo/tutorial walks through all the steps to create a lab in GNS3 and to configure a device using Python automation.
+This demo/tutorial explains how to create a lab in GNS3 and how to use Python to configure a router.
 
 >**Note** - If you are unfamiliar with GNS3, visit [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/ "The GNS3 GUI") for a great introduction to the GNS3 Graphical User Interface (GUI).
 
 1. Start GNS3 by opening a terminal and executing the "./gns3_run.sh" bash script.
-2. When the **Project** window appears, select the **New Project** tab. Enter "Lab00" in the **Name:** textbox and click **OK**. If the **Project** window does not appear, click on **File -> New blank project** or **[CTRL]+[N]** .
+2. When the **Project** window appears, select the **New Project** tab. Enter "Lab00" in the **Name** textbox and click **OK**. If the **Project** window does not appear, select **File -> New blank project** from the menu bar (on the top) or press **[CTRL]+[N]** .
    
-![Project window](../images/demo_01.png)
+![Create a New Project](../images/demo_01.png "Create a New Project")
 
-3. In the **Devices Toolbar** (on the left), click on **New template**, or select **File -> New template** from the top menu:
+3. In the **Devices Toolbar** (on the left), click on **New template**, or select **File -> New template** from the menu:
 
-![Project window](../images/demo_02.png)
+![Add a New Template - Step 1](../images/demo_02.png "Add a New Template - Step 1")
 
-4. 
+4. Select **Manually create a new template":
 
-![Project window](../images/demo_03.png)
+![Add a New Template - Step 2](../images/demo_03.png "Add a New Template - Step 2")
 
-5.
+5. On the left, expand the **Dynamips** node and select **IOS routers**. When the right hand window appears, select **New** to add a template:  
 
-![Project window](../images/demo_04.png)
+![Add a New Template - Step 3](../images/demo_04.png "Add a New Template - Step 3")
 
-6.
+6. Choose **New Image** and click **Browse**:
 
-![Project window](../images/demo_05.png)
+![Add a New Template - Step 4](../images/demo_05.png "Add a New Template - Step 4")
 
-7.
+7. During setup, you should have downloaded a Cisco Internetwork Operating System (IOS) for both the Cisco 3745 Multiservice Access Router and the Cisco 7206VXR Router. Select "c7000-a3jk9s-mz.124-25d.bin" to use IOS 12.4(25) Mainline with the Cisco 7206VXR and click **Open** at the top:
 
-![Project window](../images/demo_06.png)
+>**Note** - If you do not have these files, you can download them manually from [http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin](http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin) and [http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin](http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin).
 
-8.
+![Add a New Template - Step 5](../images/demo_06.png "Add a New Template - Step 5")
 
-![Project window](../images/demo_07.png)
+8. When asked to decompress the binary file into an IOS image, click **Yes**:
 
-9.
+![Add a New Template - Step 6](../images/demo_07.png "Add a New Template - Step 6")
 
-![Project window](../images/demo_08.png)
+9. When you return to the IOS image selection window, click **Next**:
 
-10.
+![Add a New Template - Step 7](../images/demo_08.png "Add a New Template - Step 7")
 
-![Project window](../images/demo_09.png)
+10. You can name the device whatever you like (e.g., "Cisco 7206", "My Router", etc.), but for now, accept the default values by clicking **Next**:
 
-11.
+![Add a New Template - Step 8](../images/demo_09.png "Add a New Template - Step 8")
 
-![Project window](../images/demo_10.png)
+11. The minimum RAM for IOS 12.4(25) Mainline is 256 MiB, so accept the default value by clicking **Next**:
 
-12.
+![Add a New Template - Step 9](../images/demo_10.png "Add a New Template - Step 9")
 
-![Project window](../images/demo_11.png)
+12. This device offers many configurations (e.g., additional FastEthernet ports, GigbitEthernet ports, etc.), but since we will only be using one port for this demo (FastEthernet0/0), accept the default values by clicking **Next**:
 
-13.
+![Add a New Template - Step 10](../images/demo_11.png "Add a New Template - Step 10")
 
-![Project window](../images/demo_12.png)
+>**Note** - Here is a table of the configurations available for this device. For more information on additional configurations for the Cisco 7206, visit https://www.cisco.com/c/en/us/td/docs/routers/7200/configuration/7200_port_adapter_config_guidelines/config/3875In.html#wp1054974](https://www.cisco.com/c/en/us/td/docs/routers/7200/configuration/7200_port_adapter_config_guidelines/config/3875In.html#wp1054974 "Cisco 7200 Series Port Adapter Installation Requirements").
 
-14.
+   |Product Number|Slot|Port Adapter Group|PA Type|
+   |--------------|----|-----------------|-----|
+   |C7200-IO-FE|0|I/O Controllers|1-port Fast Ethernet I/O controller (2 connectors: RJ-45 and MII)|
+   |C7200-IO-2FE|0||2-port Fast Ethernet I/O controller|
+   |C7200-IO-GE-E|0|I/O Controllers|1-port Gigabit Ethernet plus Ethernet I/O controller|
+   |PA-A1|1-6|ATM|1-port multimode|
+   |PA-FE-TX|1-6||1-port Fast Ethernet 100BASETX|
+   |PA-2FE-TX|1-6|Ethernet/Fast Ethernet/Gigabit Ethernet|2-port Fast Ethernet (TX)|
+   |PA-GE|1-6||1-port full-duplex Gigabit Ethernet|
+   |PA-4T+|1-6|Serial|4-port synchronous serial, enhanced|
+   |PA-8T|1-6|Serial|8-port synchronous serial|
+   |PA-4E|1-6||4-port Ethernet 10BASET|
+   |PA-8E|1-6||8-port Ethernet 10BASET|
+   |PA-POS-OC3|1-6|SONET|1-port SFP module-based OC-3c/STM-1|
 
-![Project window](../images/demo_13.png)
+13. In order to prevent the Dynamips emulator from monopolizing resources and locking the system, you need to set an Idle-PC value. Click on **Idle-PC finder** to find a value:
 
-15.
+![Add a New Template - Step 11a](../images/demo_12.png "Add a New Template - Step 11a")
 
-![Project window](../images/demo_14.png)
+![Add a New Template - Step 11b](../images/demo_13.png "Add a New Template - Step 11b")
 
-16.
+>**Note** - Chris Welsh provides an excellent explanation of the Idle-PC value in his blog at [https://rednectar.net/2013/02/24/dynamipsgns3-idle-pc-explained-finally/](https://rednectar.net/2013/02/24/dynamipsgns3-idle-pc-explained-finally/ "Dynamips/GNS3 Idle-PC explained. Finally!").
 
-![Project window](../images/demo_15.png)
+14. When a value has been found, click **OK** to return to the Idle-PC window. Ensure the **Idle-PC** textbox contains the value, and then click **Finish**:
 
-17.
+![Add a New Template - Step 12a](../images/demo_14.png "Add a New Template - Step 12a")
+
+![Add a New Template - Step 12b](../images/demo_15.png "Add a New Template - Step 12b")
+
+15. GNS3 will return you to the template window. Click **OK** to return to the **Workspace**.
 
 ![Project window](../images/demo_16.png)
 
-18. In the **Devices Toolbar** (on the left), click on the **Browse all devices** icon and select **Cloud**:
+16. In the **Devices Toolbar** (on the left), click on the **Browse all devices** icon and select **Cloud**:
    
 ![Project window](../images/demo_17.png)
 
