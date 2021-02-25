@@ -5,7 +5,16 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 >**Note** - If you are unfamiliar with GNS3, visit [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/ "The GNS3 GUI") for a great introduction to the GNS3 Graphical User Interface (GUI).
 
 1. Start GNS3 by opening a terminal and running the "./gns3_run.sh" bash script.
-2. When the **Project** window appears, select the **New Project** tab. Enter "Lab00" in the **Name** textbox and click **OK**. If the **Project** window does not appear, select **File -> New blank project** from the top menu or press **[CTRL]+[N]** .
+
+         [gns3user@localhost ~]$ ./gns3_run.sh
+         Setting up GNS3...
+         Original interface name is enp0s3
+         enp0s3 original IP address is 10.0.2.15
+         enp0s3 original netmask is 255.255.255.0
+         enp0s3 original broadcast address is 10.0.2.255
+         [sudo] password for gns3user: 
+
+3. When the **Project** window appears, select the **New Project** tab. Enter "Lab00" in the **Name** textbox and click **OK**. If the **Project** window does not appear, select **File -> New blank project** from the top menu or press **[CTRL]+[N]** .
    
 ![Create a New Project](../images/demo_01.png "Create a New Project")
 
@@ -241,6 +250,8 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
           login
          !
          end
+         
+         R1#
 
 29. Look for ```interface FastEthernet0/0``` in the running-config (comments added):
 
@@ -249,11 +260,11 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
           shutdown
           duplex half
 
-    The setting ```no ip address``` means the router does not have an IP address assigned and ```shutdown``` means that the FastEthernet port is closed. This means that the router is not configured and cannot be used.
+    ```no ip address``` means the router does not have an IP address assigned and ```shutdown``` means that the FastEthernet port is closed. This tells us that the router is not configured and cannot be used.
     
-30. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.100:5001).
+30. We can configure the router within this console, but since we are going to use Python instead, close the console, but make sure the router is still running.
 
-    Open a terminal and start a Python session:
+31. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.100:5001). Therefore, open a terminal and start a Python session:
     
          [gns3user@localhost ~]$ python
          Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
@@ -261,15 +272,17 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          Type "help", "copyright", "credits" or "license" for more information.
          >>> 
 
-31. Import pexpect and spawn Telnet as a child application:
+32. Import pexpect and spawn Telnet as a child application (note the space between it IP address and the port number):
 
          >>> import pexpect
          >>> child = pexpect.spawn("telnet 192.168.1.100 5001")
 
 >**Note** - If you see ```ImportError: No module named pexpect.```, you will need to install pexpect first. In CentOS/RHEL, open another terminal and run ```yum install pexpect```.
 
+33. 
+
          R1#configure terminal ! Enter Global Configuration Mode
-         R1(config)#interface FastEthernet 0/0 ! Enter Interface Configuration Mode
+         R1(config)#interface FastEthernet0/0 ! Enter Interface Configuration Mode
          R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
          R1(config-if)#no shutdown ! Bring up the interface
          R1(config-if)#exit ! Exit Interface Configuration Mode
