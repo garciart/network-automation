@@ -54,13 +54,15 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 >**Note** - For quick reference, here is a table of the configurations available for this device. For more information on additional configurations, visit [Cisco 7200 Series Port Adapter Installation Requirements](https://www.cisco.com/c/en/us/td/docs/routers/7200/configuration/7200_port_adapter_config_guidelines/config/3875In.html#wp1054974 "Cisco 7200 Series Port Adapter Installation Requirements").
 
 |Input/Output (I/O) Controller|Slot|Description|
-|--------------|----|-----------------|-----|
+|-----------------------------|----|-----------|
 |C7200-IO-FE|0|1-port Fast Ethernet I/O controller (2 connectors: RJ-45 and MII)|
 |C7200-IO-2FE|0|2-port Fast Ethernet I/O controller|
 |C7200-IO-GE-E|0|1-port Gigabit Ethernet plus Ethernet I/O controller|
 
+---
+
 |Port Adapter ID|Slot|Port Adapter Group|Port Adapter Type|
-|--------------|----|-----------------|-----|
+|---------------|----|------------------|-----------------|
 |PA-A1|1-6|Asynchronous Transfer Mode (ATM)|1-port multimode fiber|
 |PA-FE-TX|1-6|Ethernet|1-port Fast Ethernet 100BASETX|
 |PA-2FE-TX|1-6|Ethernet|2-port Fast Ethernet (TX)|
