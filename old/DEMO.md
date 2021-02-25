@@ -4,7 +4,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 >**Note** - If you are unfamiliar with GNS3, visit [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/ "The GNS3 GUI") for a great introduction to the GNS3 Graphical User Interface (GUI).
 
-1. Start GNS3 by opening a terminal and executing the "./gns3_run.sh" bash script.
+1. Start GNS3 by opening a terminal and running the "./gns3_run.sh" bash script.
 2. When the **Project** window appears, select the **New Project** tab. Enter "Lab00" in the **Name** textbox and click **OK**. If the **Project** window does not appear, select **File -> New blank project** from the top menu or press **[CTRL]+[N]** .
    
 ![Create a New Project](../images/demo_01.png "Create a New Project")
@@ -47,26 +47,29 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 ![Add a New Template - Step 9](../images/demo_10.png "Add a New Template - Step 9")
 
-12. This device offers many configurations (e.g., additional FastEthernet ports, GigbitEthernet ports, etc.), but since we will only be using one port for this demo (FastEthernet0/0), accept the default values by clicking **Next**:
+12. This device, with one slot for an Input/Output (I/O) controller and six slots for port adapters, may be configured in many different ways, but since we will only be using one port for this demo (FastEthernet0/0), accept the default values by clicking **Next**:
 
 ![Add a New Template - Step 10](../images/demo_11.png "Add a New Template - Step 10")
 
 >**Note** - For quick reference, here is a table of the configurations available for this device. For more information on additional configurations, visit [Cisco 7200 Series Port Adapter Installation Requirements](https://www.cisco.com/c/en/us/td/docs/routers/7200/configuration/7200_port_adapter_config_guidelines/config/3875In.html#wp1054974 "Cisco 7200 Series Port Adapter Installation Requirements").
 
-   |Product Number|Slot|Port Adapter Group|PA Type|
-   |--------------|----|-----------------|-----|
-   |C7200-IO-FE|0|I/O Controllers|1-port Fast Ethernet I/O controller (2 connectors: RJ-45 and MII)|
-   |C7200-IO-2FE|0|I/O Controllers|2-port Fast Ethernet I/O controller|
-   |C7200-IO-GE-E|0|I/O Controllers|1-port Gigabit Ethernet plus Ethernet I/O controller|
-   |PA-A1|1-6|ATM|1-port multimode|
-   |PA-FE-TX|1-6|Ethernet|1-port Fast Ethernet 100BASETX|
-   |PA-2FE-TX|1-6|Ethernet|2-port Fast Ethernet (TX)|
-   |PA-GE|1-6|Ethernet|1-port full-duplex Gigabit Ethernet|
-   |PA-4T+|1-6|Serial|4-port synchronous serial, enhanced|
-   |PA-8T|1-6|Serial|8-port synchronous serial|
-   |PA-4E|1-6|Ethernet|4-port Ethernet 10BASET|
-   |PA-8E|1-6|Ethernet|8-port Ethernet 10BASET|
-   |PA-POS-OC3|1-6|SONET|1-port SFP module-based OC-3c/STM-1|
+|Input/Output (I/O) Controller|Slot|Description|
+|--------------|----|-----------------|-----|
+|C7200-IO-FE|0|1-port Fast Ethernet I/O controller (2 connectors: RJ-45 and MII)|
+|C7200-IO-2FE|0|2-port Fast Ethernet I/O controller|
+|C7200-IO-GE-E|0|1-port Gigabit Ethernet plus Ethernet I/O controller|
+
+|Port Adapter ID|Slot|Port Adapter Group|Port Adapter Type|
+|--------------|----|-----------------|-----|
+|PA-A1|1-6|Asynchronous Transfer Mode (ATM)|1-port multimode fiber|
+|PA-FE-TX|1-6|Ethernet|1-port Fast Ethernet 100BASETX|
+|PA-2FE-TX|1-6|Ethernet|2-port Fast Ethernet (TX)|
+|PA-GE|1-6|Ethernet|1-port full-duplex Gigabit Ethernet|
+|PA-4T+|1-6|Serial|4-port synchronous serial, enhanced|
+|PA-8T|1-6|Serial|8-port synchronous serial|
+|PA-4E|1-6|Ethernet|4-port Ethernet 10BASET|
+|PA-8E|1-6|Ethernet|8-port Ethernet 10BASET|
+|PA-POS-OC3|1-6|SONET|1-port SFP module-based OC-3c/STM-1 fiber|
 
 13. In order to prevent the Dynamips emulator from monopolizing resources and locking the system, you will need to set an Idle-PC value. Click on **Idle-PC finder** to find a value:
 
@@ -151,10 +154,6 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          R1#show startup-config
          Using 410 out of 522232 bytes!
          !
-         !
-         !
-         !
-         !
          service timestamps debug datetime msec
          service timestamps log datetime msec
          no service password-encryption
@@ -168,20 +167,21 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          no cdp log mismatch duplex
          !
          line con 0
-         exec-timeout 0 0
-         logging synchronous
-         privilege level 15
-         no login
+          exec-timeout 0 0
+          logging synchronous
+          privilege level 15
+          no login
          line aux 0
-         exec-timeout 0 0
-         logging synchronous
-         privilege level 15
-         no login
-         !
+          exec-timeout 0 0
+          logging synchronous
+          privilege level 15
+          no login
          !
          end
 
          R1#
+         
+>**Note** - To save space, we have removed some of the exclamation points in the configuration. This does not affect the settings; the Cisco Tool Command Language (Tcl) uses exclamation points for commenting, and the Cisco command parser inserts exclamation points throughout the configuration to separate sections and improve readability.
 
 28. Compare this to the **running-config**, which is created from the **startup-config** when the device first starts, then stored in the device's volatile RAM:
 
@@ -200,63 +200,30 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          boot-start-marker
          boot-end-marker
          !
-         !
          no aaa new-model
          no ip icmp rate-limit unreachable
-         !
          !
          ip cef
          no ip domain lookup
          !
-         !
-         !
-         !         
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
-         !
          ip tcp synwait-time 5
          ! 
-         !
-         !
-         !
-         !
          interface FastEthernet0/0
           no ip address
           shutdown 
           duplex half
-         !
          !
          ip forward-protocol nd
          !
          no ip http server
          no ip http secure-server
          !
-         !
          no cdp log mismatch duplex
-         !
-         !
          !
          control-plane
          !
-         !
-         !
-         !
-         !
-         !
          gatekeeper
           shutdown
-         !         
          !
          line con 0
           exec-timeout 0 0
@@ -271,12 +238,33 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          line vty 0 4
           login
          !
-         !
          end
 
-29. Look for ```interface FastEthernet0/0``` in the running-config; you will notice that the router does not have an IP address. Therefore, we have no way to  
+29. Look for ```interface FastEthernet0/0``` in the running-config (comments added):
 
-31. 
+         interface FastEthernet0/0
+          no ip address
+          shutdown
+          duplex half
+
+    The setting ```no ip address``` means the router does not have an IP address assigned and ```shutdown``` means that the FastEthernet port is closed. This means that the router is not configured and cannot be used.
+    
+30. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.100:5001).
+
+    Open a terminal and start a Python session:
+    
+         [gns3user@localhost ~]$ python
+         Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
+         [GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux2
+         Type "help", "copyright", "credits" or "license" for more information.
+         >>> 
+
+31. Import pexpect and spawn Telnet as a child application:
+
+         >>> import pexpect
+         >>> child = pexpect.spawn("telnet 192.168.1.100 5001")
+
+>**Note** - If you see ```ImportError: No module named pexpect.```, you will need to install pexpect first. In CentOS/RHEL, open another terminal and run ```yum install pexpect```.
 
          R1#configure terminal ! Enter Global Configuration Mode
          R1(config)#interface FastEthernet 0/0 ! Enter Interface Configuration Mode
