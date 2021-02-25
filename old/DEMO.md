@@ -134,9 +134,9 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 ![Priviledged EXEC Mode](../images/demo_24.png "Priviledged EXEC Mode")
 
->**Note** - If the prompt reads ```R1>```, you are in **User EXEC Mode**. Type and enter ```enable``` at the prompt to enter **Priviledged EXEC Mode** (i.e., ```R1>enable```[ENTER]).
+>**Note** - If the prompt reads ```R1>```, you are in **User EXEC Mode**. Type and enter ```enable``` at the prompt to enter **Priviledged EXEC Mode** (i.e., ```R1>enable```**[Enter]**).
 
-24. Enter the following commands to reset the device; if prompted to ```[confirm]```, press **[ENTER]**:
+24. Enter the following commands to reset the device; if prompted to ```[confirm]```, press **[Enter]**:
     
          R1#write erase
          Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
@@ -272,24 +272,104 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
          Type "help", "copyright", "credits" or "license" for more information.
          >>> 
 
-32. Import pexpect and spawn Telnet as a child application (note the space between it IP address and the port number):
+32. Import pexpect and spawn Telnet as a child application (note the space between it IP address and the port number). We also added a delay, just in case the router has not finished starting up:
 
          >>> import pexpect
+         >>> import time
          >>> child = pexpect.spawn("telnet 192.168.1.100 5001")
+         >>> time.sleep(30)
 
 >**Note** - If you see ```ImportError: No module named pexpect.```, you will need to install pexpect first. In CentOS/RHEL, open another terminal and run ```yum install pexpect```.
 
-33. 
+33. Once the delay is over, let's take a look at the system information. First, we want to press **[Enter]** at least once to reach a clean prompt after any messages. Next, we want to make sure we are in **Priviledged EXEC Mode** by inputting the "enable" command. By the way, if we already are in **Priviledged EXEC Mode**, the "enable" command does not affect anything:
 
+         >>> child.send("\r\n")
+         2
+         >>> child.send("enable\r\n")
+         8
+         >>> child.expect_exact("R1#")
+         0
+
+>**Note** - Remember, you cannot see feedback from the console yet, so you cannot identify the prompt. In addition, for some reason, ```child.sendline("...")``` did not send a full carriage-return/line-feed (CRLF), so we switched to ```child.send("...\r\n")``` instead.
+
+34. ```child.send("...")``` returns the number of characters that were sent, while ```child.expect_exact("...")``` returns a 0 if it finds a match. If ```child.expect_exact("...")``` does not find a match, it will return an error after its built-in 30-second timeout period expires. We will demonstrate this later.
+
+35. Now that we have looked for a match, we can use ```child.before``` and ```child.after``` to see feedback from the console. Per [pexpect's API overview](https://pexpect.readthedocs.io/en/stable/overview.html "pexpect's API overview"):
+ 
+    *"After each call to expect() the before and after properties will be set to the text printed by child application. The before property will contain all text up to the expected string pattern. The after string will contain the text that was matched by the expected pattern."*
+
+    Therefore, if you enter:
+
+         >>> child.before
+
+    You will see something like:
+   
+         'Trying 192.168.1.100...\r\r\nConnected to 192.168.1.100.\r\r\nEscape character is \'^]\'.\r\r\nConnected to Dynamips VM "R1" (ID 1, type c7200) - Console port\r\nPress ENTER to get the prompt.\r\nROMMON emulation microcode.\n\nLaunching IOS image at 0x80008000...\n\r\n              Restricted Rights Legend\r\n\r\nUse, duplication, or disclosure by the Government is\r\nsubject to restrictions as set forth in subparagraph\r\n(c) of the Commercial Computer Software - Restricted\r\nRights clause at FAR sec. 52.227-19 and subparagraph\r\n(c) (1) (ii) of the Rights in Technical Data and Computer\r\nSoftware clause at DFARS sec. 252.227-7013.\r\n\r\n           cisco Systems, Inc.\r\n           170 West Tasman Drive\r\n           San Jose, California 95134-1706\r\n\r\n\r\n\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n\r\n\r\nThis product contains cryptographic features and is subject to United\r\nStates and local country laws governing import, export, transfer and\r\nuse. Delivery of Cisco cryptographic products does not imply\r\nthird-party authority to import, export, distribute or use encryption.\r\nImporters, exporters, distributors and users are responsible for\r\ncompliance with U.S. and local country laws. By using this product you\r\nagree to comply with applicable laws and regulations. If you are unable\r\nto comply with U.S. and local laws, return this product immediately.\r\n\r\nA summary of U.S. laws governing Cisco cryptographic products may be found at:\r\nhttp://www.cisco.com/wwl/export/crypto/tool/stqrg.html\r\n\r\nIf you require further assistance please contact us by sending email to\r\nexport@cisco.com.\r\n\r\nCisco 7206VXR (NPE400) processor (revision A) with 491520K/32768K bytes of memory.\r\nProcessor board ID 4279256517\r\nR7000 CPU at 150MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache\r\n6 slot VXR midplane, Version 2.1\r\n\r\nLast reset from power-on\r\n\r\nPCI bus mb0_mb1 (Slots 0, 1, 3 and 5) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb0_mb1 has a total of 200 bandwidth points. \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPCI bus mb2 (Slots 2, 4, 6) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb2 has a total of 0 bandwidth points \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPlease refer to the following document "Cisco 7200 Series Port Adaptor\r\nHardware Configuration Guidelines" on Cisco.com <http://www.cisco.com>\r\nfor c7200 bandwidth points oversubscription and usage guidelines.\r\n\r\n\r\n1 FastEthernet interface\r\n509K bytes of NVRAM.\r\n\r\n8192K bytes of Flash internal SIMM (Sector size 256K).\r\nSETUP: new interface FastEthernet0/0 placed in "shutdown" state\r\n% Crashinfo may not be recovered at bootflash:crashinfo\r\n% This file system device reports an error\x07\r\n\r\n\r\nPress RETURN to get started!\r\n\r\n\r\n*Feb 25 22:03:55.399: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up\r\n*Feb 25 22:03:55.511: %SYS-5-CONFIG_I: Configured from memory by console\r\n*Feb 25 22:03:55.695: %SYS-5-RESTART: System restarted --\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n*Feb 25 22:03:55.707: %ENTITY_ALARM-6-INFO: ASSERT INFO Fa0/0 Physical Port Administrative State Down \r\n*Feb 25 22:03:55.719: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start\r\n*Feb 25 22:03:55.747: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up\r\n*Feb 25 22:03:56.119: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down\r\n*Feb 25 22:03:57.119: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down\x1b]0;R1\x07\r\n'
+
+    To view this in human-readable format, use:
+   
+         >>> print(child.before.decode("utf-8"))
+         Trying 192.168.1.100...
+         Connected to 192.168.1.100.
+         Escape character is '^]'.
+         Connected to Dynamips VM "R1" (ID 1, type c7200) - Console port
+         Press ENTER to get the prompt.
+         ROMMON emulation microcode.
+         ...
+
+    You may also look at what was matched, using ```child.after```:
+
+         >>> child.after
+         'R1#'
+         >>> print(child.after.decode("utf-8"))
+         R1#
+
+36. As promised, before we exit the Python prompt, we will look a ```child.expect_exact error```. Try it out by entering ```child.expect_exact("This won't work.")```; a detailed error message will appear after the built-in 30-second timeout period expires.
+
+37. However, since the purpose of this tutorial is to demonstrate Python automation scripting, we will not continue to enter each command individually. Exit the Python session by entering ```exit()``` and open your favorite text editor.
+
+38. We will turn the following commands into a repeatable script:
+
+         R1>enable
          R1#configure terminal ! Enter Global Configuration Mode
          R1(config)#interface FastEthernet0/0 ! Enter Interface Configuration Mode
          R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
          R1(config-if)#no shutdown ! Bring up the interface
          R1(config-if)#exit ! Exit Interface Configuration Mode
-         R1(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway
-         R1(config)# end ! Exit Global Configuration Mode
-         R1#
-         *Mar  1 00:13:00.067: %SYS-5-CONFIG_I: Configured from memory by console
+         R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway
+         R1(config)#end ! Exit Global Configuration Mode
+         R1#write memory ! Save new configuration to flash memory
+         R1#copy running-config startup-config ! Use the current configuration for startup
+
+39. In your editor, enter the following script:
+
+import pexpect
+import time
+child = pexpect.spawn("telnet 192.168.1.100 5001")
+time.sleep(30)
+child.sendline()
+child.sendline("enable ! Enter Priviledged EXEC Mode")
+child.expect_exact("R1#")
+child.sendline("configure terminal ! Enter Global Configuration Mode")
+child.expect_exact("R1(config)#")
+child.sendline("interface FastEthernet0/0  ! Enter Interface Configuration Mode")
+child.expect_exact("R1(config-if)#")
+child.sendline("ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router")
+child.expect_exact("R1(config-if)#")
+child.sendline("no shutdown ! Bring up the interface")
+child.expect_exact("R1(config-if)#")
+child.sendline("exit ! Exit Interface Configuration Mode")
+child.expect_exact("R1(config)#")
+child.sendline("ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway")
+child.expect_exact("R1(config)#")
+child.sendline("end ! Exit Global Configuration Mode")
+child.expect_exact("R1#")
+child.sendline("write memory ! Save new configuration to flash memory")
+child.expect_exact("R1#")
+child.sendline("copy running-config startup-config ! Use the current configuration for startup")
+child.expect_exact("R1#")
+child.sendline("exit")
+print("Script complete. Have a nice day.")
 
 Ping the router’s default gateway:
 
@@ -326,7 +406,7 @@ Compare to the startup configuration settings in the NVRAM:
 
          R1#
 
-Now copy the current settings to the NVRAM. At the "Destination filename" prompt, press [ENTER] or input "startup-config":
+Now copy the current settings to the NVRAM. At the "Destination filename" prompt, press **[Enter]** or input "startup-config":
 
          R1#copy running-config startup-config
          Destination filename [startup-config]?
