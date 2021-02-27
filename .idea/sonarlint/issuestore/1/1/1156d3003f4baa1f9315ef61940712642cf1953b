@@ -1,6 +1,3 @@
 
-Wpython:S5754G"8Catch a more specific exception or reraise the exception(Ÿ­˜§8±¦Şü.
-Mpython:S1481]")Remove the unused local variable "child".(ÀÍÔøÿÿÿÿ8¤¹Õåü.
-xpython:S1186_"YAdd a nested comment explaining why this method is empty, or complete the implementation.(öîÃõ8Ã™ÊŞü.
-xpython:S1186+"YAdd a nested comment explaining why this method is empty, or complete the implementation.(£®´ı8ÿÈ§ßü.
-}python:S1186b"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ª€‘Ÿüÿÿÿÿ8Ã™ÊŞü.
+spython:S1192-"ODefine a constant instead of duplicating this literal 'R1(config-if)#' 3 times.(Şˆ«¬øÿÿÿÿ8²é®áı.
+ppython:S1192*"LDefine a constant instead of duplicating this literal 'R1(config)#' 3 times.(À¨’áúÿÿÿÿ8‚»²áı.
