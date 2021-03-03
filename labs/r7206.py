@@ -61,7 +61,7 @@ class Ramon7206(CiscoRouter):
             self._connect_to_device()
         except pexpect.exceptions.ExceptionPexpect:
             ex_type, ex_value, ex_traceback = sys.exc_info()
-            ui.error("Type {0}: {1} in {2} at line {3}.".format(e_type.__name__,
+            ui.error("Type {0}: {1} in {2} at line {3}.".format(ex_type.__name__,
                                                                 ex_value,
                                                                 ex_traceback.tb_frame.f_code.co_filename,
                                                                 ex_traceback.tb_lineno))
