@@ -17,6 +17,8 @@ from __future__ import print_function
 
 import argparse
 import logging
+import os
+import subprocess
 import sys
 import telnetlib
 import time
@@ -66,7 +68,7 @@ class Ramon7206(CiscoRouter):
                                                                 ex_traceback.tb_frame.f_code.co_filename,
                                                                 ex_traceback.tb_lineno))
         finally:
-            ui.info('Good-bye from Cisco Ramon.')
+            ui.info("Good-bye from Cisco Ramon.")
 
     def _setup_host(self):
         pass
@@ -85,15 +87,48 @@ class Ramon7206(CiscoRouter):
 
 
 class Utility(object):
+    TFTP_DIR = "/var/lib/tftpboot"
+
+    def __init__(self):
+        self.utility_user = "gns3_temp"
+        self.utility_password = "567Eight"
+        from datetime import date, timedelta
+
+        # Ensure user expires even if the application crashes
+        temp_expire = date.today() + timedelta(days=1)
+        result = subprocess.call(["sudo", "-S", "useradd", "--system", "-p", self.utility_password, self.utility_user])
+        if result != 0:
+            raise RuntimeError(result + " Unable to create temporary system user.")
+
+    def close_user(self):
+        if subprocess.call(["sudo", "-S", "userdel", "-r", self.utility_user]) != 0:
+            raise RuntimeError("Unable to delete temporary system user.")
+
+    def pexpect_run_wrapper(self, cmd, timeout=30, error_message=None):
+        pexpect.run
+        child_result, child_exitstatus = pexpect.run(cmd, timeout=timeout, withexitstatus=True,
+                                                     events={"(?i)password": "{0}\n".format(self.utility_password)})
+        if child_exitstatus == 0:
+            return child_result
+        else:
+            raise RuntimeError(error_message if error_message else child_result.decode("utf-8"))
+
     @staticmethod
-    def is_gns3_running():
+    def pexpect_expect_wrapper(cmd, expected_result):
+        pass
+
+    def is_gns3_running(self):
         # Check if the gns3server process is running
+        self.pexpect_run_wrapper("pgrep gns3server", error_message="GNS3 is not running. " +
+                                                                   "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+        """
         child_result, child_exitstatus = pexpect.run("pgrep gns3server", timeout=30, withexitstatus=True)
         if child_exitstatus == 0:
-            return True
+            return child_result
         else:
             raise RuntimeError("GNS3 is not running. " +
                                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+        """
 
     @staticmethod
     def is_the_lab_loaded(host_ip_address):
@@ -106,7 +141,47 @@ class Utility(object):
                                "Please load Lab 0 in GNS3 and start all devices before executing this script.")
 
     def enable_tftp(self):
-        pass
+        """This function:
+
+        * Verifies the default TFTP directory exists (/var/lib/tftpboot) and it
+          has the correct permissions
+        * Enables the TFTP service, opens the firewall, and starts the TFTP server.
+
+        :returns: True if the function succeeded or raises a RuntimeError.
+        :rtype: bool
+        """
+        try:
+            # Ensure tftpboot default folder exists and has the correct permissions
+            # (i.e., 755+)
+            dir_exists = os.path.isdir("/var/lib/tftpboot")
+            if not dir_exists:
+                ui_message.warning("tftpboot directory does not exist. Creating...")
+                utility.pexpect_run_wrapper("sudo mkdir -p -m755" + self.TFTP_DIR)
+            else:
+                ui_message.info("Folder exists: Good to go...")
+            dir_permissions = subprocess.check_output(["stat", "-c", "%a", self.TFTP_DIR])
+            if int(dir_permissions) < 755:
+                ui_message.warning("Incorrect permissions for tftpboot directory: Correcting...")
+                utility.pexpect_run_wrapper("sudo chmod 755 " + self.TFTP_DIR)
+            else:
+                ui_message.info("Permissions correct: Good to go...")
+            # Enable the TFTP service and start the TFTP server
+            ui_message.info("Modifying the TFTP service configuration...")
+            # subprocess.call(["sudo", "-S", "cp", "-f", os.getcwd() + "/tftp_on", "/etc/xinetd.d/tftp"])
+            utility.pexpect_run_wrapper("sudo cp -f " + os.getcwd() + "/tftp_on /etc/xinetd.d/tftp", timeout=5)
+
+            ui_message.info("Allowing TFTP traffic through firewall...")
+            print(utility.pexpect_run_wrapper("sudo firewall-cmd --zone=public --add-service=tftp"))
+            ui_message.info("Starting the TFTP server...")
+            print(utility.pexpect_run_wrapper("sudo systemctl start tftp"))
+
+            ui_message.info("TFTP service enabled.")
+            ui_message.info("Don\"t forget to reset the TFTP service configuration before " +
+                            "shutting down the machine!!!")
+        except BaseException as ex:
+            raise ex
+        finally:
+            utility.close_user()
 
     def disable_tftp(self):
         pass
@@ -145,7 +220,7 @@ if __name__ == "__main__":
         utility = Utility()
 
         # Check that GNS3 is running; if false, the method will raise an error and the script will exit.
-        if utility.is_gns3_running():
+        if utility.is_gns3_running() is not None:
             ui_message.info("GNS3 is running.")
 
         # Initialize default parameter values
@@ -187,6 +262,8 @@ if __name__ == "__main__":
         if utility.is_the_lab_loaded(host_ip_address):
             ui_message.info("Lab 0 is loaded and started.")
 
+        utility.enable_tftp()
+
     except (pexpect.exceptions.ExceptionPexpect, RuntimeError):
         # Format the error, report, and exit
         e_type, e_value, e_traceback = sys.exc_info()
@@ -194,9 +271,9 @@ if __name__ == "__main__":
                                                                       e_value,
                                                                       e_traceback.tb_frame.f_code.co_filename,
                                                                       e_traceback.tb_lineno))
-        ui_message.info('Good-bye.')
+        ui_message.info("Good-bye.")
         exit(1)
 
     # The Ramon7206 object has its own error-handling code
     r7206.run(ui_message)
-    ui_message.info('Script complete. Have a nice day.')
+    ui_message.info("Script complete. Have a nice day.")
