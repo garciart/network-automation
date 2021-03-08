@@ -33,6 +33,8 @@ logging.basicConfig(level=logging.NOTSET,
                     filename="labs.log",
                     format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
+TFTP_DIR = "/var/lib/tftpboot"
+
 
 class Ramon7206(CiscoRouter):
     @property
@@ -86,26 +88,38 @@ class Ramon7206(CiscoRouter):
         pass
 
 
-class Utility(object):
-    TFTP_DIR = "/var/lib/tftpboot"
-
+class AdminUtilities(object):
     def __init__(self):
         self.utility_user = "gns3_temp"
-        self.utility_password = "567Eight"
-        from datetime import date, timedelta
+
+        # Create password and encrypt for temporary user
+        import random
+        import string
+        password_characters = string.ascii_letters + string.digits
+        self.utility_password = ''.join(random.choice(password_characters) for _ in range(8))
+        cmd = "openssl passwd -crypt {0}".format(self.utility_password)
+
+        import shlex
+        crypt_password = subprocess.check_output(shlex.split(cmd)).strip().decode("utf-8")
 
         # Ensure user expires even if the application crashes
-        temp_expire = date.today() + timedelta(days=1)
-        result = subprocess.call(["sudo", "-S", "useradd", "--system", "-p", self.utility_password, self.utility_user])
-        if result != 0:
-            raise RuntimeError(result + " Unable to create temporary system user.")
+        from datetime import date, timedelta
+        temp_expire = str(date.today() + timedelta(days=1))
 
-    def close_user(self):
-        if subprocess.call(["sudo", "-S", "userdel", "-r", self.utility_user]) != 0:
-            raise RuntimeError("Unable to delete temporary system user.")
+        # Use subprocess here, so the user, if not root, gets a prompt for a password
+        cmd = "sudo -S useradd --system --expiredate {0} --password {1} {2}".format(
+            temp_expire, crypt_password, self.utility_user)
+
+        result = subprocess.call(shlex.split(cmd))
+        if result != 0:
+            raise RuntimeError("Unable to create temporary system user.")
+
+        # Switch to temporary account
+        result = subprocess.call(["sudo", "-u", self.utility_user])
+        if result != 0:
+            raise RuntimeError("Unable to switch to temporary system user account.")
 
     def pexpect_run_wrapper(self, cmd, timeout=30, error_message=None):
-        pexpect.run
         child_result, child_exitstatus = pexpect.run(cmd, timeout=timeout, withexitstatus=True,
                                                      events={"(?i)password": "{0}\n".format(self.utility_password)})
         if child_exitstatus == 0:
@@ -119,8 +133,9 @@ class Utility(object):
 
     def is_gns3_running(self):
         # Check if the gns3server process is running
-        self.pexpect_run_wrapper("pgrep gns3server", error_message="GNS3 is not running. " +
-                                                                   "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+        self.pexpect_run_wrapper("pgrep gns3server",
+                                 error_message="GNS3 is not running. " +
+                                               "Please run ./gns3_run.sh to start GNS3 before executing this script.")
         """
         child_result, child_exitstatus = pexpect.run("pgrep gns3server", timeout=30, withexitstatus=True)
         if child_exitstatus == 0:
@@ -150,41 +165,41 @@ class Utility(object):
         :returns: True if the function succeeded or raises a RuntimeError.
         :rtype: bool
         """
-        try:
-            # Ensure tftpboot default folder exists and has the correct permissions
-            # (i.e., 755+)
-            dir_exists = os.path.isdir("/var/lib/tftpboot")
-            if not dir_exists:
-                ui_message.warning("tftpboot directory does not exist. Creating...")
-                utility.pexpect_run_wrapper("sudo mkdir -p -m755" + self.TFTP_DIR)
-            else:
-                ui_message.info("Folder exists: Good to go...")
-            dir_permissions = subprocess.check_output(["stat", "-c", "%a", self.TFTP_DIR])
-            if int(dir_permissions) < 755:
-                ui_message.warning("Incorrect permissions for tftpboot directory: Correcting...")
-                utility.pexpect_run_wrapper("sudo chmod 755 " + self.TFTP_DIR)
-            else:
-                ui_message.info("Permissions correct: Good to go...")
-            # Enable the TFTP service and start the TFTP server
-            ui_message.info("Modifying the TFTP service configuration...")
-            # subprocess.call(["sudo", "-S", "cp", "-f", os.getcwd() + "/tftp_on", "/etc/xinetd.d/tftp"])
-            utility.pexpect_run_wrapper("sudo cp -f " + os.getcwd() + "/tftp_on /etc/xinetd.d/tftp", timeout=5)
+        # Ensure tftpboot default folder exists and has the correct permissions
+        # (i.e., 755+)
+        dir_exists = os.path.isdir("/var/lib/tftpboot")
+        if not dir_exists:
+            ui_message.warning("tftpboot directory does not exist. Creating...")
+            self.pexpect_run_wrapper("sudo mkdir -p -m755" + TFTP_DIR)
+        else:
+            ui_message.info("Folder exists: Good to go...")
+        dir_permissions = subprocess.check_output(["stat", "-c", "%a", TFTP_DIR])
+        if int(dir_permissions) < 755:
+            ui_message.warning("Incorrect permissions for tftpboot directory: Correcting...")
+            self.pexpect_run_wrapper("sudo chmod 755 " + TFTP_DIR)
+        else:
+            ui_message.info("Permissions correct: Good to go...")
+        # Enable the TFTP service and start the TFTP server
+        ui_message.info("Modifying the TFTP service configuration...")
+        # subprocess.call(["sudo", "-S", "cp", "-f", os.getcwd() + "/tftp_on", "/etc/xinetd.d/tftp"])
+        self.pexpect_run_wrapper("sudo cp -f " + os.getcwd() + "/tftp_on /etc/xinetd.d/tftp", timeout=5)
 
-            ui_message.info("Allowing TFTP traffic through firewall...")
-            print(utility.pexpect_run_wrapper("sudo firewall-cmd --zone=public --add-service=tftp"))
-            ui_message.info("Starting the TFTP server...")
-            print(utility.pexpect_run_wrapper("sudo systemctl start tftp"))
+        ui_message.info("Allowing TFTP traffic through firewall...")
+        print(self.pexpect_run_wrapper("sudo firewall-cmd --zone=public --add-service=tftp"))
+        ui_message.info("Starting the TFTP server...")
+        print(self.pexpect_run_wrapper("sudo systemctl start tftp"))
 
-            ui_message.info("TFTP service enabled.")
-            ui_message.info("Don\"t forget to reset the TFTP service configuration before " +
-                            "shutting down the machine!!!")
-        except BaseException as ex:
-            raise ex
-        finally:
-            utility.close_user()
+        ui_message.info("TFTP service enabled.")
+        ui_message.info("Don\"t forget to reset the TFTP service configuration before " +
+                        "shutting down the machine!!!")
 
     def disable_tftp(self):
         pass
+
+    def del_utility_user(self):
+        # Use subprocess here, so the user, if not root, gets a prompt for a password
+        if subprocess.call(["sudo", "-S", "userdel", "-f", self.utility_user]) != 0:
+            raise RuntimeError("Unable to delete temporary system user.")
 
 
 class UserInterface(object):
@@ -207,7 +222,7 @@ class UserInterface(object):
 
 if __name__ == "__main__":
     # To maintain scope, create empty class containers here
-    ui_message = utility = r7206 = object()
+    ui_message = utilities = r7206 = object()
 
     # Only catch errors and exceptions due to invalid inputs or incorrectly connected devices. Programming and logic
     # errors will be reported and corrected through user feedback
@@ -217,10 +232,10 @@ if __name__ == "__main__":
         ui_message.info("Connecting to Cisco Ramon...")
 
         # Instantiate the utility object here, since it does not have error-handling code
-        utility = Utility()
+        utilities = AdminUtilities()
 
         # Check that GNS3 is running; if false, the method will raise an error and the script will exit.
-        if utility.is_gns3_running() is not None:
+        if utilities.is_gns3_running() is not None:
             ui_message.info("GNS3 is running.")
 
         # Initialize default parameter values
@@ -259,10 +274,10 @@ if __name__ == "__main__":
 
         # Check if the lab is loaded and the device is started; if either is false, the method will raise an error
         # and the script will exit.
-        if utility.is_the_lab_loaded(host_ip_address):
+        if utilities.is_the_lab_loaded(host_ip_address):
             ui_message.info("Lab 0 is loaded and started.")
 
-        utility.enable_tftp()
+        utilities.enable_tftp()
 
     except (pexpect.exceptions.ExceptionPexpect, RuntimeError):
         # Format the error, report, and exit
@@ -273,6 +288,9 @@ if __name__ == "__main__":
                                                                       e_traceback.tb_lineno))
         ui_message.info("Good-bye.")
         exit(1)
+    finally:
+        utilities.pexpect_run_wrapper("exit")
+        utilities.del_utility_user()
 
     # The Ramon7206 object has its own error-handling code
     r7206.run(ui_message)
