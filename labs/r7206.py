@@ -57,10 +57,10 @@ class Ramon7206(CiscoRouter):
         return self._host_ip_address
 
     def __init__(self, config_file_path, device_ip_address, subnet_mask, host_ip_address):
-        self._device_ip_address = device_ip_address
-        self._subnet_mask = subnet_mask
-        self._config_file_path = config_file_path
-        self._host_ip_address = host_ip_address
+        self._device_ip_address = Utilities.validate_ip_address(device_ip_address)
+        self._subnet_mask = Utilities.validate_subnet_mask(subnet_mask)
+        self._config_file_path = Utilities.validate_file_path(config_file_path)
+        self._host_ip_address = Utilities.validate_ip_address(host_ip_address)
 
     def run(self, ui_messenger, **kwargs):
         try:
@@ -108,7 +108,8 @@ class Utilities(object):
     FAIL = 1
     ERROR = 2
 
-    def validate_file_path(self, file_path, ui_messenger, **kwargs):
+    @staticmethod
+    def validate_file_path(file_path):
         """Checks that the file exists. The private method double_check() takes into account
         misspelled or incorrectly formatted file paths, such as var/lib/tftpbootc7206-config.cfg
 
@@ -125,45 +126,43 @@ class Utilities(object):
             file_path = file_path.strip()
             # Hide stdout, but show stderr; use os.devnull instead of
             # subprocess.DEVNULL in Python 2.7.
-            with open(os.devnull, 'w') as quiet:
+            with open(os.devnull, "w") as quiet:
                 # Check if file exists
                 cmd = "ls {0}".format(file_path)
-                retcode = subprocess.call(shlex.split(cmd))
+                retcode = subprocess.call(shlex.split(cmd), stdout=quiet, stderr=quiet)
                 if retcode == 0:
                     pass
                 else:
                     # Double check using ML if the file does not exist
-                    best_match = self._double_check(file_path)
+                    best_match = Utilities._double_check(file_path)
                     if best_match is None:
-                        raise ValueError('{0} does not exist.'.format(file_path))
+                        raise ValueError("{0} does not exist.".format(file_path))
                     else:
                         file_path = best_match
-                        ui_messenger.info('Match found at {0}'.format(file_path))
 
-                # Check the file's permissions
-                try:
-                    cmd = "stat -c %a {0}".format(file_path)
-                    result = subprocess.check_output(shlex.split(cmd))
-                    if int(result) < 644:
-                        cmd = "sudo chmod 644 {0}".format(file_path)
-                        retcode = subprocess.call(shlex.split(cmd))
-                        if retcode == 0:
-                            pass
-                        else:
-                            raise RuntimeError("Cannot change permissions for {0}.".format(
-                                file_path))
-                except subprocess.CalledProcessError as cpe:
-                    raise RuntimeError(
-                        "Unable to check permissions for {0}: {1}".format(file_path, cpe.output))
+            # Check the file's permissions
+            try:
+                cmd = "stat -c %a {0}".format(file_path)
+                result = subprocess.check_output(shlex.split(cmd))
+                if int(result) < 644:
+                    cmd = "sudo chmod 644 {0}".format(file_path)
+                    retcode = subprocess.call(shlex.split(cmd))
+                    if retcode == 0:
+                        pass
+                    else:
+                        raise RuntimeError("Cannot change permissions for {0}.".format(
+                            file_path))
+            except subprocess.CalledProcessError as cpe:
+                raise RuntimeError(
+                    "Unable to check permissions for {0}: {1}".format(file_path, cpe.output))
             return file_path
         else:
-            raise ValueError('Invalid file path: {0}.'.format(file_path))
+            raise ValueError("Invalid file path: {0}.".format(file_path))
 
-    def _double_check(file_path, ui_messenger, **kwargs):
+    @staticmethod
+    def _double_check(file_path):
         """Looks for file paths that may have been misspelled or incorrectly
-        formatted, such as:
-         * var/lib/tftpbootNSG/CiscoCatalyst3750X/nsg-1-sw-EXT-UNCLASS-cvn-78.cfg
-         * var/lib/tftpbootNSG/SiscoKatalyst3750X/nsg-1-sw-EXT-UNCLASS-cvn-78.cfg
+        formatted, such as var/lib/tftpbootc7206-config.cfg
 
         :param file_path: The path to the file.
         :type file_path: str
@@ -175,23 +174,23 @@ class Utilities(object):
         """
         # Get the extension of the file and create a wildcard
         try:
-            file_type = '*.{0}'.format(file_path.rsplit('.', 1)[1])
+            file_type = "*.{0}".format(file_path.rsplit(".", 1)[1])
         except IndexError:
             return None
         # Create a pool of files with the same extension
-        args = shlex.split('find / -name \'{0}}\''.format(file_type))
+        args = shlex.split("find / -name '{0}'".format(file_type))
         p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
-                              stderr=open(os.devnull, 'w'))
-        p2 = subprocess.Popen(['grep', '-v', 'Permission denied'], stdin=p1.stdout,
+                              stderr=open(os.devnull, "w"))
+        p2 = subprocess.Popen(["grep", "-v", "Permission denied"], stdin=p1.stdout,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
         possibilities, err = p2.communicate()
         # Find the best match to the file name within the pool, if any
         if possibilities:
-            return difflib.get_close_matches(file_path, possibilities.encode(
-                'utf-8').splitlines(), n=1)[0]
+            return difflib.get_close_matches(file_path, possibilities.decode("utf-8").splitlines(), n=1)[0]
 
-    def validate_ip_address(ip_address, ui_messenger, ipv4_only=True, **kwargs):
+    @staticmethod
+    def validate_ip_address(ip_address, ipv4_only=True):
         """Checks that the argument is a valid IP address.
 
         :param ip_address: The IP address to check.
@@ -215,7 +214,7 @@ class Utilities(object):
             except socket.error:
                 if ipv4_only:
                     raise ValueError(
-                        'Argument contains an invalid IPv4 address: {0}'.format(
+                        "Argument contains an invalid IPv4 address: {0}".format(
                             ip_address))
                 else:
                     try:
@@ -223,13 +222,14 @@ class Utilities(object):
                         return ip_address
                     except socket.error:
                         raise ValueError(
-                            'Argument contains an invalid IP address: {0}'.format(
+                            "Argument contains an invalid IP address: {0}".format(
                                 ip_address))
         else:
             raise ValueError(
-                'Argument contains an invalid IP address: {0}'.format(ip_address))
+                "Argument contains an invalid IP address: {0}".format(ip_address))
 
-    def validate_subnet_mask(subnet_mask, ui_messenger, **kwargs):
+    @staticmethod
+    def validate_subnet_mask(subnet_mask):
         """Checks that the argument is a valid subnet mask.
 
         :param subnet_mask: The subnet mask to check.
@@ -244,10 +244,10 @@ class Utilities(object):
             https://codereview.stackexchange.com/questions/209243/verify-a-subnet-mask-for-validity-in-python
         """
         if subnet_mask is not None and subnet_mask.strip():
-            a, b, c, d = (int(octet) for octet in subnet_mask.split('.'))
+            a, b, c, d = (int(octet) for octet in subnet_mask.split("."))
             mask = a << 24 | b << 16 | c << 8 | d
             if mask == 0:
-                raise ValueError('Invalid subnet mask: {0}'.format(subnet_mask))
+                raise ValueError("Invalid subnet mask: {0}".format(subnet_mask))
             else:
                 # Count the number of consecutive 0 bits at the right.
                 # https://wiki.python.org/moin/BitManipulation#lowestSet.28.29
@@ -256,13 +256,13 @@ class Utilities(object):
                 while m:
                     m >>= 1
                     right0bits += 1
-                # Verify that all the bits to the left are 1's
+                # Verify that all the bits to the left are 1"s
                 if mask | ((1 << right0bits) - 1) != 0xffffffff:
                     raise ValueError(
-                        'Invalid subnet mask: {0}'.format(subnet_mask))
+                        "Invalid subnet mask: {0}".format(subnet_mask))
             return subnet_mask
         else:
-            raise ValueError('Invalid subnet mask: {0}.'.format(subnet_mask))
+            raise ValueError("Invalid subnet mask: {0}.".format(subnet_mask))
 
     def enable_tftp(self, ui_messenger, **kwargs):
         """This function:
@@ -365,7 +365,7 @@ class Utilities(object):
         rval = self.FAIL
         try:
             # Disable the TFTP service and stop the TFTP server
-            ui_messenger.info('Resetting the TFTP service configuration...')
+            ui_messenger.info("Resetting the TFTP service configuration...")
             cmd = "sudo cp -f {0}/tftp_off /etc/xinetd.d/tftp".format(os.getcwd())
             retcode = subprocess.call(shlex.split(cmd))
             if retcode == 0:
@@ -373,10 +373,7 @@ class Utilities(object):
             else:
                 raise RuntimeError("Unable to reset the TFTP service.")
 
-            ui_messenger.info('Blocking TFTP traffic through firewall...')
-            # subprocess.call(
-            #     ['sudo', 'firewall-cmd', '--zone=public',
-            #     '--remove-service=tftp'])
+            ui_messenger.info("Blocking TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --remove-service=tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode == 0:
@@ -384,7 +381,7 @@ class Utilities(object):
             else:
                 raise RuntimeError("Unable to modify firewall settings.")
 
-            ui_messenger.info('Stopping the TFTP service...')
+            ui_messenger.info("Stopping the TFTP service...")
             cmd = "sudo systemctl stop tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode == 0:
@@ -392,7 +389,7 @@ class Utilities(object):
             else:
                 raise RuntimeError("Unable to stop the TFTP service.")
 
-            ui_messenger.info('Disabling the TFTP service...')
+            ui_messenger.info("Disabling the TFTP service...")
             cmd = "sudo systemctl disable tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode == 0:
@@ -460,7 +457,7 @@ if __name__ == "__main__":
                 "Please run ./gns3_run.sh to start GNS3 before executing this script.")
 
         # Initialize default parameter values
-        config_file_path = "test.cfg"
+        config_file_path = "R1_7206_i1_startup-config.cfg"
         device_ip_address = "192.168.1.10"
         subnet_mask = "255.255.255.0"
         host_ip_address = "192.168.1.100"

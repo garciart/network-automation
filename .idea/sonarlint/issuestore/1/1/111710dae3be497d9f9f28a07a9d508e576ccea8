@@ -1,10 +1,13 @@
 
-xpython:S1186u"YAdd a nested comment explaining why this method is empty, or complete the implementation.(™ÈÆ8Ü¾òò‚/
-Hpython:S108ù")Either remove or fill this block of code.(ã‘Û¾8”Œâ¥/
-}python:S1186y"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ÍøÎíıÿÿÿÿ8¿ûúÄ€/
-xpython:S1186U"YAdd a nested comment explaining why this method is empty, or complete the implementation.(°ÀÁõ8¿ûúÄ€/
-}python:S1186L"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ı»´ıÿÿÿÿ8¿ûúÄ€/
-~python:S1186§"YAdd a nested comment explaining why this method is empty, or complete the implementation.(˜Ÿåúÿÿÿÿ8”Œâ¥/
-xpython:S1186X"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ûÜ®«8¿ûúÄ€/
-}python:S1186["YAdd a nested comment explaining why this method is empty, or complete the implementation.(©Ã±¦üÿÿÿÿ8¿ûúÄ€/
->python:S125Ì"Remove this commented out code.(ø×ğ´8ÿ­¡’ƒ/
+}python:S1186b"YAdd a nested comment explaining why this method is empty, or complete the implementation.(©Ã±¦üÿÿÿÿ8¿ûúÄ€/
+fpython:S5720¢"ARename "file_path" to "self" or add the missing "self" parameter.(Í×¦®ûÿÿÿÿ8ªÑ½ƒ/
+cpython:S5720è"CRename "subnet_mask" to "self" or add the missing "self" parameter.(Æá‹Ô8ÓäÎ½ƒ/
+Cpython:S2275¶"#Fix this formatted string's syntax.(À¬ı8ã‰Ÿ¿ƒ/
+Hpython:S108—")Either remove or fill this block of code.(ã‘Û¾8ü½ö¾ƒ/
+ypython:S3776‹"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(Š†³ÿÿÿÿÿ8Ä©÷ºƒ/
+Npython:S1481€")Remove the unused local variable "quiet".(–Çµçûÿÿÿÿ8ÿ¾ù¾ƒ/
+spython:S3776o"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(·ÔÄ8ƒÂò¾ƒ/
+}python:S1186Q"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ı»´ıÿÿÿÿ8¿ûúÄ€/
+xpython:S1186X"YAdd a nested comment explaining why this method is empty, or complete the implementation.(°ÀÁõ8¿ûúÄ€/
+Hpython:S108…")Either remove or fill this block of code.(ã‘Û¾8ÒßÚ¾ƒ/
+gpython:S5720Â"BRename "ip_address" to "self" or add the missing "self" parameter.(®¾–¦øÿÿÿÿ8ÓäÎ½ƒ/
