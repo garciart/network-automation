@@ -330,46 +330,61 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 38. We will turn the following commands into a repeatable script:
 
-         R1>enable
-         R1#configure terminal ! Enter Global Configuration Mode
-         R1(config)#interface FastEthernet0/0 ! Enter Interface Configuration Mode
-         R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
-         R1(config-if)#no shutdown ! Bring up the interface
-         R1(config-if)#exit ! Exit Interface Configuration Mode
-         R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway
-         R1(config)#end ! Exit Global Configuration Mode
-         R1#write memory ! Save new configuration to flash memory
-         R1#copy running-config startup-config ! Use the current configuration for startup
+        R1>enable
+        R1#configure terminal ! Enter Global Configuration Mode
+        R1(config)#interface FastEthernet0/0 ! Enter Interface Configuration Mode
+        R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
+        R1(config-if)#no shutdown ! Bring up the interface
+        R1(config-if)#exit ! Exit Interface Configuration Mode
+        R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway
+        R1(config)#end ! Exit Global Configuration Mode
+        R1#write memory ! Save new configuration to flash memory
+        R1#copy running-config startup-config ! Use the current configuration for startup
 
 39. In your editor, enter the following script:
 
-import pexpect
-import time
-child = pexpect.spawn("telnet 192.168.1.100 5001")
-time.sleep(30)
-child.sendline()
-child.sendline("enable ! Enter Priviledged EXEC Mode")
-child.expect_exact("R1#")
-child.sendline("configure terminal ! Enter Global Configuration Mode")
-child.expect_exact("R1(config)#")
-child.sendline("interface FastEthernet0/0  ! Enter Interface Configuration Mode")
-child.expect_exact("R1(config-if)#")
-child.sendline("ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router")
-child.expect_exact("R1(config-if)#")
-child.sendline("no shutdown ! Bring up the interface")
-child.expect_exact("R1(config-if)#")
-child.sendline("exit ! Exit Interface Configuration Mode")
-child.expect_exact("R1(config)#")
-child.sendline("ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway")
-child.expect_exact("R1(config)#")
-child.sendline("end ! Exit Global Configuration Mode")
-child.expect_exact("R1#")
-child.sendline("write memory ! Save new configuration to flash memory")
-child.expect_exact("R1#")
-child.sendline("copy running-config startup-config ! Use the current configuration for startup")
-child.expect_exact("R1#")
-child.sendline("exit")
-print("Script complete. Have a nice day.")
+        child = pexpect.spawn('telnet 192.168.1.100 5001')
+        time.sleep(10)
+        child.sendline('\r')
+        # Enter Privileged EXEC Mode
+        child.sendline('enable\r')
+        child.expect_exact('R1#', timeout=5)
+        print(child.before.decode('utf-8'))
+        print(child.after.decode('utf-8'))
+        # Enter Global Configuration Mode
+        child.sendline('configure terminal\r')
+        child.expect_exact('R1(config)#')
+        # Enter Interface Configuration Mode
+        child.sendline('interface FastEthernet0/0\r')
+        child.expect_exact('R1(config-if)#')
+        # Set the IP address of the router
+        child.sendline('ip address 192.168.1.10 255.255.255.0\r')
+        child.expect_exact('R1(config-if)#')
+        # Bring up the interface
+        child.sendline('no shutdown\r')
+        child.expect_exact('R1(config-if)#')
+        # Exit Interface Configuration Mode
+        child.sendline('exit\r')
+        child.expect_exact('R1(config)#')
+        # Configure the default gateway
+        child.sendline('ip route 0.0.0.0 0.0.0.0 192.168.1.100\r')
+        child.expect_exact('R1(config)#')
+        # Exit Global Configuration Mode
+        child.sendline('end\r')
+        child.expect_exact('R1#')
+        # Save new configuration to flash memory
+        child.sendline('write memory\r')
+        time.sleep(10)
+        child.expect_exact('R1#')
+        # Use the current configuration for startup
+        child.sendline('copy running-config startup-config\r')
+        child.expect_exact('R1#')
+        # Exit Telnet
+        child.sendline('exit\r')
+        child.expect_exact('Press RETURN to get started.')
+        child.sendcontrol(']')
+        child.expect_exact('telnet>')
+        child.sendline('quit\r')
 
 Ping the router’s default gateway:
 
