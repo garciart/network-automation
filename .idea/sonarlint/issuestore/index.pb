@@ -58,3 +58,5 @@ B
 labs/tftp_on,0/2/02a6142ba7b24c080c93a0a1eb4797994834b239
 =
 labs/tftp_off,1/6/16d563d53bd641486255008db1044f36b093b5b7
+C
+labs/create_user.py,2/d/2dfc44d587d8f6296bd9b75d4623c47cf04cbf3a
