@@ -311,13 +311,38 @@ class Utilities(object):
                 raise RuntimeError(
                     "Unable to check tftpboot directory permission: {0}".format(cpe.output))
 
+            """
+            ui_messenger.info(
+                "Checking that the TFTP service configuration file has the correct permissions (i.e., 666+)...")
+            try:
+                dir_permissions = subprocess.check_output(["stat", "-c", "%a", "/etc/xinetd.d/tftp"])
+                if int(dir_permissions) < 666:
+                    ui_messenger.warning(
+                        "Incorrect permissions for TFTP service configuration file: Correcting...")
+                    cmd = "sudo chmod 666 {0}".format("/etc/xinetd.d/tftp")
+                    retcode = subprocess.call(shlex.split(cmd))
+                    if retcode == 0:
+                        ui_messenger.info("TFTP service configuration file permissions corrected.")
+                    else:
+                        raise RuntimeError("Unable to correct TFTP service configuration file permissions.")
+                else:
+                    ui_messenger.info("Permissions correct: Good to go...")
+            except subprocess.CalledProcessError as cpe:
+                raise RuntimeError(
+                    "Unable to check TFTP service configuration file permission: {0}".format(cpe.output))
+            """
+
             ui_messenger.info("Modifying the TFTP service configuration...")
-            cmd = "sudo cp -f {0}/tftp_on /etc/xinetd.d/tftp".format(os.getcwd())
-            retcode = subprocess.call(shlex.split(cmd))
-            if retcode == 0:
-                ui_messenger.info("TFTP service configuration modified.")
-            else:
-                raise RuntimeError("Unable to modify TFTP service configuration.")
+            cmd = (
+                "sudo sed -i 's/server_args             = -s \/var\/lib\/tftpboot/server_args             = -c -s \/var\/lib\/tftpboot/g' /etc/xinetd.d/tftp",
+                "sudo sed -i 's/disable                 = yes/disable                 = no/g' /etc/xinetd.d/tftp")
+            for i, c in enumerate(cmd, 1):
+                # print(shlex.split(c))
+                retcode = subprocess.call(shlex.split(c))
+                if retcode == 0:
+                    print("TFTP configuration set to enabled ({0}/2)".format(i))
+                else:
+                    raise RuntimeError("Unable to set TFTP configuration to enabled ({0}/2)".format(i))
 
             ui_messenger.info("Allowing TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --add-service=tftp"
@@ -366,12 +391,16 @@ class Utilities(object):
         try:
             # Disable the TFTP service and stop the TFTP server
             ui_messenger.info("Resetting the TFTP service configuration...")
-            cmd = "sudo cp -f {0}/tftp_off /etc/xinetd.d/tftp".format(os.getcwd())
-            retcode = subprocess.call(shlex.split(cmd))
-            if retcode == 0:
-                ui_messenger.info("TFTP service configuration reset.")
-            else:
-                raise RuntimeError("Unable to reset the TFTP service.")
+            cmd = (
+                "sudo sed -i 's/server_args             = -c -s \/var\/lib\/tftpboot/server_args             = -s \/var\/lib\/tftpboot/g' /etc/xinetd.d/tftp",
+                "sudo sed -i 's/disable                 = no/disable                 = yes/g' /etc/xinetd.d/tftp")
+            for i, c in enumerate(cmd, 1):
+                # print(shlex.split(c))
+                retcode = subprocess.call(shlex.split(c))
+                if retcode == 0:
+                    print("TFTP settings set to disabled ({0}/2)".format(i))
+                else:
+                    raise RuntimeError("Unable to set TFTP settings to disabled ({0}/2)".format(i))
 
             ui_messenger.info("Blocking TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --remove-service=tftp"
@@ -501,7 +530,7 @@ if __name__ == "__main__":
         try:
             # In Lab 0, the unconfigured router is connected to the host through console
             # port 5001 TCP.
-            with telnetlib.Telnet(host_ip_address, 5001):
+            with telnetlib.Telnet(host_ip_address, 5001, timeout=15):
                 ui_messenger.info("Device reached.")
         except ConnectionRefusedError:
             raise RuntimeError(
@@ -519,6 +548,6 @@ if __name__ == "__main__":
         ui_messenger.info("Good-bye.")
         exit(1)
 
-    # The Ramon7206 object has its own error-handling code
+    # The Ramon object has its own error-handling code
     r7206.run(ui_messenger)
     ui_messenger.info("Script complete. Have a nice day.")

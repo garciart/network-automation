@@ -1,8 +1,8 @@
 
-Mpython:S1481O")Remove the unused local variable "child".(ÀÍÔøÿÿÿÿ8¿ûúÄ€/
-xpython:S1186T"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ûÜ®«8¿ûúÄ€/
-~python:S1186Ä"YAdd a nested comment explaining why this method is empty, or complete the implementation.(˜Ÿåúÿÿÿÿ8¿ûúÄ€/
-}python:S1186K"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ı»´ıÿÿÿÿ8¿ûúÄ€/
-xpython:S1186Q"YAdd a nested comment explaining why this method is empty, or complete the implementation.(°ÀÁõ8¿ûúÄ€/
-}python:S1186W"YAdd a nested comment explaining why this method is empty, or complete the implementation.(©Ã±¦üÿÿÿÿ8¿ûúÄ€/
-~python:S1186ƒ"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ÍøÎíıÿÿÿÿ8¿ûúÄ€/
+Hpython:S108—")Either remove or fill this block of code.(ã‘Û¾8ÃøêÈƒ/
+ypython:S3776‹"TRefactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed.(Š†³ÿÿÿÿÿ8ÃøêÈƒ/
+}python:S1186Q"YAdd a nested comment explaining why this method is empty, or complete the implementation.(ı»´ıÿÿÿÿ8ÃøêÈƒ/
+xpython:S1186X"YAdd a nested comment explaining why this method is empty, or complete the implementation.(°ÀÁõ8ÃøêÈƒ/
+Hpython:S108†")Either remove or fill this block of code.(ã‘Û¾8ÃøêÈƒ/
+}python:S1186b"YAdd a nested comment explaining why this method is empty, or complete the implementation.(©Ã±¦üÿÿÿÿ8ÃøêÈƒ/
+xpython:S3776p"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(ÿÀöşùÿÿÿÿ8ÃøêÈƒ/
