@@ -65,9 +65,11 @@ class Ramon7206(CiscoRouter):
     def run(self, ui_messenger, **kwargs):
         try:
             ui_messenger.info("Hello from Cisco Ramon!")
+            # self._setup_host()
             child = self._connect_to_device(ui_messenger, **kwargs)
             self._transfer_files(child, ui_messenger, **kwargs)
             self._disconnect_from_device(child, ui_messenger, **kwargs)
+            # self._reset_host()
         except pexpect.exceptions.ExceptionPexpect:
             ex_type, ex_value, ex_traceback = sys.exc_info()
             ui_messenger.error("Type {0}: {1} in {2} at line {3}.".format(
@@ -79,7 +81,51 @@ class Ramon7206(CiscoRouter):
             ui_messenger.info("Good-bye from Cisco Ramon.")
 
     def _setup_host(self):
-        pass
+        """
+
+        :return:
+        """
+        """
+        Also check https://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-from-nic-in-python
+        
+        # Get and save the original IP address that can connect to the Internet (should be enp0s3 or eth0)
+        org_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
+        org_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+        org_netmask=$(ifconfig $org_interface | grep -w inet | awk '{print $4}' | cut -d ":" -f 2)
+        org_broadcast=$(ifconfig $org_interface | grep -w inet | awk '{print $6}' | cut -d ":" -f 2)
+        """
+        # The host is configured using gns3_run.sh
+        interface = [i for i in os.listdir("/sys/class/net/") if i.startswith("em", "en", "eth")]
+        if len(interface) < 1:
+            raise RuntimeError("No Ethernet interfaces were found. Use ifconfig to diagnose.")
+        elif len(interface) > 1:
+            raise RuntimeError(
+                "Multiple Ethernet interfaces were found. " +
+                "Please remove all Ethernet connections except for the connection to the device.")
+        else:
+            cmd = ("sudo ip tuntap add tap0 mode tap",  # Add the tap device
+                   "sudo ifconfig tap0 0.0.0.0 promisc up",  # Configure the tap
+                   "sudo ifconfig {0} 0.0.0.0 promisc up".format(interface[0]),
+                   # Zero out the default Ethernet connection
+                   "sudo brctl addbr br0",  # Create the bridge
+                   "sudo brctl addif br0 tap0",  # Add the tap to the bridge
+                   "sudo brctl addif br0 {0}".format(interface[0]),
+                   # Add the default Ethernet connection to the bridge
+                   "sudo ifconfig br0 up",  # Start the bridge
+                   "sudo ifconfig br0 {0}/24".format(self._host_ip_address),
+                   # Configure the bridge
+                   "sudo route add default gw {0}".format(
+                       self._host_ip_address[:self._host_ip_address.rfind(
+                           '.') + 1] + '254'))  # Setup the default gateway"
+
+            for i, c in enumerate(cmd, 1):
+                # print(shlex.split(c))
+                retcode = subprocess.call(shlex.split(c))
+                if retcode == 0:
+                    pass
+                else:
+                    raise RuntimeError(
+                        "Unable to configure host: Step {0}".format(i))
 
     def _connect_to_device(self, ui_messenger, **kwargs):
         child = pexpect.spawn("telnet {0}".format(self._device_ip_address))
@@ -100,6 +146,9 @@ class Ramon7206(CiscoRouter):
 
     def _disconnect_from_device(self, child, ui_messenger, **kwargs):
         child.close()
+
+    def _reset_host(self):
+        pass
 
 
 class Utilities(object):
@@ -187,7 +236,9 @@ class Utilities(object):
         possibilities, err = p2.communicate()
         # Find the best match to the file name within the pool, if any
         if possibilities:
-            return difflib.get_close_matches(file_path, possibilities.decode("utf-8").splitlines(), n=1)[0]
+            return \
+                difflib.get_close_matches(file_path, possibilities.decode("utf-8").splitlines(),
+                                          n=1)[0]
 
     @staticmethod
     def validate_ip_address(ip_address, ipv4_only=True):
@@ -342,7 +393,8 @@ class Utilities(object):
                 if retcode == 0:
                     print("TFTP configuration set to enabled ({0}/2)".format(i))
                 else:
-                    raise RuntimeError("Unable to set TFTP configuration to enabled ({0}/2)".format(i))
+                    raise RuntimeError(
+                        "Unable to set TFTP configuration to enabled ({0}/2)".format(i))
 
             ui_messenger.info("Allowing TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --add-service=tftp"
