@@ -17,6 +17,7 @@ from __future__ import print_function
 
 import argparse
 import difflib
+import hashlib
 import logging
 import os
 import shlex
@@ -65,6 +66,7 @@ class Ramon7206(CiscoRouter):
     def run(self, ui_messenger, **kwargs):
         try:
             ui_messenger.info("Hello from Cisco Ramon!")
+            self._get_config_file_hash(self._config_file_path)
             # self._setup_host()
             child = self._connect_to_device(ui_messenger, **kwargs)
             self._transfer_files(child, ui_messenger, **kwargs)
@@ -79,6 +81,21 @@ class Ramon7206(CiscoRouter):
                 ex_traceback.tb_lineno))
         finally:
             ui_messenger.info("Good-bye from Cisco Ramon.")
+
+    def _get_config_file_hash(self, config_file_path):
+        blocksize = 65536
+        hashes = {
+            "hashlib": [hashlib.md5(), hashlib.sha1(), hashlib.sha256()],
+            "title": ["MD5 hash", "SHA1 hash", "SHA256 hash"],
+        }
+        for h, t in zip(hashes["hashlib"], hashes["title"]):
+            hasher = h
+            with open(config_file_path, "rb") as afile:
+                buf = afile.read(blocksize)
+                while len(buf) > 0:
+                    hasher.update(buf)
+                    buf = afile.read(blocksize)
+            print("{0}: {1}".format(t, hasher.hexdigest()))
 
     def _setup_host(self):
         """
