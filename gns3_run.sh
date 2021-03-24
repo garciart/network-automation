@@ -17,8 +17,8 @@ sudo brctl addbr br0 # Create the bridge
 sudo brctl addif br0 tap0 # Add the tap to the bridge
 sudo brctl addif br0 $org_interface # Add the default Ethernet connection to the bridge
 sudo ifconfig br0 up # Start the bridge
-sudo ifconfig br0 192.168.1.100/24 # Configure the bridge
-sudo route add default gw 192.168.1.254 # Setup the default gateway
+sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
+sudo route add default gw 192.168.1.1 # Setup the default gateway
 echo
 echo -e "Network interface configuration:"
 ifconfig # Verify the devices exist

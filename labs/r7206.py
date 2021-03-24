@@ -57,21 +57,67 @@ class Ramon7206(CiscoRouter):
     def host_ip_address(self):
         return self._host_ip_address
 
-    def __init__(self, config_file_path, device_ip_address, subnet_mask, host_ip_address):
+    def __init__(self, config_file_path, device_ip_address, subnet_mask, host_ip_address,
+                 **kwargs):
+        """Set instance variables and save original Ethernet configuration.
+
+        :param config_file_path:
+        :param device_ip_address:
+        :param subnet_mask:
+        :param host_ip_address:
+
+        :raises FileNotFoundError: blah, blah, blah.
+        :raises IndexError: blah, blah, blah.
+        :raises RuntimeError: blah, blah, blah.
+        """
         self._device_ip_address = Utilities.validate_ip_address(device_ip_address)
         self._subnet_mask = Utilities.validate_subnet_mask(subnet_mask)
         self._config_file_path = Utilities.validate_file_path(config_file_path)
         self._host_ip_address = Utilities.validate_ip_address(host_ip_address)
+        self._priority = kwargs.get("priority", 1)
+        self._org_eth_config = {
+            "name": None,
+            "ipv4": None,
+            "netmask": None,
+            "broadcast": None,
+            "ipv6": None,
+            "mac": None,
+        }
+
+        """
+        # Get and save the original Ethernet configuration
+        # Use network device names from RHEL 6 (eth), Fedora 15 (em), and RHEL 7 (en)
+        eth_interface_name = [i for i in os.listdir("/sys/class/net/") if i.startswith(
+            ("em", "en", "eth"))]
+        if len(eth_interface_name) < 1:
+            raise RuntimeError("No Ethernet interfaces were found. Use ifconfig to diagnose.")
+        elif len(eth_interface_name) > 1:
+            raise RuntimeError(
+                "Multiple Ethernet interfaces were found. " +
+                "Please remove all Ethernet connections except for the connection to the device.")
+        else:
+            # Future: os.popen("ip addr show {0}".format(eth_interface_name[0])).read().split("inet ")[1].split("/")[0]
+            eth_config = os.popen("ifconfig {0}".format(eth_interface_name[0])).read()
+            self._org_eth_config["name"] = eth_interface_name[0]
+            self._org_eth_config["ipv4"] = eth_config.split("inet ")[1].split(" ")[0].strip()
+            self._org_eth_config["netmask"] = eth_config.split("netmask ")[1].split(" ")[0].strip()
+            self._org_eth_config["broadcast"] = eth_config.split("broadcast ")[1].split(" ")[
+                0].strip()
+            self._org_eth_config["ipv6"] = eth_config.split("inet6 ")[1].split(" ")[0].strip()
+            self._org_eth_config["mac"] = eth_config.split("ether ")[1].split(" ")[0].strip()
+        """
 
     def run(self, ui_messenger, **kwargs):
         try:
             ui_messenger.info("Hello from Cisco Ramon!")
-            self._get_config_file_hash(self._config_file_path)
-            # self._setup_host()
+            # self._setup_host(ui_messenger, **kwargs)
             child = self._connect_to_device(ui_messenger, **kwargs)
+            self._setup_device(child, ui_messenger, **kwargs)
+            self._backup_files(child, ui_messenger, **kwargs)
             self._transfer_files(child, ui_messenger, **kwargs)
+            self._reset_device(child, ui_messenger, **kwargs)
             self._disconnect_from_device(child, ui_messenger, **kwargs)
-            # self._reset_host()
+            # self._reset_host(ui_messenger, **kwargs)
         except pexpect.exceptions.ExceptionPexpect:
             ex_type, ex_value, ex_traceback = sys.exc_info()
             ui_messenger.error("Type {0}: {1} in {2} at line {3}.".format(
@@ -82,7 +128,104 @@ class Ramon7206(CiscoRouter):
         finally:
             ui_messenger.info("Good-bye from Cisco Ramon.")
 
-    def _get_config_file_hash(self, config_file_path):
+    def _setup_host(self, ui_messenger, **kwargs):
+        # FIXME: PLACEHOLDER CODE ONLY! Run gns3_run.sh to configure host, before executing this script
+        cmd = (
+            # Add the tap device
+            "sudo ip tuntap add tap0 mode tap",
+            # Configure the tap
+            "sudo ifconfig tap0 0.0.0.0 promisc up",
+            # Zero out the default Ethernet connection
+            "sudo ifconfig {0} 0.0.0.0 promisc up".format(self._org_eth_config["name"]),
+            # Create the bridge
+            "sudo brctl addbr br0",
+            # Add the tap to the bridge
+            "sudo brctl addif br0 tap0",
+            # Add the default Ethernet connection to the bridge
+            "sudo brctl addif br0 {0}".format(self._org_eth_config["name"]),
+            # Start the bridge
+            "sudo ifconfig br0 up",
+            # Configure the bridge
+            "sudo ifconfig br0 {0} netmask {1}".format(self._host_ip_address, self._subnet_mask),
+            # Setup the default gateway
+            "sudo route add default gw {0}".format(
+                self._host_ip_address[:self._host_ip_address.rfind(
+                    ".") + 1] + "1"),
+        )
+
+        ui_messenger.info("Configuring the host...")
+        for i, c in enumerate(cmd, 1):
+            # print(shlex.split(c))
+            retcode = subprocess.call(shlex.split(c))
+            if retcode == 0:
+                pass
+            else:
+                raise RuntimeError(
+                    "Unable to configure host: Step {0}".format(i))
+
+    def _connect_to_device(self, ui_messenger, **kwargs):
+        child = pexpect.spawn("telnet {0} {1}".format(device_ip_address, "5001"), encoding="utf-8")
+        time.sleep(5)
+        return child
+
+    def _setup_device(self, child, ui_messenger, **kwargs):
+        try:
+            # Send two returns and enable, in case the device is already in Privileged EXEC Mode
+            child.sendline("\r")
+            # Enter Privileged EXEC Mode
+            child.sendline("enable\r")
+            child.expect_exact("R1#", timeout=5)
+
+
+            # Enter Global Configuration Mode
+            child.sendline("configure terminal\r")
+            child.expect_exact("R1(config)#")
+            # Enter Interface Configuration Mode
+            child.sendline("interface FastEthernet0/0\r")
+            child.expect_exact("R1(config-if)#")
+            # Set the IP address of the router
+            child.sendline("ip address 192.168.1.10 255.255.255.0\r")
+            child.expect_exact("R1(config-if)#")
+            # Bring up the interface
+            child.sendline("no shutdown\r")
+            child.expect_exact("R1(config-if)#")
+            # Exit Interface Configuration Mode
+            child.sendline("exit\r")
+            child.expect_exact("R1(config)#")
+            # Configure the default gateway
+            child.sendline("ip route 0.0.0.0 0.0.0.0 192.168.1.1\r")
+            child.expect_exact("R1(config)#")
+            # Exit Global Configuration Mode
+            child.sendline("end\r")
+            child.expect_exact("R1#")
+        except pexpect.exceptions.ExceptionPexpect as ex:
+            # print(ex)
+            e_type, e_value, e_traceback = sys.exc_info()
+            ui_messenger.error("Type {0}: Expected {1}, found {2} in {3} at line {4}.".format(
+                e_type.__name__,
+                str(ex).split("searcher_string:\n    0: ")[1].split("\n")[0].strip(),
+                str(ex).split("before (last 100 chars): ")[1].split("\n")[0].strip(),
+                e_traceback.tb_frame.f_code.co_filename,
+                e_traceback.tb_lineno
+            ))
+            raise RuntimeError("Unable to setup device.")
+
+    def _backup_files(self, child, ui_messenger, **kwargs):
+        utility = Utilities()
+        try:
+            utility.enable_tftp(ui_messenger)
+        finally:
+            utility.disable_tftp(ui_messenger)
+
+    def _transfer_files(self, child, ui_messenger, **kwargs):
+        utility = Utilities()
+        try:
+            utility.enable_tftp(ui_messenger)
+            self._get_config_file_hash(self._config_file_path, ui_messenger, **kwargs)
+        finally:
+            utility.disable_tftp(ui_messenger)
+
+    def _get_config_file_hash(self, config_file_path, ui_messenger, **kwargs):
         blocksize = 65536
         hashes = {
             "hashlib": [hashlib.md5(), hashlib.sha1(), hashlib.sha256()],
@@ -95,79 +238,56 @@ class Ramon7206(CiscoRouter):
                 while len(buf) > 0:
                     hasher.update(buf)
                     buf = afile.read(blocksize)
-            print("{0}: {1}".format(t, hasher.hexdigest()))
+            ui_messenger.info("{0}: {1}".format(t, hasher.hexdigest()))
 
-    def _setup_host(self):
-        """
-
-        :return:
-        """
-        # The host is currently configured using gns3_run.sh, but will move here.
-
-        # Get and save the original Ethernet configuration
-        eth_interface = [i for i in os.listdir("/sys/class/net/") if i.startswith(
-            "em", "en", "eth")]
-        if len(eth_interface) < 1:
-            raise RuntimeError("No Ethernet interfaces were found. Use ifconfig to diagnose.")
-        elif len(eth_interface) > 1:
-            raise RuntimeError(
-                "Multiple Ethernet interfaces were found. " +
-                "Please remove all Ethernet connections except for the connection to the device.")
-        else:
-            # os.popen("ip addr show {0}".format(eth_interface[0])).read().split("inet ")[1].split("/")[0]
-            org_eth_config = os.popen("ifconfig {0}".format(eth_interface[0])).read()
-            org_eth_ipv4 = org_eth_config.split("inet ")[1].split(" ")[0].strip()
-            org_eth_netmask = org_eth_config.split("netmask ")[1].split(" ")[0].strip()
-            org_eth_broadcast = org_eth_config.split("broadcast ")[1].split(" ")[0].strip()
-            org_eth_ipv6 = org_eth_config.split("inet6 ")[1].split(" ")[0].strip()
-            org_eth_mac = org_eth_config.split("ether ")[1].split(" ")[0].strip()
-
-            cmd = ("sudo ip tuntap add tap0 mode tap",  # Add the tap device
-                   "sudo ifconfig tap0 0.0.0.0 promisc up",  # Configure the tap
-                   "sudo ifconfig {0} 0.0.0.0 promisc up".format(eth_interface[0]),
-                   # Zero out the default Ethernet connection
-                   "sudo brctl addbr br0",  # Create the bridge
-                   "sudo brctl addif br0 tap0",  # Add the tap to the bridge
-                   "sudo brctl addif br0 {0}".format(eth_interface[0]),
-                   # Add the default Ethernet connection to the bridge
-                   "sudo ifconfig br0 up",  # Start the bridge
-                   "sudo ifconfig br0 {0}/24".format(self._host_ip_address),
-                   # Configure the bridge
-                   "sudo route add default gw {0}".format(
-                       self._host_ip_address[:self._host_ip_address.rfind(
-                           '.') + 1] + '1'))  # Setup the default gateway"
-
-            for i, c in enumerate(cmd, 1):
-                # print(shlex.split(c))
-                retcode = subprocess.call(shlex.split(c))
-                if retcode == 0:
-                    pass
-                else:
-                    raise RuntimeError(
-                        "Unable to configure host: Step {0}".format(i))
-
-    def _connect_to_device(self, ui_messenger, **kwargs):
-        child = pexpect.spawn("telnet {0}".format(self._device_ip_address))
-        return child
-
-    def _setup_device(self):
-        pass
-
-    def _transfer_files(self, child, ui_messenger, **kwargs):
-        try:
-            utility = Utilities()
-            utility.enable_tftp(ui_messenger)
-        finally:
-            utility.disable_tftp(ui_messenger)
-
-    def _verify_device_configuration(self):
+    def _reset_device(self, child, ui_messenger, **kwargs):
         pass
 
     def _disconnect_from_device(self, child, ui_messenger, **kwargs):
+        child.sendline("exit\r")
+        child.expect_exact("Press RETURN to get started.")
+        child.sendcontrol("]")
+        child.expect_exact("telnet>")
+        child.sendline("quit\r")
         child.close()
 
-    def _reset_host(self):
-        pass
+    def _reset_host(self, ui_messenger, **kwargs):
+        # FIXME: PLACEHOLDER CODE ONLY! Run gns3_run.sh to configure host, before executing this script
+        # Upon exit from GNS3, reset the default Ethernet connection to access the Internet
+        cmd = (
+            # Stop the bridge
+            "sudo ifconfig br0 down",
+            # Remove the default Ethernet connection from the bridge
+            "sudo brctl delif br0 {0}".format(self._org_eth_config["name"]),
+            # Remove the tap from the bridge
+            "sudo brctl delif br0 tap0",
+            # Delete the bridge
+            "sudo brctl delbr br0",
+            # Stop the tap
+            "sudo ifconfig tap0 down",
+            # Delete the tap
+            "sudo ip link delete tap0",
+            # Reset the default Ethernet connection
+            "sudo ifconfig {0} -promisc".format(self._org_eth_config["name"]),
+            "sudo ifconfig {0} {1} up".format(self._org_eth_config["name"],
+                                              self._org_eth_config["ipv4"]),
+            "sudo ifconfig {0} netmask {1}".format(self._org_eth_config["name"],
+                                                   self._org_eth_config["netmask"]),
+            "sudo ifconfig {0} broadcast {1}".format(self._org_eth_config["name"],
+                                                     self._org_eth_config["broadcast"]),
+            # Check your OS; may use service networking restart
+            "sudo systemctl restart network",
+        )
+
+        ui_messenger.info("Resetting the host (please wait 30 seconds...)")
+        for i, c in enumerate(cmd, 1):
+            # print(shlex.split(c))
+            retcode = subprocess.call(shlex.split(c))
+            if retcode == 0:
+                pass
+            else:
+                raise RuntimeError(
+                    "Unable to reset host: Step {0}".format(i))
 
 
 class Utilities(object):
@@ -246,8 +366,8 @@ class Utilities(object):
         except IndexError:
             return None
         # Create a pool of files with the same extension
-        args = shlex.split("find / -name '{0}'".format(file_type))
-        p1 = subprocess.Popen(args, stdout=subprocess.PIPE,
+        cmd = shlex.split("find / -name '{0}'".format(file_type))
+        p1 = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                               stderr=open(os.devnull, "w"))
         p2 = subprocess.Popen(["grep", "-v", "Permission denied"], stdin=p1.stdout,
                               stdout=subprocess.PIPE,
@@ -543,24 +663,11 @@ if __name__ == "__main__":
         ui_messenger = UserInterface()
         ui_messenger.info("Connecting to Cisco Ramon...")
 
-        # Check that GNS3 is running; if false, the method will raise an error and the script
-        # will exit.
-        # Use subprocess here, so the user running the script, if not root, gets prompted for
-        # their password
-        cmd = "sudo -S pgrep gns3server"  # Returns the process ID
-        retcode = subprocess.call(shlex.split(cmd))
-        if retcode == 0:
-            ui_messenger.info("GNS3 is running.")
-        else:
-            raise RuntimeError(
-                "GNS3 is not running. " +
-                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
-
         # Initialize default parameter values
         config_file_path = "R1_7206_i1_startup-config.cfg"
         device_ip_address = "192.168.1.10"
         subnet_mask = "255.255.255.0"
-        host_ip_address = "192.168.1.100"
+        host_ip_address = "192.168.1.1"
 
         # Get parameter values from the command-line
         parser = argparse.ArgumentParser()
@@ -597,6 +704,21 @@ if __name__ == "__main__":
         # Instantiate the router object here, since __init__ does not have error-handling code
         r7206 = Ramon7206(config_file_path, device_ip_address, subnet_mask, host_ip_address)
 
+        # FIXME: Just for GNS3
+        # Check that GNS3 is running; if false, the method will raise an error and the script
+        # will exit.
+        # Use subprocess here, so the user running the script, if not root, gets prompted for
+        # their password
+        cmd = "sudo -S pgrep gns3server"  # Returns the process ID
+        retcode = subprocess.call(shlex.split(cmd))
+        if retcode == 0:
+            ui_messenger.info("GNS3 is running.")
+        else:
+            raise RuntimeError(
+                "GNS3 is not running. " +
+                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+
+        # FIXME: Just for GNS3
         # Check if the lab is loaded and the device is started
         try:
             # In Lab 0, the unconfigured router is connected to the host through console
@@ -608,7 +730,7 @@ if __name__ == "__main__":
                 "Unable to reach device. " +
                 "Please load Lab 0 in GNS3 and start all devices before executing this script.")
 
-    except RuntimeError:
+    except (FileNotFoundError, IndexError, RuntimeError):
         # Format the error, report, and exit
         e_type, e_value, e_traceback = sys.exc_info()
         ui_messenger.error("Type {0}: '{1}' in {2} at line {3}.".format(
