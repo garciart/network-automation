@@ -1,4 +1,5 @@
 *.bin
 *.pyc
 /labs/xtest.py
-/labs/r7206.py
+.idea/
+.vscode/
