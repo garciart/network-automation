@@ -85,38 +85,40 @@ class Ramon7206(CiscoRouter):
 
         :return:
         """
-        """
-        Also check https://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-from-nic-in-python
-        
-        # Get and save the original IP address that can connect to the Internet (should be enp0s3 or eth0)
-        org_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
-        org_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-        org_netmask=$(ifconfig $org_interface | grep -w inet | awk '{print $4}' | cut -d ":" -f 2)
-        org_broadcast=$(ifconfig $org_interface | grep -w inet | awk '{print $6}' | cut -d ":" -f 2)
-        """
-        # The host is configured using gns3_run.sh
-        interface = [i for i in os.listdir("/sys/class/net/") if i.startswith("em", "en", "eth")]
-        if len(interface) < 1:
+        # The host is currently configured using gns3_run.sh, but will move here.
+
+        # Get and save the original Ethernet configuration
+        eth_interface = [i for i in os.listdir("/sys/class/net/") if i.startswith(
+            "em", "en", "eth")]
+        if len(eth_interface) < 1:
             raise RuntimeError("No Ethernet interfaces were found. Use ifconfig to diagnose.")
-        elif len(interface) > 1:
+        elif len(eth_interface) > 1:
             raise RuntimeError(
                 "Multiple Ethernet interfaces were found. " +
                 "Please remove all Ethernet connections except for the connection to the device.")
         else:
+            # os.popen("ip addr show {0}".format(eth_interface[0])).read().split("inet ")[1].split("/")[0]
+            org_eth_config = os.popen("ifconfig {0}".format(eth_interface[0])).read()
+            org_eth_ipv4 = org_eth_config.split("inet ")[1].split(" ")[0].strip()
+            org_eth_netmask = org_eth_config.split("netmask ")[1].split(" ")[0].strip()
+            org_eth_broadcast = org_eth_config.split("broadcast ")[1].split(" ")[0].strip()
+            org_eth_ipv6 = org_eth_config.split("inet6 ")[1].split(" ")[0].strip()
+            org_eth_mac = org_eth_config.split("ether ")[1].split(" ")[0].strip()
+
             cmd = ("sudo ip tuntap add tap0 mode tap",  # Add the tap device
                    "sudo ifconfig tap0 0.0.0.0 promisc up",  # Configure the tap
-                   "sudo ifconfig {0} 0.0.0.0 promisc up".format(interface[0]),
+                   "sudo ifconfig {0} 0.0.0.0 promisc up".format(eth_interface[0]),
                    # Zero out the default Ethernet connection
                    "sudo brctl addbr br0",  # Create the bridge
                    "sudo brctl addif br0 tap0",  # Add the tap to the bridge
-                   "sudo brctl addif br0 {0}".format(interface[0]),
+                   "sudo brctl addif br0 {0}".format(eth_interface[0]),
                    # Add the default Ethernet connection to the bridge
                    "sudo ifconfig br0 up",  # Start the bridge
                    "sudo ifconfig br0 {0}/24".format(self._host_ip_address),
                    # Configure the bridge
                    "sudo route add default gw {0}".format(
                        self._host_ip_address[:self._host_ip_address.rfind(
-                           '.') + 1] + '254'))  # Setup the default gateway"
+                           '.') + 1] + '1'))  # Setup the default gateway"
 
             for i, c in enumerate(cmd, 1):
                 # print(shlex.split(c))

@@ -56,7 +56,7 @@ Before we start, here's the subnet info for the network:
 - Usable IP Range: 192.168.1.1 - 192.168.1.254
 - **GNS3 Host Device IP Address: 192.168.1.1/32**
 - **First Virtual Device IP Address: 192.168.1.10/32**
-- Gateway: 192.168.1.254
+- Gateway: 192.168.1.1
 - Broadcast Address: 192.168.1.255
 - Wildcard Mask: 0.0.0.255
 - Binary Subnet Mask: 11111111.11111111.11111111.00000000

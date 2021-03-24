@@ -264,7 +264,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
     
 30. We can configure the router within this console, but since we are going to use Python instead, close the console, but make sure the router is still running.
 
-31. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.100:5001). Therefore, open a terminal and start a Python session:
+31. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.1:5001). Therefore, open a terminal and start a Python session:
     
          [gns3user@localhost ~]$ python
          Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
@@ -276,7 +276,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
          >>> import pexpect
          >>> import time
-         >>> child = pexpect.spawn("telnet 192.168.1.100 5001")
+         >>> child = pexpect.spawn("telnet 192.168.1.1 5001")
          >>> time.sleep(30)
 
 >**Note** - If you see ```ImportError: No module named pexpect.```, you will need to install pexpect first. In CentOS/RHEL, open another terminal and run ```yum install pexpect```.
@@ -304,13 +304,13 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
     You will see something like:
    
-         'Trying 192.168.1.100...\r\r\nConnected to 192.168.1.100.\r\r\nEscape character is \'^]\'.\r\r\nConnected to Dynamips VM "R1" (ID 1, type c7200) - Console port\r\nPress ENTER to get the prompt.\r\nROMMON emulation microcode.\n\nLaunching IOS image at 0x80008000...\n\r\n              Restricted Rights Legend\r\n\r\nUse, duplication, or disclosure by the Government is\r\nsubject to restrictions as set forth in subparagraph\r\n(c) of the Commercial Computer Software - Restricted\r\nRights clause at FAR sec. 52.227-19 and subparagraph\r\n(c) (1) (ii) of the Rights in Technical Data and Computer\r\nSoftware clause at DFARS sec. 252.227-7013.\r\n\r\n           cisco Systems, Inc.\r\n           170 West Tasman Drive\r\n           San Jose, California 95134-1706\r\n\r\n\r\n\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n\r\n\r\nThis product contains cryptographic features and is subject to United\r\nStates and local country laws governing import, export, transfer and\r\nuse. Delivery of Cisco cryptographic products does not imply\r\nthird-party authority to import, export, distribute or use encryption.\r\nImporters, exporters, distributors and users are responsible for\r\ncompliance with U.S. and local country laws. By using this product you\r\nagree to comply with applicable laws and regulations. If you are unable\r\nto comply with U.S. and local laws, return this product immediately.\r\n\r\nA summary of U.S. laws governing Cisco cryptographic products may be found at:\r\nhttp://www.cisco.com/wwl/export/crypto/tool/stqrg.html\r\n\r\nIf you require further assistance please contact us by sending email to\r\nexport@cisco.com.\r\n\r\nCisco 7206VXR (NPE400) processor (revision A) with 491520K/32768K bytes of memory.\r\nProcessor board ID 4279256517\r\nR7000 CPU at 150MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache\r\n6 slot VXR midplane, Version 2.1\r\n\r\nLast reset from power-on\r\n\r\nPCI bus mb0_mb1 (Slots 0, 1, 3 and 5) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb0_mb1 has a total of 200 bandwidth points. \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPCI bus mb2 (Slots 2, 4, 6) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb2 has a total of 0 bandwidth points \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPlease refer to the following document "Cisco 7200 Series Port Adaptor\r\nHardware Configuration Guidelines" on Cisco.com <http://www.cisco.com>\r\nfor c7200 bandwidth points oversubscription and usage guidelines.\r\n\r\n\r\n1 FastEthernet interface\r\n509K bytes of NVRAM.\r\n\r\n8192K bytes of Flash internal SIMM (Sector size 256K).\r\nSETUP: new interface FastEthernet0/0 placed in "shutdown" state\r\n% Crashinfo may not be recovered at bootflash:crashinfo\r\n% This file system device reports an error\x07\r\n\r\n\r\nPress RETURN to get started!\r\n\r\n\r\n*Feb 25 22:03:55.399: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up\r\n*Feb 25 22:03:55.511: %SYS-5-CONFIG_I: Configured from memory by console\r\n*Feb 25 22:03:55.695: %SYS-5-RESTART: System restarted --\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n*Feb 25 22:03:55.707: %ENTITY_ALARM-6-INFO: ASSERT INFO Fa0/0 Physical Port Administrative State Down \r\n*Feb 25 22:03:55.719: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start\r\n*Feb 25 22:03:55.747: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up\r\n*Feb 25 22:03:56.119: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down\r\n*Feb 25 22:03:57.119: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down\x1b]0;R1\x07\r\n'
+         'Trying 192.168.1.1...\r\r\nConnected to 192.168.1.1.\r\r\nEscape character is \'^]\'.\r\r\nConnected to Dynamips VM "R1" (ID 1, type c7200) - Console port\r\nPress ENTER to get the prompt.\r\nROMMON emulation microcode.\n\nLaunching IOS image at 0x80008000...\n\r\n              Restricted Rights Legend\r\n\r\nUse, duplication, or disclosure by the Government is\r\nsubject to restrictions as set forth in subparagraph\r\n(c) of the Commercial Computer Software - Restricted\r\nRights clause at FAR sec. 52.227-19 and subparagraph\r\n(c) (1) (ii) of the Rights in Technical Data and Computer\r\nSoftware clause at DFARS sec. 252.227-7013.\r\n\r\n           cisco Systems, Inc.\r\n           170 West Tasman Drive\r\n           San Jose, California 95134-1706\r\n\r\n\r\n\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n\r\n\r\nThis product contains cryptographic features and is subject to United\r\nStates and local country laws governing import, export, transfer and\r\nuse. Delivery of Cisco cryptographic products does not imply\r\nthird-party authority to import, export, distribute or use encryption.\r\nImporters, exporters, distributors and users are responsible for\r\ncompliance with U.S. and local country laws. By using this product you\r\nagree to comply with applicable laws and regulations. If you are unable\r\nto comply with U.S. and local laws, return this product immediately.\r\n\r\nA summary of U.S. laws governing Cisco cryptographic products may be found at:\r\nhttp://www.cisco.com/wwl/export/crypto/tool/stqrg.html\r\n\r\nIf you require further assistance please contact us by sending email to\r\nexport@cisco.com.\r\n\r\nCisco 7206VXR (NPE400) processor (revision A) with 491520K/32768K bytes of memory.\r\nProcessor board ID 4279256517\r\nR7000 CPU at 150MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache\r\n6 slot VXR midplane, Version 2.1\r\n\r\nLast reset from power-on\r\n\r\nPCI bus mb0_mb1 (Slots 0, 1, 3 and 5) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb0_mb1 has a total of 200 bandwidth points. \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPCI bus mb2 (Slots 2, 4, 6) has a capacity of 600 bandwidth points.\r\nCurrent configuration on bus mb2 has a total of 0 bandwidth points \r\nThis configuration is within the PCI bus capacity and is supported. \r\n\r\nPlease refer to the following document "Cisco 7200 Series Port Adaptor\r\nHardware Configuration Guidelines" on Cisco.com <http://www.cisco.com>\r\nfor c7200 bandwidth points oversubscription and usage guidelines.\r\n\r\n\r\n1 FastEthernet interface\r\n509K bytes of NVRAM.\r\n\r\n8192K bytes of Flash internal SIMM (Sector size 256K).\r\nSETUP: new interface FastEthernet0/0 placed in "shutdown" state\r\n% Crashinfo may not be recovered at bootflash:crashinfo\r\n% This file system device reports an error\x07\r\n\r\n\r\nPress RETURN to get started!\r\n\r\n\r\n*Feb 25 22:03:55.399: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up\r\n*Feb 25 22:03:55.511: %SYS-5-CONFIG_I: Configured from memory by console\r\n*Feb 25 22:03:55.695: %SYS-5-RESTART: System restarted --\r\nCisco IOS Software, 7200 Software (C7200-A3JK9S-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by Cisco Systems, Inc.\r\nCompiled Wed 18-Aug-10 11:54 by prod_rel_team\r\n*Feb 25 22:03:55.707: %ENTITY_ALARM-6-INFO: ASSERT INFO Fa0/0 Physical Port Administrative State Down \r\n*Feb 25 22:03:55.719: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start\r\n*Feb 25 22:03:55.747: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up\r\n*Feb 25 22:03:56.119: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down\r\n*Feb 25 22:03:57.119: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down\x1b]0;R1\x07\r\n'
 
     To view this in human-readable format, use:
    
          >>> print(child.before.decode("utf-8"))
-         Trying 192.168.1.100...
-         Connected to 192.168.1.100.
+         Trying 192.168.1.1...
+         Connected to 192.168.1.1.
          Escape character is '^]'.
          Connected to Dynamips VM "R1" (ID 1, type c7200) - Console port
          Press ENTER to get the prompt.
@@ -336,14 +336,14 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
         R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
         R1(config-if)#no shutdown ! Bring up the interface
         R1(config-if)#exit ! Exit Interface Configuration Mode
-        R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.100 ! Configure the default gateway
+        R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1 ! Configure the default gateway
         R1(config)#end ! Exit Global Configuration Mode
         R1#write memory ! Save new configuration to flash memory
         R1#copy running-config startup-config ! Use the current configuration for startup
 
 39. In your editor, enter the following script:
 
-        child = pexpect.spawn('telnet 192.168.1.100 5001')
+        child = pexpect.spawn('telnet 192.168.1.1 5001')
         time.sleep(10)
         child.sendline('\r')
         # Enter Privileged EXEC Mode
@@ -367,7 +367,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
         child.sendline('exit\r')
         child.expect_exact('R1(config)#')
         # Configure the default gateway
-        child.sendline('ip route 0.0.0.0 0.0.0.0 192.168.1.100\r')
+        child.sendline('ip route 0.0.0.0 0.0.0.0 192.168.1.1\r')
         child.expect_exact('R1(config)#')
         # Exit Global Configuration Mode
         child.sendline('end\r')
@@ -388,10 +388,10 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 Ping the router’s default gateway:
 
-         R1#ping 192.168.1.100
+         R1#ping 192.168.1.1
 
          Type escape sequence to abort.
-         Sending 5, 100-byte ICMP Echos to 192.168.1.100, timeout is 2 seconds:
+         Sending 5, 100-byte ICMP Echos to 192.168.1.1, timeout is 2 seconds:
          .!!!!
          Success rate is 80 percent (4/5), round-trip min/avg/max = 32/36/40 ms
          R1#
