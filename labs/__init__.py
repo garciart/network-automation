@@ -29,17 +29,7 @@ class CiscoRouter(object):
     # Common class attributes
     # USE @abstractproperty INSTEAD OF @property FOR PYTHON < 3.3
     @abstractproperty
-    def config_file_path(self):
-        return None
-
-    # USE @abstractproperty INSTEAD OF @property FOR PYTHON < 3.3
-    @abstractproperty
-    def device_ip_address(self):
-        return None
-
-    # USE @abstractproperty INSTEAD OF @property FOR PYTHON < 3.3
-    @abstractproperty
-    def subnet_mask(self):
+    def device_name(self):
         return None
 
     # Common class methods
