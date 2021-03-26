@@ -1,0 +1,17 @@
+/usr/bin/python3.6 /home/gns3user/repos/Automation/labs/r7206.py
+Message: Running Cisco Ramon...
+Warning: You are running this application with default test values.
+[sudo] password for gns3user: gns3user
+5514
+Message: GNS3 is running.
+Message: Device reached.
+Message: Hello from Cisco Ramon!
+Message: Connecting to device from host...
+Message: Connected to device from host.
+Message: Configuring device for file transfer...
+Error: Type EOF: Expected 'R1#', found "scape character is '^]'.\r\n\r\n\r\nPassword required, but none set\r\nConnection closed by foreign host.\r\r\n" in /home/gns3user/repos/Automation/labs/r7206.py at line 190.
+Error: Type RuntimeError: Unable to configure for file transfer. in /home/gns3user/repos/Automation/labs/r7206.py at line 108.
+Message: Good-bye from Cisco Ramon.
+Message: Script complete. Have a nice day.
+
+Process finished with exit code 0
