@@ -53,7 +53,7 @@ def main():
         child.sendline('exit\r')
         child.expect_exact('R1(config)#')
         # Configure the default gateway
-        child.sendline('ip route 0.0.0.0 0.0.0.0 192.168.1.100\r')
+        child.sendline('ip route 0.0.0.0 0.0.0.0 192.168.1.1\r')
         child.expect_exact('R1(config)#')
         # Exit Global Configuration Mode
         child.sendline('end\r')

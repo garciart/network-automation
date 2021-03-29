@@ -1,0 +1,43 @@
+/usr/bin/python3.6 /home/gns3user/repos/Automation/labs/r7206.py
+Message: Running Cisco Ramon...
+Warning: You are running this application with default test values.
+[sudo] password for gns3user: gns3user
+5514
+Message: GNS3 is running.
+Message: Device reached.
+Message: Hello from Cisco Ramon!
+Message: Connecting to device from host...
+Index:  1
+Message: Device already configured.
+Message: Configuring device for file transfer...
+Message: Device configured for file transfer.
+Message: Backing up configuration files...
+Warning: Incorrect permissions for TFTP service configuration file: Correcting...
+success
+Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
+Message: Configuration files backed-up.
+success
+Warning: Stopping tftp.service, but it can still be activated by:
+  tftp.socket
+Removed symlink /etc/systemd/system/sockets.target.wants/tftp.socket.
+Message: Uploading new configuration files...
+Warning: Incorrect permissions for TFTP service configuration file: Correcting...
+success
+Created symlink from /etc/systemd/system/sockets.target.wants/tftp.socket to /usr/lib/systemd/system/tftp.socket.
+Message: Computed hashes for /home/gns3user/Documents/R1_3745_i1_startup-config.cfg:
+Message: MD5 hash: 0c5f6aea96819bb8e5ad6ee437766c56
+Message: SHA1 hash: 3225b01e17f86a0f4438b9710434965153f42186
+Message: SHA256 hash: 3abbe9755cff45822e4d9916af8717018e8b78d7f8ce305a0bb972f50707f975
+Message: New configuration files uploaded.
+success
+Warning: Stopping tftp.service, but it can still be activated by:
+  tftp.socket
+Removed symlink /etc/systemd/system/sockets.target.wants/tftp.socket.
+Message: Reloading device...
+Message: Device reloaded.
+Message: Disconnecting from device...
+Message: Disconnected from device.
+Message: Good-bye from Cisco Ramon.
+Message: Script complete. Have a nice day.
+
+Process finished with exit code 0

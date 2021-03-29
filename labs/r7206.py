@@ -16,6 +16,7 @@ Requirements:
 from __future__ import print_function
 
 import argparse
+import datetime
 import difflib
 import hashlib
 import logging
@@ -47,9 +48,10 @@ class Ramon7206(CiscoRouter):
     PEXPECT_ERROR_MESSAGE = "Type {0}: Expected {1}, found {2} in {3} at line {4}."
     PEXPECT_EXPECTED = "searcher_string:\n    0: "
     PEXPECT_FOUND = "before (last 100 chars): "
+    PROMPT_CONFIG = "R1(config)#"
+    PROMPT_INTERFACE = "R1(config-if)#"
 
-    def __init__(self, config_file_path, device_ip_address, subnet_mask, host_ip_address,
-                 **kwargs):
+    def __init__(self, config_file_path, device_ip_address, subnet_mask, host_ip_address, **kwargs):
         """Set instance variables and save original Ethernet configuration.
 
         :param config_file_path:
@@ -65,6 +67,7 @@ class Ramon7206(CiscoRouter):
         self._subnet_mask = Utilities.validate_subnet_mask(subnet_mask)
         self._config_file_path = Utilities.validate_file_path(config_file_path)
         self._host_ip_address = Utilities.validate_ip_address(host_ip_address)
+        self._device_ethernet_interface = kwargs.get("device_ethernet_interface", "FastEthernet0/0")
         self._priority = kwargs.get("priority", 1)
         self._org_eth_config = {
             "name": None,
@@ -74,6 +77,8 @@ class Ramon7206(CiscoRouter):
             "ipv6": None,
             "mac": None,
         }
+        current_utc = datetime.datetime.utcnow()
+        self._backup_file_path = "r1-config-{0}.cfg".format(current_utc.strftime("%Y-%m-%d-%H%M"))
 
         """
         # Get and save the original Ethernet configuration
@@ -100,18 +105,19 @@ class Ramon7206(CiscoRouter):
 
     def run(self, ui_messenger, **kwargs):
         ui_messenger.info("Hello from Cisco Ramon!")
-        child = object()
+        child = None
         # Catch all exceptions here, except for pexpect feedback
         try:
             # self._configure_host(ui_messenger, **kwargs)
             child = self._connect_to_device(ui_messenger, **kwargs)
             self._configure_device(child, ui_messenger, **kwargs)
-            self._backup_files(child, ui_messenger, **kwargs)
-            self._upload_files(child, ui_messenger, **kwargs)
+            self._verify_configuration(ui_messenger, **kwargs)
+            self._backup_configuration(child, ui_messenger, **kwargs)
+            self._upload_configuration(child, ui_messenger, **kwargs)
             self._reload_device(child, ui_messenger, **kwargs)
             self._disconnect_from_device(child, ui_messenger, **kwargs)
             # self._reset_host(ui_messenger, **kwargs)
-        except (RuntimeError, pexpect.exceptions.ExceptionPexpect):
+        except (RuntimeError, pexpect.ExceptionPexpect):
             ex_type, ex_value, ex_traceback = sys.exc_info()
             ui_messenger.error("Type {0}: {1} in {2} at line {3}.".format(
                 ex_type.__name__,
@@ -120,7 +126,8 @@ class Ramon7206(CiscoRouter):
                 ex_traceback.tb_lineno))
         finally:
             # Ensure child is closed
-            child.close()
+            if child:
+                child.close()
             ui_messenger.info("Good-bye from Cisco Ramon.")
 
     def _configure_host(self, ui_messenger, **kwargs):
@@ -149,7 +156,7 @@ class Ramon7206(CiscoRouter):
                     ".") + 1] + "1"),
         )
         for i, c in enumerate(cmd, 1):
-            # print(shlex.split(c))
+            # ui_messenger.debug(shlex.split(c))
             retcode = subprocess.call(shlex.split(c))
             if retcode != 0:
                 raise RuntimeError(
@@ -157,16 +164,37 @@ class Ramon7206(CiscoRouter):
         ui_messenger.info("Host configured for file transfer.")
 
     def _connect_to_device(self, ui_messenger, **kwargs):
-        ui_messenger.info("Connecting to device from host...")
+        ui_messenger.info("Connecting to device from host (please wait 30 seconds)...")
         # Use local try-expect to capture pexpect feedback, but push RuntimeError to run method
+        child = None
         try:
-            child = pexpect.spawn("telnet {0} {1}".format(self._host_ip_address, "5001"), timeout=10, encoding="utf-8")
-            time.sleep(5)
-            child.expect_exact("Connected to {0}.".format(self._host_ip_address))
-            ui_messenger.info("Connected to device from host.")
+            index = 0
+            while 0 <= index <= 3:
+                # FYI - This simulates a console connection. Using child =
+                # pexpect.spawn("telnet {0}".format(self._device_ip_address), timeout=10) on a
+                # device with an IP address may result in a "Password required, but none set" error
+                child = pexpect.spawn("telnet {0} {1}".format(self._host_ip_address, "5001"),
+                                      timeout=10)
+                time.sleep(30)
+                # Send a return to clear any messages
+                child.sendline("\r")
+                # pexpect will break the loop with an error if the index is not found
+                index = child.expect_exact([
+                    "R1>",
+                    "R1#",
+                    "Would you like to terminate autoinstall? [yes/no]:",
+                    "Would you like to enter the initial configuration dialog? [yes/no]:", ])
+                ui_messenger.debug("Spawn index = {0}).".format(index))
+                if index in [0, 1]:
+                    ui_messenger.debug("Connected to device from host.")
+                    break
+                if index == 2:
+                    child.sendline("yes\r")
+                if index == 3:
+                    child.sendline("no\r")
             return child
-        except pexpect.exceptions.ExceptionPexpect as ex:
-            # print(ex)
+        except pexpect.ExceptionPexpect as ex:
+            # ui_messenger.debug(ex)
             e_type, e_value, e_traceback = sys.exc_info()
             ui_messenger.error(self.PEXPECT_ERROR_MESSAGE.format(
                 e_type.__name__,
@@ -187,9 +215,47 @@ class Ramon7206(CiscoRouter):
             child.sendline("enable\r")
             child.expect_exact("R1#")
             # Enter Global Configuration Mode
+            child.sendline("configure terminal\r")
+            child.expect_exact(self.PROMPT_CONFIG)
+            # Enter Interface Configuration Mode
+            child.sendline("interface {0}\r".format(self._device_ethernet_interface))
+            child.expect_exact(self.PROMPT_INTERFACE)
+            # Set the IP address of the router
+            child.sendline("ip address {0} {1}\r".format(self._device_ip_address, self._subnet_mask))
+            child.expect_exact(self.PROMPT_INTERFACE)
+            # Bring up the interface
+            child.sendline("no shutdown\r")
+            child.expect_exact(self.PROMPT_INTERFACE)
+            # Exit Interface Configuration Mode
+            child.sendline("exit\r")
+            child.expect_exact(self.PROMPT_CONFIG)
+            # Configure the default gateway
+            child.sendline("ip route 0.0.0.0 0.0.0.0 {0}\r".format(self._host_ip_address))
+            child.expect_exact(self.PROMPT_CONFIG)
+            """
+            # Generate keys for SCP transfer: 1024 will enable SSH 1.99 and 2048 will enable SSH 2
+            child.sendline("crypto key zeroize rsa\r")
+            child.expect_exact(self.PROMPT_CONFIG)
+            child.sendline("generate rsa general-keys modulus 2048\r")
+            child.expect_exact(self.PROMPT_CONFIG)
+            # Enable secure copy of files from host
+            child.sendline("ip scp server enable\r")
+            child.expect_exact(self.PROMPT_CONFIG)
+            """
+            # Have TFTP as a backup if SCP fails
+            # Ensure the router uses F0/0 as the TFTP source interface
+            child.sendline("ip tftp source-interface {0}\r".format(self._device_ethernet_interface))
+            child.expect_exact(self.PROMPT_CONFIG)
+            # Exit Global Configuration Mode
+            child.sendline("end\r")
+            child.expect_exact("R1#")
+            # Save new configuration to flash memory
+            child.sendline("write memory\r")
+            time.sleep(10)
+            child.expect_exact("R1#")
             ui_messenger.info("Device configured for file transfer.")
-        except pexpect.exceptions.ExceptionPexpect as ex:
-            # print(ex)
+        except pexpect.ExceptionPexpect as ex:
+            # ui_messenger.debug(ex)
             e_type, e_value, e_traceback = sys.exc_info()
             ui_messenger.error(self.PEXPECT_ERROR_MESSAGE.format(
                 e_type.__name__,
@@ -198,29 +264,122 @@ class Ramon7206(CiscoRouter):
                 e_traceback.tb_frame.f_code.co_filename,
                 e_traceback.tb_lineno
             ))
-            raise RuntimeError("Unable to configure for file transfer.")
+            raise RuntimeError("Unable to configure device for file transfer.")
 
-    def _backup_files(self, child, ui_messenger, **kwargs):
+    def _verify_configuration(self, ui_messenger, **kwargs):
+        ui_messenger.info("Verifying device configuration...")
+        try:
+            cmd = "ping -c 4 {0}".format(self._device_ip_address)
+            result = subprocess.check_output(shlex.split(cmd))
+            if int(result.split("packets transmitted, ")[1].split(" ")[0].strip()) > 0:
+                ui_messenger.info("Device configuration verified.")
+            else:
+                raise RuntimeError("Unable to ping {0}: {1}".format(self._device_ip_address, result))
+        except subprocess.CalledProcessError as cpe:
+            raise RuntimeError(
+                "Unable to ping {0}: {1}".format(self._device_ip_address, cpe.output))
+
+    def _backup_configuration(self, child, ui_messenger, **kwargs):
         ui_messenger.info("Backing up configuration files...")
         utility = Utilities()
         # Use try-finally to ensure TFTP is diabled even if an error occurs
         # Any exceptions will be caught by the run method
         try:
-            utility.enable_tftp(ui_messenger)
-            ui_messenger.info("Configuration files backed-up.")
+            utility.enable_tftp(ui_messenger,
+                                upload_filename=self._config_file_path,
+                                download_filename=self._backup_file_path)
+
+            child.sendline("\r")
+            child.expect_exact("R1#")
+            child.sendline("copy nvram:startup-config tftp:\r")
+            child.expect_exact("Address or name of remote host [")
+            child.sendline("{0}\r".format(self._host_ip_address))
+            # child.expect_exact("Source username [")
+            # child.sendline("{0}\r".format("gns3user"))
+            # child.expect_exact("Source filename [")
+            # child.sendline("{0}\r".format(self._config_file_path))
+            child.expect_exact("Destination filename [")
+            child.sendline("{0}\r".format(self._backup_file_path))
+            index = 0
+            while 0 <= index <= 2:
+                index = child.expect_exact(["Error",
+                                            "Do you want to overwrite?",
+                                            "Password:",
+                                            "bytes copied in"])
+                ui_messenger.debug("Backup index = {0}).".format(index))
+                if index == 0:
+                    raise RuntimeError(
+                        "Cannot upload new configuration file (upload index {0}".format(index))
+                if index == 1:
+                    child.sendline("yes\r")
+                if index == 2:
+                    child.sendline("gns3user\r")
+                if index == 3:
+                    ui_messenger.info("Configuration files backed up.")
+                    break
+        except pexpect.ExceptionPexpect as ex:
+            # ui_messenger.debug(ex)
+            e_type, e_value, e_traceback = sys.exc_info()
+            ui_messenger.error(self.PEXPECT_ERROR_MESSAGE.format(
+                e_type.__name__,
+                str(ex).split(self.PEXPECT_EXPECTED)[1].split("\n")[0].strip("\r\n"),
+                str(ex).split(self.PEXPECT_FOUND)[1].split("\n")[0].strip("\r\n"),
+                e_traceback.tb_frame.f_code.co_filename,
+                e_traceback.tb_lineno
+            ))
+            raise RuntimeError("Unable to backup configuration files.")
+
         finally:
             utility.disable_tftp(ui_messenger)
 
-    def _upload_files(self, child, ui_messenger, **kwargs):
+    def _upload_configuration(self, child, ui_messenger, **kwargs):
         ui_messenger.info("Uploading new configuration files...")
         utility = Utilities()
         # Use try-finally to ensure TFTP is diabled even if an error occurs
         # Any exceptions will be caught by the run method
         try:
-            utility.enable_tftp(ui_messenger)
             # Provide the user with a computed hash for comparison
             self.__get_config_file_hash(self._config_file_path, ui_messenger, **kwargs)
-            ui_messenger.info("New configuration files uploaded.")
+            utility.enable_tftp(ui_messenger)
+
+            child.sendline("\r")
+            child.expect_exact("R1#")
+            child.sendline("copy tftp: nvram:startup-config:\r")
+            child.expect_exact("Address or name of remote host [")
+            child.sendline("{0}\r".format(self._host_ip_address))
+            # child.expect_exact("Source username [")
+            # child.sendline("{0}\r".format("gns3user"))
+            child.expect_exact("Source filename [")
+            child.sendline("{0}\r".format(self._config_file_path.lstrip("/var/lib/tftpboot/")))
+            child.expect_exact("Destination filename [")
+            child.sendline("startup-config\r")
+            index = 0
+            while 0 <= index <= 2:
+                index = child.expect_exact(
+                    ["Error", "Do you want to overwrite?", "Password:", "[OK]"])
+                ui_messenger.debug("Upload index = {0}).".format(index))
+                if index == 0:
+                    raise RuntimeError(
+                        "Cannot upload new configuration file (upload index {0}".format(index))
+                if index == 1:
+                    child.sendline("yes\r")
+                if index == 2:
+                    child.sendline("gns3user\r")
+                if index == 3:
+                    ui_messenger.info("New configuration files uploaded.")
+                    break
+        except pexpect.ExceptionPexpect as ex:
+            # ui_messenger.debug(ex)
+            e_type, e_value, e_traceback = sys.exc_info()
+            ui_messenger.error(self.PEXPECT_ERROR_MESSAGE.format(
+                e_type.__name__,
+                str(ex).split(self.PEXPECT_EXPECTED)[1].split("\n")[0].strip("\r\n"),
+                str(ex).split(self.PEXPECT_FOUND)[1].split("\n")[0].strip("\r\n"),
+                e_traceback.tb_frame.f_code.co_filename,
+                e_traceback.tb_lineno
+            ))
+            raise RuntimeError("Unable to upload configuration files.")
+
         finally:
             utility.disable_tftp(ui_messenger)
 
@@ -255,8 +414,8 @@ class Ramon7206(CiscoRouter):
             child.sendline("quit\r")
             child.expect_exact("Connection closed.")
             ui_messenger.info("Disconnected from device.")
-        except pexpect.exceptions.ExceptionPexpect as ex:
-            # print(ex)
+        except pexpect.ExceptionPexpect as ex:
+            # ui_messenger.debug(ex)
             e_type, e_value, e_traceback = sys.exc_info()
             ui_messenger.error(self.PEXPECT_ERROR_MESSAGE.format(
                 e_type.__name__,
@@ -299,7 +458,7 @@ class Ramon7206(CiscoRouter):
         )
         ui_messenger.info("Resetting the network (please wait 30 seconds...)")
         for i, c in enumerate(cmd, 1):
-            # print(shlex.split(c))
+            # ui_messenger.debug(shlex.split(c))
             retcode = subprocess.call(shlex.split(c))
             if retcode != 0:
                 raise RuntimeError(
@@ -471,7 +630,7 @@ class Utilities(object):
         else:
             raise ValueError("Invalid subnet mask: {0}.".format(subnet_mask))
 
-    def enable_tftp(self, ui_messenger, **kwargs):
+    def enable_tftp(self, ui_messenger, upload_filename=None, download_filename=None, **kwargs):
         """This function:
 
         * Verifies the default TFTP directory exists (/var/lib/tftpboot) and it
@@ -486,7 +645,7 @@ class Utilities(object):
         cmd = retcode = dir_permissions = None
         rval = self.FAIL
         try:
-            ui_messenger.info("Checking if the tftpboot directory exists...")
+            ui_messenger.debug("Checking if the tftpboot directory exists...")
             dir_exists = os.path.isdir(self.TFTP_DIR)
             if not dir_exists:
                 ui_messenger.warning("tftpboot directory does not exist. Creating...")
@@ -495,11 +654,11 @@ class Utilities(object):
                 if retcode != 0:
                     raise RuntimeError("Unable to create tftpboot directory.")
                 else:
-                    ui_messenger.info("tftpboot directory created.")
+                    ui_messenger.debug("tftpboot directory created.")
             else:
-                ui_messenger.info("Directory exists: Good to go.")
+                ui_messenger.debug("Directory exists: Good to go.")
 
-            ui_messenger.info(
+            ui_messenger.debug(
                 "Checking that the tftpboot directory has the correct permissions (i.e., 755+)...")
             try:
                 dir_permissions = subprocess.check_output(["stat", "-c", "%a", self.TFTP_DIR])
@@ -511,71 +670,119 @@ class Utilities(object):
                     if retcode != 0:
                         raise RuntimeError("Unable to correct tftpboot directory permissions.")
                     else:
-                        ui_messenger.info("tftpboot directory permissions corrected.")
+                        ui_messenger.debug("tftpboot directory permissions corrected.")
                 else:
-                    ui_messenger.info("Permissions correct: Good to go.")
+                    ui_messenger.debug("Permissions correct: Good to go.")
             except subprocess.CalledProcessError as cpe:
                 raise RuntimeError(
                     "Unable to check tftpboot directory permission: {0}".format(cpe.output))
 
-            ui_messenger.info(
+            if upload_filename is not None:
+                ui_messenger.debug(
+                    "Checking that the new configuration file has the correct permissions (i.e., 666)...")
+                try:
+                    file_permissions = subprocess.check_output(
+                        ["stat", "-c", "%a", upload_filename])
+                    # Permissions must be 666 to write FROM the switch and to send TO the switch
+                    if int(file_permissions) < 666:
+                        ui_messenger.warning(
+                            "Incorrect permissions for new configuration file: Correcting...")
+                        cmd = "sudo chmod 666 {0}".format(upload_filename)
+                        retcode = subprocess.call(shlex.split(cmd))
+                        if retcode != 0:
+                            raise RuntimeError(
+                                "Unable to correct new configuration file permissions.")
+                        else:
+                            ui_messenger.debug(
+                                "New configuration file permissions corrected.")
+                    else:
+                        ui_messenger.debug("Permissions correct: Good to go.")
+                except subprocess.CalledProcessError as cpe:
+                    raise RuntimeError(
+                        "Unable to check new configuration file permission: {0}".format(
+                            cpe.output))
+
+            if download_filename is not None:
+                ui_messenger.debug("Creating the download destination file...")
+                # Permissions must be 666 to write FROM the switch and to send TO the switch
+                cmd = ("touch {0}/{1}".format(self.TFTP_DIR, download_filename),
+                       "chmod 666 {0}/{1}".format(self.TFTP_DIR, download_filename))
+                for i, c in enumerate(cmd, 1):
+                    # ui_messenger.debug(shlex.split(c))
+                    retcode = subprocess.call(shlex.split(c))
+                    if retcode != 0:
+                        raise RuntimeError(
+                            "Unable to create the download destination file." 
+                            if i == 1 else
+                            "Unable to set download destination file permissions.")
+                    else:
+                        ui_messenger.debug(
+                            "Download destination file created."
+                            if i == 1 else
+                            "Download destination file permissions set.")
+
+            ui_messenger.debug(
                 "Checking that the TFTP service configuration file has the correct permissions (i.e., 666+)...")
             try:
-                dir_permissions = subprocess.check_output(["stat", "-c", "%a", self.TFTP_CONFIG_FILE])
-                if int(dir_permissions) < 666:
+                file_permissions = subprocess.check_output(
+                    ["stat", "-c", "%a", self.TFTP_CONFIG_FILE])
+                if int(file_permissions) < 666:
                     ui_messenger.warning(
                         "Incorrect permissions for TFTP service configuration file: Correcting...")
                     cmd = "sudo chmod 666 {0}".format(self.TFTP_CONFIG_FILE)
                     retcode = subprocess.call(shlex.split(cmd))
                     if retcode != 0:
-                        raise RuntimeError("Unable to correct TFTP service configuration file permissions.")
+                        raise RuntimeError(
+                            "Unable to correct TFTP service configuration file permissions.")
                     else:
-                        ui_messenger.info("TFTP service configuration file permissions corrected.")
+                        ui_messenger.debug(
+                            "TFTP service configuration file permissions corrected.")
                 else:
-                    ui_messenger.info("Permissions correct: Good to go.")
+                    ui_messenger.debug("Permissions correct: Good to go.")
             except subprocess.CalledProcessError as cpe:
                 raise RuntimeError(
-                    "Unable to check TFTP service configuration file permission: {0}".format(cpe.output))
+                    "Unable to check TFTP service configuration file permission: {0}".format(
+                        cpe.output))
 
-            ui_messenger.info("Modifying the TFTP service configuration...")
+            ui_messenger.debug("Modifying the TFTP service configuration...")
             cmd = (
                 "sudo sed -i 's/server_args             = -s \/var\/lib\/tftpboot/server_args             = -c -s \/var\/lib\/tftpboot/g' /etc/xinetd.d/tftp",
                 "sudo sed -i 's/disable                 = yes/disable                 = no/g' /etc/xinetd.d/tftp")
             for i, c in enumerate(cmd, 1):
-                # print(shlex.split(c))
+                # ui_messenger.debug(shlex.split(c))
                 retcode = subprocess.call(shlex.split(c))
                 if retcode != 0:
                     raise RuntimeError(
                         "Unable to set TFTP configuration to enabled ({0}/2)".format(i))
                 else:
-                    print("TFTP configuration set to enabled ({0}/2)".format(i))
+                    ui_messenger.debug("TFTP configuration set to enabled ({0}/2)".format(i))
 
-            ui_messenger.info("Allowing TFTP traffic through firewall...")
+            ui_messenger.debug("Allowing TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --add-service=tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to modify firewall settings.")
             else:
-                ui_messenger.info("Firewall settings modified.")
+                ui_messenger.debug("Firewall settings modified.")
 
-            ui_messenger.info("Starting the TFTP server...")
+            ui_messenger.debug("Starting the TFTP server...")
             cmd = "sudo systemctl start tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to start the TFTP service.")
             else:
-                ui_messenger.info("TFTP service started.")
+                ui_messenger.debug("TFTP service started.")
 
-            ui_messenger.info("Enabling the TFTP server...")
+            ui_messenger.debug("Enabling the TFTP server...")
             cmd = "sudo systemctl enable tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to enable the TFTP service.")
             else:
-                ui_messenger.info("TFTP service enabled.")
+                ui_messenger.debug("TFTP service enabled.")
 
-            ui_messenger.info("Don\"t forget to reset the TFTP service configuration before " +
-                              "shutting down the machine!!!")
+            ui_messenger.debug("Don\"t forget to reset the TFTP service configuration before " +
+                               "shutting down the machine!!!")
             rval = self.SUCCESS
         except RuntimeError:
             rval = self.ERROR
@@ -596,50 +803,51 @@ class Utilities(object):
         rval = self.FAIL
         try:
             # Disable the TFTP service and stop the TFTP server
-            ui_messenger.info("Resetting the TFTP service configuration...")
+            ui_messenger.debug("Resetting the TFTP service configuration...")
             cmd = (
                 "sudo sed -i 's/server_args             = -c -s \/var\/lib\/tftpboot/server_args             = -s \/var\/lib\/tftpboot/g' /etc/xinetd.d/tftp",
                 "sudo sed -i 's/disable                 = no/disable                 = yes/g' /etc/xinetd.d/tftp")
             for i, c in enumerate(cmd, 1):
-                # print(shlex.split(c))
+                # ui_messenger.debug(shlex.split(c))
                 retcode = subprocess.call(shlex.split(c))
                 if retcode != 0:
                     raise RuntimeError("Unable to set TFTP settings to disabled ({0}/2)".format(i))
                 else:
-                    print("TFTP settings set to disabled ({0}/2)".format(i))
+                    ui_messenger.debug("TFTP settings set to disabled ({0}/2)".format(i))
 
-            ui_messenger.info("Restoring default permissions for the TFTP service configuration file (i.e., 644)...")
+            ui_messenger.debug(
+                "Restoring default permissions for the TFTP service configuration file (i.e., 644)...")
             cmd = "sudo chmod 644 {0}".format(self.TFTP_CONFIG_FILE)
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError(
                     "Unable to restore TFTP service configuration file permissions.")
             else:
-                ui_messenger.info("TFTP service configuration file permissions restored.")
+                ui_messenger.debug("TFTP service configuration file permissions restored.")
 
-            ui_messenger.info("Blocking TFTP traffic through firewall...")
+            ui_messenger.debug("Blocking TFTP traffic through firewall...")
             cmd = "sudo firewall-cmd --zone=public --remove-service=tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to modify firewall settings.")
             else:
-                ui_messenger.info("Firewall settings modified.")
+                ui_messenger.debug("Firewall settings modified.")
 
-            ui_messenger.info("Stopping the TFTP service...")
+            ui_messenger.debug("Stopping the TFTP service...")
             cmd = "sudo systemctl stop tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to stop the TFTP service.")
             else:
-                ui_messenger.info("TFTP service stopped.")
+                ui_messenger.debug("TFTP service stopped.")
 
-            ui_messenger.info("Disabling the TFTP service...")
+            ui_messenger.debug("Disabling the TFTP service...")
             cmd = "sudo systemctl disable tftp"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Unable to disable the TFTP service.")
             else:
-                ui_messenger.info("TFTP service disabled.")
+                ui_messenger.debug("TFTP service disabled.")
             rval = self.SUCCESS
         except RuntimeError:
             rval = self.ERROR
@@ -662,7 +870,8 @@ class UserInterface(object):
 
     @staticmethod
     def debug(msg):
-        print("Debug: {0}".format(msg))
+        pass
+        # print("Debug: {0}".format(msg))
 
     @staticmethod
     def warning(msg):
@@ -691,6 +900,7 @@ if __name__ == "__main__":
         device_ip_address = "192.168.1.10"
         subnet_mask = "255.255.255.0"
         host_ip_address = "192.168.1.1"
+        device_ethernet_interface = "FastEthernet0/0"
 
         # Get parameter values from the command-line
         parser = argparse.ArgumentParser()
@@ -725,7 +935,7 @@ if __name__ == "__main__":
             ui_messenger.warning("You are running this application with default test values.")
 
         # Instantiate the router object here, since __init__ does not have error-handling code
-        r7206 = Ramon7206(config_file_path, device_ip_address, subnet_mask, host_ip_address)
+        r7206 = Ramon7206(config_file_path, device_ip_address, subnet_mask, host_ip_address, device_ethernet_interface = device_ethernet_interface)
 
         # TODO: Just for GNS3
         # Check that GNS3 is running; if false, the method will raise an error and the script
@@ -746,14 +956,16 @@ if __name__ == "__main__":
         try:
             # In Lab 0, the unconfigured router is connected to the host through console
             # port 5001 TCP.
-            with telnetlib.Telnet(host_ip_address, 5001, timeout=15):
+            t = telnetlib.Telnet(host_ip_address, "5001", timeout=15)
+            if t:
                 ui_messenger.info("Device reached.")
-        except ConnectionRefusedError:
+                t.close()
+        except OSError:
             raise RuntimeError(
                 "Unable to reach device. " +
                 "Please load Lab 0 in GNS3 and start all devices before executing this script.")
 
-    except (FileNotFoundError, IndexError, RuntimeError):
+    except (OSError, IndexError, RuntimeError):
         # Format the error, report, and exit
         e_type, e_value, e_traceback = sys.exc_info()
         ui_messenger.error("Type {0}: '{1}' in {2} at line {3}.".format(
