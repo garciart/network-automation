@@ -34,7 +34,7 @@ class CiscoRouter(object):
 
     # Common class methods
     @abstractmethod
-    def run(self, user_interface, **options):
+    def run(self, **kwargs):
         """This method must be implemented by all derived classes in
         mtk.mtk.script.
 
