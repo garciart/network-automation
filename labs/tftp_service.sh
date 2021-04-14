@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to anable and disable TFTP service
+# Script to enable and disable TFTP service
 # Usage: ./tftp_service.sh enable /var/lib/tftpboot/R1_7206_i1_startup-config.cfg
 # Usage: ./tftp_service.sh disable
 # Don't forget to set this script's permissions to executable!
