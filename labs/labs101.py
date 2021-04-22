@@ -31,7 +31,7 @@ def main():
             print("GNS3 server is running; process number {0}.".format(child_result.decode().strip()))
 
         else:
-            print("GNS3 is not running. Please run ./gns3_run.sh to start GNS3.")
+            print("GNS3 is not running. Please run gns3_run to start GNS3.")
     except BaseException as ex:
         raise ex
 

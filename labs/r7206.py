@@ -994,7 +994,7 @@ if __name__ == "__main__":
         if retcode != 0:
             raise RuntimeError(
                 "GNS3 is not running. " +
-                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+                "Please run gns3_run to start GNS3 before executing this script.")
         else:
             ui_messenger.info("GNS3 is running.")
 

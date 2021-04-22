@@ -38,12 +38,9 @@ class CiscoRouter(object):
         """This method must be implemented by all derived classes in
         mtk.mtk.script.
 
-        :param user_interface: A reference to the Reporter object (a pop-up window)
-            that is informing the user of the script's progress and status.
-        :type user_interface: object
-        :param options: A dictionary of additional keyword arguments for the
+        :param kwargs: A dictionary of additional keyword arguments for the
             method.
-        :type options: dict
+        :type kwargs: dict
 
         :raises: NotImplementedError if the run method is not implemented in
             the child class.

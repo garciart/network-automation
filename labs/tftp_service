@@ -1,8 +1,11 @@
 #!/bin/bash
 # Script to anable and disable TFTP service
-# Usage: ./tftp_service.sh enable /var/lib/tftpboot/R1_7206_i1_startup-config.cfg
-# Usage: ./tftp_service.sh disable
-# Don't forget to set this script's permissions to executable!
+# Usage: tftp_service enable /var/lib/tftpboot/R1_7206_i1_startup-config.cfg
+# Usage: tftp_service disable
+# Don't forget to place this script in /usr/bin and set the permissions to executable!
+# sudo mv tftp_service /usr/bin/tftp_service
+# sudo chown root:root /usr/bin/tftp_service
+# sudo chmod 755 /usr/bin/tftp_service
 
 if [ "$1" == "enable" ] && [ "$#" == 2 ]
 then
@@ -41,6 +44,6 @@ then
 else
   echo "Enables and disables the TFTP service."
   echo "Usage:"
-  echo "  (To enable):  ./tftp_service.sh enable /var/lib/tftpboot/<configuration file name>"
-  echo "  (To disable): ./tftp_service.sh disable"
+  echo "  (To enable):  ./tftp_service enable /var/lib/tftpboot/<configuration file name>"
+  echo "  (To disable): ./tftp_service disable"
 fi

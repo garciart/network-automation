@@ -4,9 +4,9 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 >**Note** - If you are unfamiliar with GNS3, visit [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui/ "The GNS3 GUI") for a great introduction to the GNS3 Graphical User Interface (GUI).
 
-1. Start GNS3 by opening a terminal and running the "./gns3_run.sh" bash script.
+1. Start GNS3 by opening a terminal and running the "gns3_run" bash script, located in /usr/bin.
 
-         [gns3user@localhost ~]$ ./gns3_run.sh
+         [gns3user@localhost ~]$ gns3_run
          Setting up GNS3...
          Original interface name is enp0s3
          enp0s3 original IP address is 10.0.2.15
