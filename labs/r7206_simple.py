@@ -195,7 +195,7 @@ class Ramon7206(CiscoRouter):
         try:
             # Provide the user with a computed hash for comparison
             self.__get_config_file_hash(self._config_file_path, **kwargs)
-            cmd = "sudo ./tftp_service.sh enable {0}".format(self._config_file_path)
+            cmd = "sudo ./tftp_service enable {0}".format(self._config_file_path)
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Could not enable the TFTP service.")
@@ -231,7 +231,7 @@ class Ramon7206(CiscoRouter):
                     print("New configuration file uploaded.")
                     break
         finally:
-            cmd = "sudo ./tftp_service.sh disable"
+            cmd = "sudo ./tftp_service disable"
             retcode = subprocess.call(shlex.split(cmd))
             if retcode != 0:
                 raise RuntimeError("Could not disable the TFTP service.")
@@ -469,7 +469,7 @@ if __name__ == "__main__":
         if retcode != 0:
             raise RuntimeError(
                 "GNS3 is not running. " +
-                "Please run ./gns3_run.sh to start GNS3 before executing this script.")
+                "Please run gns3_run to start GNS3 before executing this script.")
         else:
             print("GNS3 is running.")
 

@@ -34,7 +34,7 @@ However, GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (R
 
 2. Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
-We used Centos 7 for the labs and demos in this repository. While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos.sh "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos.sh "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
+We used Centos 7 for the labs and demos in this repository. While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
 
 ### Windows
 
@@ -79,7 +79,7 @@ Before we start, here's the subnet info for the network:
 > - sudo yum -y install lsof
 > ```
 
-In [gns3_setup_centos.sh](gns3_setup_centos.sh "CentOS Setup Script"), you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
+In [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script"), you installed bridge-utils, a utility which creates and manages Ethernet bridge devices. We will use this bridge to connect the host machine and GNS3 virtual devices.
 
 The [gns3_run.sh](gns3_run.sh "CentOS Run Script") script sets up your environment, runs GNS3, and resets your environment when you exit GNS3. Please open the gns3_run.sh file and examine it. This script does the following:
 
@@ -98,7 +98,7 @@ When you exit GNS3, the script will close the bridge and tap, and reset the netw
 
 ## Running the Labs
 
-Start GNS3 by either running ```sudo ./gns3_run.sh``` in Linux or clicking the GNS3 icon in Windows.
+Start GNS3 by either running ```sudo gns3_run``` in Linux or clicking the GNS3 icon in Windows.
 
 >**NOTE** - In Linux, you must run the script. Do not run GNS3 from the Application menu or clicking the GNS3 icon.
 
