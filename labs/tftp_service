@@ -24,8 +24,8 @@ then
     if [ "$permissions" -lt 666 ]
     then
       sudo chmod 666 /etc/xinetd.d/tftp
-      sudo sed -i 's|server_args             = -s /var/lib/tftpboot|server_args             = -c -s /var/lib/tftpboot|g' /etc/xinetd.d/tftp
-      sudo sed -i 's|disable                 = yes|disable                 = no|g' /etc/xinetd.d/tftp
+      sudo sed -i 's|server_args *= -s /var/lib/tftpboot|server_args             = -c -s /var/lib/tftpboot|g' /etc/xinetd.d/tftp
+      sudo sed -i 's|disable *= yes|disable                 = no|g' /etc/xinetd.d/tftp
       sudo firewall-cmd --zone=public --add-service=tftp
       sudo systemctl start tftp
       sudo systemctl enable tftp
@@ -34,8 +34,8 @@ then
 elif [ "$1" == "disable" ]
 then
   echo "Disabling TFTP service."
-  sudo sed -i 's|server_args             = -c -s /var/lib/tftpboot|server_args             = -s /var/lib/tftpboot|g' /etc/xinetd.d/tftp
-  sudo sed -i 's|disable                 = no|disable                 = yes|g' /etc/xinetd.d/tftp
+  sudo sed -i 's|server_args *= -c -s /var/lib/tftpboot|server_args             = -s /var/lib/tftpboot|g' /etc/xinetd.d/tftp
+  sudo sed -i 's|disable *= no|disable                 = yes|g' /etc/xinetd.d/tftp
   sudo chmod 644 /etc/xinetd.d/tftp
   sudo firewall-cmd --zone=public --remove-service=tftp
   sudo systemctl stop tftp
