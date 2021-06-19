@@ -14,7 +14,7 @@ The bad news is that, normally, to test the script, you will need a physical dev
 
 This tutorial is broken down into three parts:
 
-- [Installing GNS3](#installing-gns3 "Installing GNS3")
+- [Installing GNS3 in CentOS](#installing-gns3-in-centos "Installing GNS3")
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
@@ -22,41 +22,35 @@ BTW, the focus of this tutorial is to use GNS3 to test our scripts, so we won't 
 
 -----
 
-## Installing GNS3
-
-### Linux
+## Installing GNS3 in CentOS
 
 Setting up GNS3 in Ubuntu and Debian is pretty simple: check out [https://docs.gns3.com/docs/getting-started/installation/linux](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install").
 
-However, GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS. But before kicking them to the curb, remember...
+However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
 
-1. Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use one of these operating systems, and RHEL is second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
+>**NOTE**
+>
+>Why are we using CentOS? First, this is my daily OS. Second...
+> - Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use one of these operating systems, and RHEL is second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
+> - Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
-2. Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
-
-We used Centos 7 for the labs and demos in this repository. While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
-
-### Windows
-
-Installing GNS3 on windows is also relatively simple; check out [https://docs.gns3.com/docs/getting-started/installation/windows/](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"). David Bombal also has a [great video series on using GNS3](https://www.youtube.com/watch?v=Ibe3hgP8gCA&list=PLhfrWIlLOoKNFP_e5xcx5e2GDJIgk3ep6&index=1&ab_channel=DavidBombal "GNS3 Installation - David Bombal"), starting with installation; highly recommended!
+While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
 
 -----
 
 ## Setting up the environment
 
-In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Windows, you will need to create a Loopback interface. To do so in Linux, you will need to create a TUN/TAP interface.
+In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Linux, you will need to create a TUN/TAP interface.
 
 Before we start, here's the subnet info for the network:
 
 ```
-- **Network Address: 192.168.1.0/24**
-- **Subnet Mask: 255.255.255.0 (ff:ff:ff:00)**
-- Total Number of Hosts: 256
-- Number of Usable Hosts: 254
-- Usable IP Range: 192.168.1.1 - 192.168.1.254
-- **GNS3 Host Device IP Address: 192.168.1.1/32**
-- **First Virtual Device IP Address: 192.168.1.10/32**
-- Gateway: 192.168.1.1
+- Network Address: 192.168.1.0/24
+- Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
+- GNS3 Host Device IP Address: 192.168.1.1/32
+- Gateway IP Address: 192.168.1.2/32
+- Number of Usable Hosts: 252
+- Usable IP Range: 192.168.1.3 - 192.168.1.254
 - Broadcast Address: 192.168.1.255
 - Wildcard Mask: 0.0.0.255
 - Binary Subnet Mask: 11111111.11111111.11111111.00000000
@@ -69,8 +63,6 @@ Before we start, here's the subnet info for the network:
 - IPv4 Mapped Address: ::ffff:c0a8.0101
 - 6to4 Prefix: 2002:c0a8.0101::/48
 ```
-
-### Linux
 
 >**NOTE** - We will use nmap and other CLI tools in this tutorial. Therefore, open a terminal and ensure the following packages are installed:
 > ```
@@ -91,10 +83,6 @@ The [gns3_run.sh](gns3_run.sh "CentOS Run Script") script sets up your environme
 >**NOTE** - You will not be able to connect to the Internet through your Ethernet interface until you exit GNS3
 
 When you exit GNS3, the script will close the bridge and tap, and reset the network, which will allow you to econnect to the Internet, etc.
-
-### Windows
-
-(Info on how to create a loopback interface)
 
 ## Running the Labs
 
