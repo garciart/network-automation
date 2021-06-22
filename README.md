@@ -40,7 +40,9 @@ While there were a lot of good posts and articles on how to install GNS3 on Cent
 
 ## Setting up the environment
 
-In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Linux, you will need to create a TUN/TAP interface.
+In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Linux, you will need to create a TUN/TAP interface and connect it to your host interface using a bridge.
+
+>**NOTE** - TUN (network TUNnel) works with IP packets (Layer 3/Network). TAP (network TAP) works with Ethernet frames (Layer 2/Data).
 
 Before we start, here's the subnet info for the network:
 
@@ -48,7 +50,7 @@ Before we start, here's the subnet info for the network:
 - Network Address: 192.168.1.0/24
 - Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
 - GNS3 Host Device IP Address: 192.168.1.1/32
-- Gateway IP Address: 192.168.1.2/32
+- Gateway IP Address: 192.168.1.1/32
 - Number of Usable Hosts: 252
 - Usable IP Range: 192.168.1.3 - 192.168.1.254
 - Broadcast Address: 192.168.1.255
