@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Recently, for personal and professional reasons (CCNA and CompTIA training, anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, for personal and professional reasons (CCNA and CompTIA , anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
 
 This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device and enter the commands for you? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
 
@@ -18,7 +18,13 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
-BTW, the focus of this tutorial is to use GNS3 to test our scripts, so we won't get into installing operating systems or creating virtual machines; there's already tons of web sites dedicated to setting up OS's and VM's. In addition, many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
+>**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not installing operating systems or creating virtual machines; there are already tons of websites dedicated to setting up OS's and VM's. However, whether you use VMWare or VirtualBox, make sure you add an additional network interface to your system:
+> 
+> ![Network Settings](images/gns3_00.png)
+> 
+> ![Network Settings](images/gns3_00a.png)
+
+>**NOTE** - Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
 
 -----
 
