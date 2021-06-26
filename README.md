@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Recently, for personal and professional reasons (CCNA and CompTIA , anyone?), I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, for personal and professional reasons, I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable, access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
 
 This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device and enter the commands for you? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
 
@@ -18,29 +18,62 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
->**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not installing operating systems or creating virtual machines; there are already tons of websites dedicated to setting up OS's and VM's. However, whether you use VMWare or VirtualBox, make sure you add an additional network interface to your system:
-> 
-> ![Network Settings](images/gns3_00.png)
-> 
-> ![Network Settings](images/gns3_00a.png)
-
 >**NOTE** - Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
 
 -----
 
 ## Installing GNS3 in CentOS
 
-Setting up GNS3 in Ubuntu and Debian is pretty simple: check out [https://docs.gns3.com/docs/getting-started/installation/linux](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install").
+The makers of GNS3 did a great job explaining how to install their network simulator on Windows; check out [https://docs.gns3.com/docs/getting-started/installation/windows/](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"). Setting up GNS3 in Ubuntu and Debian is pretty straight forward as well: check out [https://docs.gns3.com/docs/getting-started/installation/linux](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install").
 
 However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
 
->**NOTE**
->
->Why are we using CentOS? First, this is my daily OS. Second...
-> - Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use one of these operating systems, and RHEL is second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
-> - Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
+>**NOTE** - Why are we using CentOS? First, this is my daily OS. Second...
+>- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, Red Hat Linux (RHEL), and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
+>- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
-While there were a lot of good posts and articles on how to install GNS3 on CentOS, each of them were slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")). We also recommend you look at the comments in the script, so you can become familiar with GNS3's dependencies.
+To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, we recommend you review the instructions on the following sites:
+
+- [Oracle VM VirtualBox User Manual](https://www.virtualbox.org/manual/ "Oracle VM VirtualBox User Manual")
+
+- [VMware Workstation Player Documentation](https://docs.vmware.com/en/VMware-Workstation-Player/index.html "VMware Workstation Player Documentation")
+
+>**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines; there are already tons of websites dedicated to setting up OS's and VM's. However, whether you use VMWare or VirtualBox, make sure you:
+> 
+> - Allocate 2048 MB of RAM to your machine  (e.g., in VirtualBox...):
+> 
+> ![Memory size](images/gns3_00b.png "Memory size")
+>  
+> - Allocate 16GB of hard disk space to your machine (e.g., in VirtualBox...):
+> 
+> ![File location and size](images/gns3_00c.png "File location and size")
+> 
+> - Allocate two processors to your machine  (e.g., in VirtualBox...):
+> 
+> ![Settings -> System](images/gns3_00d.png "Settings -> System")
+> 
+> - Add an additional network interface to your system:
+> 
+> ![Network Settings](images/gns3_00.png)
+> 
+> ![Network Settings](images/gns3_00a.png)
+
+Once you have finished creating your virtual machine, open a Terminal, go to a directory of your choice, and clone this repository:
+
+```
+git clone https://github.com/garciart/Automation.git
+```
+
+While there are a lot of good posts and articles on how to install GNS3 on CentOS, each of them are slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). We recommend you open the script in an editor, and look at its commands and comments, so you can become familiar with GNS3's dependencies.
+
+To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")).
+
+```
+sudo chmod +x gns3_setup_centos.sh
+sudo ./gns3_setup_centos.sh
+```
+
+Check the output for any errors. If there are none, continue to [Setting up the environment](#setting-up-the-environment "Setting up the environment").
 
 -----
 
