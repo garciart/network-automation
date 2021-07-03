@@ -24,9 +24,7 @@ This tutorial is broken down into three parts:
 
 ## Installing GNS3 in CentOS
 
-The makers of GNS3 did a great job explaining how to install their network simulator on Windows; check out [https://docs.gns3.com/docs/getting-started/installation/windows/](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"). Setting up GNS3 in Ubuntu and Debian is pretty straight forward as well: check out [https://docs.gns3.com/docs/getting-started/installation/linux](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install").
-
-However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
+Installing GNS on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"), [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install") is pretty straight forward. However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
 
 >**NOTE** - Why are we using CentOS? First, this is my daily OS. Second...
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, Red Hat Linux (RHEL), and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
@@ -38,7 +36,9 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 
 - [VMware Workstation Player Documentation](https://docs.vmware.com/en/VMware-Workstation-Player/index.html "VMware Workstation Player Documentation")
 
->**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines; there are already tons of websites dedicated to setting up OS's and VM's. However, whether you use VMWare or VirtualBox, make sure you:
+>**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and we will not repeat those steps here.
+> 
+>However, whether you use VMWare or VirtualBox, make sure you:
 > 
 > - Allocate 2048 MB of RAM to your machine  (e.g., in VirtualBox...):
 > 
