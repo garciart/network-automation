@@ -1,19 +1,6 @@
 #!/usr/bin/bash
-# Get interface address from user
-echo "Setting up GNS3..."
-echo "Available ethernet interfaces:"
-choices=`ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ && $3 ~ /^<NO-CARRIER/ {print substr($2, 1, length($2)-1)}'`
-echo $choices
-read -p "Enter an ethernet interface for GNS3 to use: " org_interface
-valid="^(em|en|et).*[0-9]$"
-if [[ $org_interface =~ $valid ]] && [[ "$org_interface" == *"$choices"* ]];
-then
-    echo "Good to go!"
-else
-    echo "WTF, over?"
-    exit 1
-fi
-
+# Research using ip or ifconfig, but not both
+echo -e "Setting up GNS3..."
 # Get and save the original IP address that can connect to the Internet (should be enp0s3 or eth0)
 org_interface=$(ip route get 8.8.8.8 | awk -F"dev " 'NR==1{split($2,a," ");print a[1]}')
 org_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')

@@ -24,7 +24,7 @@ This tutorial is broken down into three parts:
 
 ## Installing GNS3 in CentOS
 
-Installing GNS on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"), [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install") is pretty straight forward. However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
+Installing GNS on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"), or Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
 
 >**NOTE** - Why are we using CentOS? First, this is my daily OS. Second...
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, Red Hat Linux (RHEL), and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
@@ -40,53 +40,56 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > 
 >However, whether you use VMWare or VirtualBox, make sure you:
 > 
-> - Allocate 2048 MB of RAM to your machine  (e.g., in VirtualBox...):
+> **1. Allocate 2048 MB of RAM to your machine  (e.g., in VirtualBox...):**
 > 
-> ![Memory size](images/gns3_00b.png "Memory size")
+>    ![Memory size](images/gns3_00b.png "Settings -> Memory size")
 >  
-> - Allocate 16GB of hard disk space to your machine (e.g., in VirtualBox...):
+> **2. Allocate at least 16 GB of hard disk space to your machine (e.g., in VirtualBox...):**
 > 
-> ![File location and size](images/gns3_00c.png "File location and size")
+>    ![File location and size](images/gns3_00c.png "Settings -> File location and size")**
 > 
-> - Allocate two processors to your machine  (e.g., in VirtualBox...):
+> **3. Allocate two processors to your machine (e.g., in VirtualBox...):**
 > 
-> ![Settings -> System](images/gns3_00d.png "Settings -> System")
+>    ![Settings -> System](images/gns3_00d.png "Settings -> System")
 > 
-> - Add an additional network interface to your system:
+> **4. Add an additional network interface to your system (e.g., in VirtualBox...):**
 > 
-> ![Network Settings](images/gns3_00.png)
+>    ![Network Settings](images/gns3_00.png "Settings -> Network")
+>
+> You can make the same changes in VMWare in the **Settings** window:
 > 
-> ![Network Settings](images/gns3_00a.png)
+>    ![Settings](images/gns3_00a.png)
 
-Once you have finished creating your virtual machine, open a Terminal, go to a directory of your choice, and clone this repository:
+Once you have finished creating your virtual machine, open a Terminal and clone this repository:
 
 ```
 git clone https://github.com/garciart/Automation.git
 ```
 
-While there are a lot of good posts and articles on how to install GNS3 on CentOS, each of them are slightly different, so we distilled them into [one shell script](gns3_setup_centos "CentOS Setup Script"). We recommend you open the script in an editor, and look at its commands and comments, so you can become familiar with GNS3's dependencies.
+Now for the setup: There are a lot of good posts and articles on how to install GNS3 on CentOS. However, each of them are slightly different, so, to make life easier, we distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, we recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
 
-To run this script, make sure you assign executable permissions to the file first (i.e., "chmod +x [gns3_setup_centos.sh](gns3_setup_centos "CentOS Setup Script")).
+Using elevated privileges, make the shell script executable, run it, and check the output for any errors.:
 
 ```
-sudo chmod +x gns3_setup_centos.sh
-sudo ./gns3_setup_centos.sh
+sudo chmod +x gns3_setup_centos
+sudo ./gns3_setup_centos > setup_output.txt
+grep -i -e "error" -e "warning" setup_output.txt
 ```
 
-Check the output for any errors. If there are none, continue to [Setting up the environment](#setting-up-the-environment "Setting up the environment").
+If there are no errors, continue to [Setting up the environment](#setting-up-the-environment "Setting up the environment").
 
 -----
 
 ## Setting up the environment
 
-In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Linux, you will need to create a TUN/TAP interface and connect it to your host interface using a bridge.
+In order for your code to interact with the switch, you will need to connect your host computer with virtual devices in GNS3. To do so in Linux, you will need to create a TUN/TAP interface and connect it to your host interface using a bridge. Both TUN (network TUNnel) and TAP (network TAP) are software loopback interfaces
 
 >**NOTE** - TUN (network TUNnel) works with IP packets (Layer 3/Network). TAP (network TAP) works with Ethernet frames (Layer 2/Data).
 
 Before we start, here's the subnet info for the network:
 
 ```
-- Network Address: 192.168.1.0/24
+- Network Address: 192.168.0.0/24
 - Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
 - GNS3 Host Device IP Address: 192.168.1.1/32
 - Gateway IP Address: 192.168.1.1/32
