@@ -178,11 +178,11 @@ Finally, accept the default Idle-PC value and click **Finish:**
 
 ![Preferences dialog](images/gns3_12.png)
 
-The IOS template's details appear. Note the memory for Personal Computer Memory Card International Association (PCMCIA) slot disk0; click on **Edit**:
+The IOS template's details appear. Note the memory for the Personal Computer Memory Card International Association (PCMCIA) disk0. This is the device's CompactFlash (CF) memory card, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory. Click on **Edit** to change it:
 
 ![Preferences dialog](images/gns3_13.png)
 
-Set the PCMCIA disk0 to 1 MiB and click **OK**:
+Set the PCMCIA disk0 to 32 MiB and click **OK**:
 
 ![Preferences dialog](images/gns3_14.png)
 
