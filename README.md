@@ -29,7 +29,7 @@ Installing GNS on [Windows](https://docs.gns3.com/docs/getting-started/installat
 >**NOTE** - Why are we using CentOS for this tutorial?
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
 >- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
->- I, along with several million others, use Fedora, RHEL, or CentOS quite a bit, and I could not find a tutorial that captured all the steps in integrating GNS3 with the Fedora OS family.
+>- I use Fedora, RHEL, or CentOS quite a bit, and I could not find a tutorial that captured all the steps involved in integrating GNS3 with the Fedora OS family.
 
 To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, we recommend you review the instructions on the following sites:
 
@@ -63,7 +63,24 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > 
 >    ![Settings](images/a04.png)
 
-Once you have finished creating your virtual machine, open a Terminal and clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```, etc.):
+Once you have finished creating your virtual machine, update and upgrade the OS.
+
+>**NOTE** - If you are uing VirtualBox, we recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste from the host, etc. Check out [Aaron Kili's great article for TecMint on how to do that.](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands before running the Guest Additions' ISO:
+>
+>```
+>sudo yum -y install epel-release
+>sudo yum -y update
+>sudo yum install make gcc kernel-headers kernel-devel perl dkms bzip2
+>sudo export KERN_DIR=/usr/src/kernels/$(uname -r)
+>```
+>
+>Don't forget to reboot as well.
+
+Open a Terminal and install git:
+
+```sudo yum -y install git```
+
+Next, clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```):
 
 ```
 [gns3user@localhost ~]$ git clone https://github.com/garciart/Automation.git
@@ -86,16 +103,28 @@ rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router (End-of-Sale Date: 2007-03-27, End-of-Support Date: 2012-03-27) and the Cisco 7206VXR router (End-of-Sale Date: 2012-09-29, End-of-Support Date: 2017-09-30). Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
+>**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206VXR router. Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites. Just remember to place them in the /GNS3/images/IOS folder in your home directory (e.g., /home/gns3user//GNS3/images/IOS). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware. Here are the names of the files and their hashes:
+>The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites. Just remember to place them in the /GNS3/images/IOS folder in your home directory (e.g., ```/home/gns3user//GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware. Here are the names of the files, their hashes, and some additional information:
 >
->- IOS version 12.4.25d (Mainline):
+>- Cisco 3745 Multiservice Access Router:
+>   * IOS version 12.4.25d (Mainline):
 >   * File Name: c3745-adventerprisek9-mz.124-25d.bin
 >   * MD5: 563797308a3036337c3dee9b4ab54649
->- IOS version 12.4.25g (Mainline):
+>   * Flash Memory: 64MB
+>   * DRAM: 256MB
+>   * End-of-Sale Date: 2007-03-27
+>   * End-of-Support Date: 2012-03-27
+>   * IOS End-of-Support Date: 2016-01-31
+>- Cisco 7206VXR router:
+>   * IOS version 12.4.25g (Mainline):
 >   * File Name: c7200-a3jk9s-mz.124-25g.bin
+>   * Flash Memory: 64MB
+>   * DRAM: 256MB
 >   * MD5: 3a78cb61831b3ef1530f7402f5986556
+>   * End-of-Sale Date: 2012-09-29 
+>   * End-of-Support Date: 2017-09-30
+>   * IOS End-of-Support Date: 2016-01-31
 
 -----
 
@@ -110,7 +139,7 @@ Before we start, here's the subnet info for the network:
 - Gateway IP Address: 192.168.1.1/32
 - Total Number of Hosts: 256
 - Number of Usable Hosts: 254
-- Usable IP Range: 192.168.1.1 - 192.168.1.254
+- Usable IP Range: 192.168.1.2 - 192.168.1.254
 - Broadcast Address: 192.168.1.255
 - IP Class and Type: C (Private)
 ```
@@ -151,23 +180,23 @@ gns3
 
 A Setup wizard will appear. Select **Run appliances on my local computer** and click **Next>**:
 
-{ SETUP WIZARD PIC }
+![Setup Wizard](images/a05.png)
 
 In **Local sever configuration**, under **Host binding**, select the isolated interface:
 
-{ Local sever configuration PIC }
+![Local sever configuration](images/a06.png)
 
 After a few minutes, a **Local server status** window will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next>** to continue:
 
-{ Local server status PIC }
+![Local server status](images/a07.png)
 
 At the **Summary** window, click **Finish**:
 
-{ Summary PIC }
+![Setup Wizard Summary](images/a08.png)
 
 >**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses. Restart GNS3 and select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and set the **Host binding** to the the isolated interface's IP address: 
 >
->{ Preferences PIC }
+>![Preferences](images/a09.png)
 >
 
 ## Running the Labs
@@ -176,37 +205,37 @@ Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</k
 
 You will see a dialog asking you to create a new project. Enter "g001_ping" in the ***Name*** textbox and click the **OK** button.
 
-![Project dialog](images/gns3_01.png)
+![Project dialog](images/a10.png)
 
-In the main menu, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is "192.168.1.1":
+When the main window reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is "192.168.1.1":
 
-![Preferences dialog](images/gns3_02.png)
+![Preferences dialog](images/a11.png)
 
-Once again, look on the left-hand menu in the **Preferences** window, and select **Dynamips -> IOS Routers:**
+Once again, look in the left-hand menu in the **Preferences** window, and select **Dynamips -> IOS Routers** and click on **New:**
 
-![Preferences dialog](images/gns3_03.png)
+![Preferences dialog](images/a12.png)
 
 When the **New IOS Router Template window** appears, ensure ***New Image*** is selected, and then click **Browse**:
 
-![Preferences dialog](images/gns3_04.png)
+![Preferences dialog](images/a13.png)
 
-When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the file window appears:
+When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the file window appears and click **Open** at the top:
 
-![Preferences dialog](images/gns3_05.png)
+![Preferences dialog](images/a14.png)
 
 When asked, "Would like to decompress this IOS image?", click **Yes**:
 
-![Preferences dialog](images/gns3_06.png)
+![Preferences dialog](images/a15.png)
 
 Back in the **New IOS Router Template window**, click **Next >:**
 
-![Preferences dialog](images/gns3_07.png)
+![Preferences dialog](images/a16.png)
 
 When it comes to customizing the router's details, use the default values for both the name and memory and click on **Next >** for each:
 
-![Preferences dialog](images/gns3_08.png)
+![Preferences dialog](images/a17.png)
 
-![Preferences dialog](images/gns3_09.png)
+![Preferences dialog](images/a18.png)
 
 Here is the back of a 3745 Router. As you can see, it has two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1, as well as an auxilary and console port. By the way, when you interact with the router through the terminal in GNS3, you are using a simulated connection to the console port.
 
