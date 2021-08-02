@@ -4,12 +4,15 @@ echo -e "Using:"
 cat /etc/centos-release
 echo -e "Updating CentOS"
 sudo yum -y update
+sudo yum -y upgrade
 # Install Python 3 and pip
 sudo yum -y install python3 # Also installs python3-setuptools
 sudo python3 -m pip install --upgrade pip
 sudo python3 -m ensurepip
 sudo yum -y install python3-devel
 sudo yum -y install python3-tools
+# Install Git
+sudo yum -y install git
 # Install GNS3 dependencies
 sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
