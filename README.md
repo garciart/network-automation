@@ -18,7 +18,7 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
->**NOTE** - Many thanks to David Bombal, Paul Browning, and many other incredible network gurus and coders (you know who you are :thumbsup: ).
+>**NOTE** - Thanks to David Bombal, Paul Browning, and many other incredible network gurus and coders (you know who you are :thumbsup: ).
 
 -----
 
@@ -103,11 +103,11 @@ rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206VXR router. Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
+>**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
 >
 >The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites. Just remember to place them in the /GNS3/images/IOS folder in your home directory (e.g., ```/home/gns3user//GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware. Here are the names of the files, their hashes, and some additional information:
 >
->- Cisco 3745 Multiservice Access Router:
+>- **Cisco 3745 Multiservice Access Router:**
 >   * IOS version 12.4.25d (Mainline):
 >   * File Name: c3745-adventerprisek9-mz.124-25d.bin
 >   * MD5: 563797308a3036337c3dee9b4ab54649
@@ -116,7 +116,7 @@ sudo reboot now
 >   * End-of-Sale Date: 2007-03-27
 >   * End-of-Support Date: 2012-03-27
 >   * IOS End-of-Support Date: 2016-01-31
->- Cisco 7206VXR router:
+>- **Cisco 7206 VXR 6-Slot Router:**
 >   * IOS version 12.4.25g (Mainline):
 >   * File Name: c7200-a3jk9s-mz.124-25g.bin
 >   * Flash Memory: 64MB
@@ -130,7 +130,7 @@ sudo reboot now
 
 ## Setting up the environment
 
-Before we start, here's the subnet info for the network:
+Before we start, here's the subnet information for the network:
 
 ```
 - Network Address: 192.168.1.0/24
@@ -159,7 +159,7 @@ In CentOS, network interfaces for Ethernet will start with ```em```, ```en```, a
 [gns3user@localhost ~]$ 
 ```
 
-Look for the interface that does not have an IP address. In this case, the isolated interface is named ```enp0s8```. Give the interface an IPv4 address, by inputting ```sudo ip addr add 192.168.1.1/24 dev enp0s8```. Do not forget to add the subnet (```/24```), or the ```ip``` program, by default, will set a netmask of 255.255.255.255 (```/32```), which will allow only one host on the isolated network, instead of a netmask of 255.255.255.0, which will allow the 256 hosts we want:
+Look for the interface that does not have an IP address. In this case, the isolated interface is named ```enp0s8```. Give the interface an IPv4 address, by inputting ```sudo ip addr add 192.168.1.1/24 dev enp0s8```. Do not forget to add the subnet (```/24```), or the ```ip``` program, by default, will set a netmask of 255.255.255.255 (```/32```), which will allow only one host on the isolated network, instead of a netmask of 255.255.255.0  (```/24```), which will allow the 256 hosts we want:
 
 ```
 [gns3user@localhost ~]$ sudo ip addr add 192.168.1.1/24 dev enp0s8
@@ -178,7 +178,9 @@ Open a Terminal and start GNS3:
 gns3
 ```
 
-A Setup wizard will appear. Select **Run appliances on my local computer** and click **Next>**:
+>**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses.
+
+A Setup wizard will appear. Select **Run appliances on my local computer** and click **Next >**:
 
 ![Setup Wizard](images/a05.png)
 
@@ -186,7 +188,7 @@ In **Local sever configuration**, under **Host binding**, select the isolated in
 
 ![Local sever configuration](images/a06.png)
 
-After a few minutes, a **Local server status** window will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next>** to continue:
+After a few minutes, a **Local server status** window will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next >** to continue:
 
 ![Local server status](images/a07.png)
 
@@ -194,10 +196,9 @@ At the **Summary** window, click **Finish**:
 
 ![Setup Wizard Summary](images/a08.png)
 
->**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses. Restart GNS3 and select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and set the **Host binding** to the the isolated interface's IP address: 
+>**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and set the **Host binding** to the the isolated interface's IP address: 
 >
 >![Preferences](images/a09.png)
->
 
 ## Running the Labs
 
@@ -244,7 +245,7 @@ Here is the back of a 3745 Router:
  In between the power supply modules, from top to bottom, the 3745 has:
  
  - Three (3) WAN interface card (WIC) slots
- - A console (light blue) and an auxilary port (black) on the right, a CompactFlash (CF) memory card slot in the center, and two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1. By the way, when you interact with the router directly in GNS3, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
+ - A console (labeled in light blue) and an auxilary port (labeled in black) on the right, a CompactFlash (CF) memory card slot in the center, and two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
 - Four (4) network adapter module slots.
 
 For network adapter modules, you have three options; we want all three for training. Place one option each in an open slot:
@@ -286,6 +287,17 @@ This brings you back to the template details page. There is some good informatio
 Now that you have finished setting up your lab environment, 
 
 ![Preferences dialog](images/gns3_16.png)
+
+Add appliance (router R0)
+Select and start appliance
+Look up R0's console port (should be 192.168.1.1:5000)
+Connect Cloud1's LoopbackEth to R0 FastEthernet0/0
+Opened a Command window (cmd or Powershell)
+Input "telnet 192.168.1.1 5000" to connect to R0
+
+Press return and configure R0
+Press Ctrl + "]" to leave R0.
+Input "q" to exit telnet.
 
 ![Preferences dialog](images/gns3_17.png)
 
