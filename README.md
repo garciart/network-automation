@@ -45,23 +45,23 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > 
 > 1. Allocate **2048 MB** of RAM to your machine  (e.g., in VirtualBox...):
 > 
->    ![Memory size](images/a00.png "Settings -> Memory size")
+>    ![Memory size](img/a00.png "Settings -> Memory size")
 >  
 >2. Allocate at least **16 GB** of hard disk space to your machine (e.g., in VirtualBox...):
 > 
->    ![File location and size](images/a01.png "Settings -> File location and size")**
+>    ![File location and size](img/a01.png "Settings -> File location and size")**
 > 
 >3. Allocate **two** processors to your machine (e.g., in VirtualBox...):
 > 
->    ![Settings -> System](images/a02.png "Settings -> System")
+>    ![Settings -> System](img/a02.png "Settings -> System")
 > 
 >4. Add another network interface to your system. Make it private and isolate it from the outside world, by attaching it to an **Internal Network** in VirtualBox (shown) or connecting it to a **LAN segment** in VMWare:
 > 
->    ![Network Settings](images/a03.png "Settings -> Network")
+>    ![Network Settings](img/a03.png "Settings -> Network")
 >
 > In VMWare, you can make all the above changes to your VM, in the **Settings** window:
 > 
->    ![Settings](images/a04.png)
+>    ![Settings](img/a04.png)
 
 Once you have finished creating your virtual machine, update and upgrade the OS.
 
@@ -182,23 +182,23 @@ gns3
 
 A Setup wizard will appear. Select **Run appliances on my local computer** and click **Next >**:
 
-![Setup Wizard](images/a05.png)
+![Setup Wizard](img/a05.png)
 
 In **Local sever configuration**, under **Host binding**, select the isolated interface:
 
-![Local sever configuration](images/a06.png)
+![Local sever configuration](img/a06.png)
 
 After a few minutes, a **Local server status** window will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next >** to continue:
 
-![Local server status](images/a07.png)
+![Local server status](img/a07.png)
 
 At the **Summary** window, click **Finish**:
 
-![Setup Wizard Summary](images/a08.png)
+![Setup Wizard Summary](img/a08.png)
 
 >**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and set the **Host binding** to the the isolated interface's IP address: 
 >
->![Preferences](images/a09.png)
+>![Preferences](img/a09.png)
 
 ## Running the Labs
 
@@ -206,87 +206,98 @@ Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</k
 
 You will see a dialog asking you to create a new project. Enter "g001_ping" in the ***Name*** textbox and click the **OK** button.
 
-![Project dialog](images/a10.png)
+![Project dialog](img/a10.png)
 
 When the main window reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is "192.168.1.1":
 
-![Preferences dialog](images/a11.png)
+![Preferences dialog](img/a11.png)
 
 Once again, look in the left-hand menu in the **Preferences** window, and select **Dynamips -> IOS Routers** and click on **New:**
 
-![Preferences dialog](images/a12.png)
+![Preferences dialog](img/a12.png)
 
 When the **New IOS Router Template window** appears, ensure ***New Image*** is selected, and then click **Browse**:
 
-![Preferences dialog](images/a13.png)
+![Preferences dialog](img/a13.png)
 
 When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the file window appears and click **Open** at the top:
 
-![Preferences dialog](images/a14.png)
+![Preferences dialog](img/a14.png)
 
 When asked, "Would like to decompress this IOS image?", click **Yes**:
 
-![Preferences dialog](images/a15.png)
+![Preferences dialog](img/a15.png)
 
 Back in the **New IOS Router Template window**, click **Next >:**
 
-![Preferences dialog](images/a16.png)
+![Preferences dialog](img/a16.png)
 
 When it comes to customizing the router's details, use the default values for both the name and memory and click on **Next >** for each:
 
-![Preferences dialog](images/a17.png)
+![Preferences dialog](img/a17.png)
 
-![Preferences dialog](images/a18.png)
+![Preferences dialog](img/a18.png)
 
 Here is the back of a 3745 Router:
 
-![Cisco 3745 back](images/a19.png)
+![Cisco 3745 back](img/a19.png)
 
  In between the power supply modules, from top to bottom, the 3745 has:
  
  - Three (3) WAN interface card (WIC) slots
- - A console (labeled in light blue) and an auxilary port (labeled in black) on the right, a CompactFlash (CF) memory card slot in the center, and two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
+ - Built-in Modules:
+     - A console (labeled in light blue) and an auxilary port (labeled in black) on the right
+     - A CompactFlash (CF) memory card slot in the center
+     - Two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
 - Four (4) network adapter module slots.
 
-For network adapter modules, you have three options; we want all three for training. Place one option each in an open slot:
+For network adapter modules, you have three options:
 
 - NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Module
 - NM-4T 4 port Synchronous Serial Network Module
 - NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Module
 
-![Preferences dialog](images/a20.png)
+Fill open slots 1, 2, and 3 with a module:
 
-For WAN Interface Cards (WICs), we have two options. Once again, place an option in each of the first open slots:
+![Preferences dialog](img/a20.png)
+
+Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
+
+For WAN Interface Cards (WICs), we have three slots, but only two options:
 
 - WIC-1T One port serial (DB60, Cisco 60-pin "5-in-1" connector )
 - WIC-2T Two port serial (DB60, Cisco 60-pin "5-in-1" connector )
 
+ Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty:
+
+![Preferences dialog](img/a21.png)
+
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
 CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, we have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
 
-![Preferences dialog](images/a21.png)
-
 Finally, accept the default Idle-PC value and click **Finish:** 
 
-![Preferences dialog](images/a22.png)
+![Preferences dialog](img/a22.png)
 
 The IOS template's details appear. Note the memory for the Personal Computer Memory Card International Association (PCMCIA) disk0. This is the device's CompactFlash (CF) memory card, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory. Click on **Edit** to change it:
 
-![Preferences dialog](images/a23.png)
+![Preferences dialog](img/a23.png)
 
 Select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB and click **OK**:
 
-![Preferences dialog](images/a24.png)
+![Preferences dialog](img/a24.png)
 
-This brings you back to the template details page. There is some good information here, such as the name of the startup configuration file:
+This brings you back to the template details page. Take a moment to look it over; there is some good information here, such as the name of the startup configuration file, which you will edit later:
 
-![Preferences dialog](images/a25.png)
+![Preferences dialog](img/a25.png)
 
  Once you are done, click **OK** to return to the main window.
 
-Now that you have finished setting up your lab environment, 
+Now that you have finished setting up your lab environment, click **View** -> **Docks** -> **All devices**. All the devices you can use in your lab will appear in a docked window on the right.
 
-![Preferences dialog](images/gns3_16.png)
+Select a **Cloud** and place it in the workspace, then select a **c3745 and place it on the workspace:
+
+![Preferences dialog](img/gns3_16.png)
 
 Add appliance (router R0)
 Select and start appliance
@@ -299,23 +310,23 @@ Press return and configure R0
 Press Ctrl + "]" to leave R0.
 Input "q" to exit telnet.
 
-![Preferences dialog](images/gns3_17.png)
+![Preferences dialog](img/gns3_17.png)
 
-![Preferences dialog](images/gns3_18.png)
+![Preferences dialog](img/gns3_18.png)
 
-![Preferences dialog](images/gns3_19.png)
+![Preferences dialog](img/gns3_19.png)
 
-![Preferences dialog](images/gns3_20.png)
+![Preferences dialog](img/gns3_20.png)
 
-![Preferences dialog](images/gns3_21.png)
+![Preferences dialog](img/gns3_21.png)
 
 One way to detect hosts on your subnet is to run ```nmap -sP 192.168.1.1-255```:
 
-![Preferences dialog](images/gns3_21a.png)
+![Preferences dialog](img/gns3_21a.png)
 
-![Preferences dialog](images/gns3_22.png)
+![Preferences dialog](img/gns3_22.png)
 
-![Preferences dialog](images/gns3_23.png)
+![Preferences dialog](img/gns3_23.png)
 
 >**NOTE** - We will use nmap and other CLI tools in this tutorial. Therefore, open a terminal and ensure you have installed the following packages:
 > ```
