@@ -237,40 +237,49 @@ When it comes to customizing the router's details, use the default values for bo
 
 ![Preferences dialog](images/a18.png)
 
-Here is the back of a 3745 Router. As you can see, it has two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1, as well as an auxilary and console port. By the way, when you interact with the router through the terminal in GNS3, you are using a simulated connection to the console port.
+Here is the back of a 3745 Router:
 
-The 3745 also has three WAN interface card (WIC) slots along the top of the router, and four (4) network module slots on the bottom half of the router.
+![Cisco 3745 back](images/a19.png)
 
-For Network adapters, you have three options; we want all three for training. Place one option each in an open slot:
+ In between the power supply modules, from top to bottom, the 3745 has:
+ 
+ - Three (3) WAN interface card (WIC) slots
+ - A console (light blue) and an auxilary port (black) on the right, a CompactFlash (CF) memory card slot in the center, and two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1. By the way, when you interact with the router directly in GNS3, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
+- Four (4) network adapter module slots.
+
+For network adapter modules, you have three options; we want all three for training. Place one option each in an open slot:
 
 - NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Module
 - NM-4T 4 port Synchronous Serial Network Module
 - NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Module
 
-![Preferences dialog](images/gns3_10.png)
+![Preferences dialog](images/a20.png)
 
 For WAN Interface Cards (WICs), we have two options. Once again, place an option in each of the first open slots:
 
 - WIC-1T One port serial (DB60, Cisco 60-pin "5-in-1" connector )
 - WIC-2T Two port serial (DB60, Cisco 60-pin "5-in-1" connector )
 
-![Preferences dialog](images/gns3_11.png)
+>**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
+CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, we have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
+
+![Preferences dialog](images/a21.png)
 
 Finally, accept the default Idle-PC value and click **Finish:** 
 
-![Preferences dialog](images/gns3_12.png)
+![Preferences dialog](images/a22.png)
 
 The IOS template's details appear. Note the memory for the Personal Computer Memory Card International Association (PCMCIA) disk0. This is the device's CompactFlash (CF) memory card, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory. Click on **Edit** to change it:
 
-![Preferences dialog](images/gns3_13.png)
+![Preferences dialog](images/a23.png)
 
-Set the PCMCIA disk0 to 32 MiB and click **OK**:
+Select the **Memories and disks** tab. Set the PCMCIA disk0 to 32 MiB and click **OK**:
 
-![Preferences dialog](images/gns3_14.png)
+![Preferences dialog](images/a24.png)
 
 This brings you back to the template details page; click **OK** to return to the main window:
 
-![Preferences dialog](images/gns3_15.png)
+![Preferences dialog](images/a25.png)
 
 Once you blah, blah, blah...
 
