@@ -18,7 +18,7 @@ This tutorial is broken down into three parts:
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
->**NOTE** - Many thanks to David Bombal, Paul Browning, and many other incredible coders and network gurus (you know who you are :thumbsup: ).
+>**NOTE** - Many thanks to David Bombal, Paul Browning, and many other incredible network gurus and coders (you know who you are :thumbsup: ).
 
 -----
 
@@ -273,15 +273,17 @@ The IOS template's details appear. Note the memory for the Personal Computer Mem
 
 ![Preferences dialog](images/a23.png)
 
-Select the **Memories and disks** tab. Set the PCMCIA disk0 to 32 MiB and click **OK**:
+Select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB and click **OK**:
 
 ![Preferences dialog](images/a24.png)
 
-This brings you back to the template details page; click **OK** to return to the main window:
+This brings you back to the template details page. There is some good information here, such as the name of the startup configuration file:
 
 ![Preferences dialog](images/a25.png)
 
-Once you blah, blah, blah...
+ Once you are done, click **OK** to return to the main window.
+
+Now that you have finished setting up your lab environment, 
 
 ![Preferences dialog](images/gns3_16.png)
 
