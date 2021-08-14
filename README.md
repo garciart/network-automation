@@ -59,7 +59,7 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > 
 >    ![Network Settings](img/a03.png "Settings -> Network")
 >
-> In VMWare, you can make all the above changes to your VM, in the **Settings** window:
+> In VMWare, you can make all the above changes to your VM, in the **Settings**:
 > 
 >    ![Settings](img/a04.png)
 
@@ -105,7 +105,7 @@ sudo reboot now
 
 >**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites. Just remember to place them in the /GNS3/images/IOS folder in your home directory (e.g., ```/home/gns3user//GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware. Here are the names of the files, their hashes, and some additional information:
+>The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites, and we have included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware (you can use our included script, [hash_checker.py](hash_checker.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
 >
 >- **Cisco 3745 Multiservice Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -119,9 +119,9 @@ sudo reboot now
 >- **Cisco 7206 VXR 6-Slot Router:**
 >   * IOS version 12.4.25g (Mainline):
 >   * File Name: c7200-a3jk9s-mz.124-25g.bin
+>   * MD5: 3a78cb61831b3ef1530f7402f5986556
 >   * Flash Memory: 64MB
 >   * DRAM: 256MB
->   * MD5: 3a78cb61831b3ef1530f7402f5986556
 >   * End-of-Sale Date: 2012-09-29 
 >   * End-of-Support Date: 2017-09-30
 >   * IOS End-of-Support Date: 2016-01-31
@@ -188,11 +188,11 @@ In **Local sever configuration**, under **Host binding**, select the isolated in
 
 ![Local sever configuration](img/a06.png)
 
-After a few minutes, a **Local server status** window will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next >** to continue:
+After a few minutes, a **Local server status** pop-up dialog will appear, letting you know that a "Connection to the local GNS3 server has been successful!". Click **Next >** to continue:
 
 ![Local server status](img/a07.png)
 
-At the **Summary** window, click **Finish**:
+At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
@@ -202,54 +202,54 @@ At the **Summary** window, click **Finish**:
 
 ## Running the Labs
 
-Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
+Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have given your isolated Ethernet interface an IP address of ```192.168.1.1```, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
 
-You will see a dialog asking you to create a new project. Enter "g001_ping" in the ***Name*** textbox and click the **OK** button.
+A pop-up dialog will appear, asking you to create a new project. Enter ```g001_ping``` in the ***Name*** textbox and click the **OK** button.
 
-![Project dialog](img/a10.png)
+![Project Dialog](img/a10.png)
 
-When the main window reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is "192.168.1.1":
+When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is ```192.168.1.1```:
 
-![Preferences dialog](img/a11.png)
+![Preferences - Server](img/a11.png)
 
-Once again, look in the left-hand menu in the **Preferences** window, and select **Dynamips -> IOS Routers** and click on **New:**
+Once again, look in the left-hand menu in **Preferences**, and select **Dynamips -> IOS Routers** and click on **New:**
 
-![Preferences dialog](img/a12.png)
+![Preferences - Dynamips](img/a12.png)
 
-When the **New IOS Router Template window** appears, ensure ***New Image*** is selected, and then click **Browse**:
+When the **New IOS Router Template** pop-up dialog appears, ensure ***New Image*** is selected, and then click **Browse**:
 
-![Preferences dialog](img/a13.png)
+![New IOS Router Template](img/a13.png)
 
-When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the file window appears and click **Open** at the top:
+When you installed GNS3, you also downloaded the IOS image for a Cisco 3745 Router. Select the image when the **Select an IOS image** file dialog appears and click **Open** at the top:
 
-![Preferences dialog](img/a14.png)
+![Select an IOS image](img/a14.png)
 
 When asked, "Would like to decompress this IOS image?", click **Yes**:
 
-![Preferences dialog](img/a15.png)
+![Decompress IOS Image](img/a15.png)
 
-Back in the **New IOS Router Template window**, click **Next >:**
+Back in the **New IOS Router Template** dialog window, click **Next >:**
 
-![Preferences dialog](img/a16.png)
+![New IOS Router Template](img/a16.png)
 
 When it comes to customizing the router's details, use the default values for both the name and memory and click on **Next >** for each:
 
-![Preferences dialog](img/a17.png)
+![Name and platform](img/a17.png)
 
-![Preferences dialog](img/a18.png)
+![Memory](img/a18.png)
 
-Here is the back of a 3745 Router:
+The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected module "cards". Here is the back of a Cisco 3745 Router:
 
-![Cisco 3745 back](img/a19.png)
+![Cisco 3745 Rear View](img/a19.png)
 
  In between the power supply modules, from top to bottom, the 3745 has:
  
- - Three (3) WAN interface card (WIC) slots
+ - Three (3) WAN interface card (WIC) slots (uncovered in the image).
  - Built-in Modules:
-     - A console (labeled in light blue) and an auxilary port (labeled in black) on the right
-     - A CompactFlash (CF) memory card slot in the center
-     - Two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port. However, our Python scripts will connect to the router through the Ethernet cable, using either Telnet or SSH.
-- Four (4) network adapter module slots.
+     - A console (labeled in light blue) and an auxilary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port.
+     - A CompactFlash (CF) memory card slot in the center.
+     - Two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through the Ethernet cable, using either Telnet or SSH.
+- Four (4) network adapter module slots (two uncovered and two covered in the image).
 
 For network adapter modules, you have three options:
 
@@ -257,11 +257,9 @@ For network adapter modules, you have three options:
 - NM-4T 4 port Synchronous Serial Network Module
 - NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Module
 
-Fill open slots 1, 2, and 3 with a module:
+Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters. Fill open slots 1, 2, and 3 with a module:
 
-![Preferences dialog](img/a20.png)
-
-Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
+![Network Adapters](img/a20.png)
 
 For WAN Interface Cards (WICs), we have three slots, but only two options:
 
@@ -270,34 +268,52 @@ For WAN Interface Cards (WICs), we have three slots, but only two options:
 
  Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty:
 
-![Preferences dialog](img/a21.png)
+![WIC Adapters](img/a21.png)
 
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
 CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, we have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
 
 Finally, accept the default Idle-PC value and click **Finish:** 
 
-![Preferences dialog](img/a22.png)
+![Idle PC value](img/a22.png)
 
 The IOS template's details appear. Note the memory for the Personal Computer Memory Card International Association (PCMCIA) disk0. This is the device's CompactFlash (CF) memory card, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory. Click on **Edit** to change it:
 
-![Preferences dialog](img/a23.png)
+![Preferences](img/a23.png)
 
-Select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB and click **OK**:
+In the **Dynamips IOS router template configuration** pop-up dialog, select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB and click **OK**:
 
-![Preferences dialog](img/a24.png)
+![Dynamips IOS router template configuration](img/a24.png)
 
-This brings you back to the template details page. Take a moment to look it over; there is some good information here, such as the name of the startup configuration file, which you will edit later:
+This brings you back to the template details window. Take a moment to look it over; there is some good information here, such as the name of the startup configuration file, which you will edit later:
 
-![Preferences dialog](img/a25.png)
+![Preferences](img/a25.png)
 
- Once you are done, click **OK** to return to the main window.
+Once you are done, click **OK** to return to the the GNS3 Graphical User Interface (GUI).
 
-Now that you have finished setting up your lab environment, click **View** -> **Docks** -> **All devices**. All the devices you can use in your lab will appear in a docked window on the right.
+>**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Select a **Cloud** and place it in the workspace, then select a **c3745 and place it on the workspace:
+Now that you have finished setting up your lab environment, click **View** -> **Docks** -> **All templates**:
 
-![Preferences dialog](img/gns3_16.png)
+![All devices](img/a26.png)
+
+All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
+
+Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is "R1":
+
+![Populate Workspace](img/a27.png)
+
+Select the "Add a link" icon at the bottom of the Devices Toolbar:
+
+![Add a link icon](img/a27i.png)
+
+![Add a link icon](img/a28.png)
+
+![Add a link icon](img/a29.png)
+
+![Add a link icon](img/a30.png)
+
+![Add a link icon](img/a31.png)
 
 Add appliance (router R0)
 Select and start appliance
