@@ -59,7 +59,7 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > 
 >    ![Network Settings](img/a03.png "Settings -> Network")
 >
-> In VMWare, you can make all the above changes to your VM, in the **Settings**:
+> In VMWare, you can make all the above changes to your VM, in **Settings**:
 > 
 >    ![Settings](img/a04.png)
 
@@ -204,7 +204,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have given your isolated Ethernet interface an IP address of ```192.168.1.1```, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```g001_ping``` in the ***Name*** textbox and click the **OK** button.
+A pop-up dialog will appear, asking you to create a new project. Enter ```lab000``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](img/a10.png)
 
@@ -238,7 +238,7 @@ When it comes to customizing the router's details, use the default values for bo
 
 ![Memory](img/a18.png)
 
-The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected module "cards". Here is the back of a Cisco 3745 Router:
+The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
 
 ![Cisco 3745 Rear View](img/a19.png)
 
@@ -246,8 +246,8 @@ The Cisco 3745 is a customizable router, capable of supporting different network
  
  - Three (3) WAN interface card (WIC) slots (uncovered in the image).
  - Built-in Modules:
-     - A console (labeled in light blue) and an auxilary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the console port.
-     - A CompactFlash (CF) memory card slot in the center.
+     - A console (labeled in light blue) and an auxilary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
+     - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
      - Two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through the Ethernet cable, using either Telnet or SSH.
 - Four (4) network adapter module slots (two uncovered and two covered in the image).
 
@@ -299,7 +299,7 @@ Now that you have finished setting up your lab environment, click **View** -> **
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
-Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is "R1":
+Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is **R1**:
 
 ![Populate Workspace](img/a27.png)
 
@@ -307,46 +307,160 @@ Select the "Add a link" icon at the bottom of the Devices Toolbar:
 
 ![Add a link icon](img/a27i.png)
 
-![Add a link icon](img/a28.png)
+Move the cross-hair over **Cloud1** and select your isolated Ethernet interface name (e.g., **enp0s8**):
 
-![Add a link icon](img/a29.png)
+![Connect to the Cloud](img/a28.png)
 
-![Add a link icon](img/a30.png)
+Connect the other end to built-in **FastEthernet0/0** port in **R1**:
 
-![Add a link icon](img/a31.png)
+![Connect to the Router](img/a29.png)
 
-Add appliance (router R0)
-Select and start appliance
-Look up R0's console port (should be 192.168.1.1:5000)
-Connect Cloud1's LoopbackEth to R0 FastEthernet0/0
-Opened a Command window (cmd or Powershell)
-Input "telnet 192.168.1.1 5000" to connect to R0
+Notice that, while the devices are connect, nothing is being transmitted, because the router is not on:
 
-Press return and configure R0
-Press Ctrl + "]" to leave R0.
-Input "q" to exit telnet.
+![Router off](img/a30.png)
 
-![Preferences dialog](img/gns3_17.png)
+Let us fix that. Click on the green **Play** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to start all devices?", click **Yes**:
 
-![Preferences dialog](img/gns3_18.png)
+![Confirm Start All](img/a31.png)
 
-![Preferences dialog](img/gns3_19.png)
+You will see that all the nodes are now green, both in the Workspace and the Topology Summary in the top left hand corner:
 
-![Preferences dialog](img/gns3_20.png)
+![All Devices Started](img/a32.png)
 
-![Preferences dialog](img/gns3_21.png)
+By the way, note the console information for R1 in the the Topology Summary. This means that, even though it does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745.
 
-One way to detect hosts on your subnet is to run ```nmap -sP 192.168.1.1-255```:
+Let us do that now: open a Terminal and input the following command:
 
-![Preferences dialog](img/gns3_21a.png)
+```
+telnet 192.168.1.1 5001
+```
 
-![Preferences dialog](img/gns3_22.png)
+You should see output similar to the following:
 
-![Preferences dialog](img/gns3_23.png)
+```
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
+Press ENTER to get the prompt.
+*Mar  1 00:00:04.627: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
+...
+*Mar  1 00:00:07.499: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet3/6, changed state to down
+R1#
+```
 
->**NOTE** - We will use nmap and other CLI tools in this tutorial. Therefore, open a terminal and ensure you have installed the following packages:
-> ```
-> - sudo yum -y install net-tools
-> - sudo yum -y install nmap
-> - sudo yum -y install lsof
-> ```
+You are now connected to the router through the Console port. Before we continue, let us take care of some housekeeping.
+
+When we first configured the router, we gave it a default IOS image (c3745-adventerprisek9-mz.124-25d.bin). However, when the router first starts, it looks for an IOS image in flash memory. This is because the 3745 can store multiple IOS's in flash memory; you tell the router which one you want to use, by inputting ```boot system flash:<the IOS filename>.bin``` at a configuration prompt and saving it in the start-up configuration file. If the router does not find an IOS there, it will look in its Read-Only Memory (ROM) for a default IOS.
+
+Our router will do this because we have not formatted our flash memory, preventing us from uploading another IOS. As a mtter of fact, you may see the following error:
+
+```
+PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+```
+
+In this lab, we will not need another IOS, but we do want to use our flash memory. Therefore, using Cisco's Tool Command Language (TCL), let us fix our memory issue, by inputting the following command:
+
+```
+R1#erase flash:
+```
+
+You should see output similar to the following:
+
+```
+Erasing the flash filesystem will remove all files! Continue? [confirm]
+Current DOS File System flash card in flash: will be formatted into Low End File System flash card!  Continue? [confirm]
+Erasing device... eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee ...erased
+Erase of flash: complete
+```
+
+Input ```show flash``` to see what is in the drive:
+
+```
+System CompactFlash directory:
+No files in System CompactFlash
+[0 bytes used, 67108860 available, 67108860 total]
+65536K bytes of ATA System CompactFlash (Read/Write)
+```
+
+Now, normally, you would enter the ```reload``` command to restart the router. However, this is not possible in GNS3 using Dynamips, so press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, right click on **R1**, and click on **Reload**:
+
+![Reload the Router](img/a33.png)
+
+In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
+
+Telnet back into the router using ```telnet 192.168.1.1 5001```.
+
+Using Cisco's Tool Command Language (TCL), check the status of the router's internet protocol interfaces:
+
+```
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            unassigned      YES unset  administratively down down
+...
+Vlan1                      unassigned      YES unset  up                    down
+```
+
+Let us get a little more information about the port we will use for our Ethernet connection, FastEthernet0/0:
+
+```
+R1#show ip interface FastEthernet0/0
+FastEthernet0/0 is administratively down, line protocol is down
+  Internet protocol processing disabled
+```
+
+Okay, FastEthernet0/0 is down and not configured. We will give it an IP address of 192.168.1.10 and and bring the port up:
+
+```
+R1#enable
+R1#configure terminal
+```
+
+When you see the message ```Enter configuration commands, one per line.  End with CNTL/Z.```, interface with the Ethernet port. Assign it an IP address and bring it up, using the following commands:
+
+```
+R1(config)#interface FastEthernet0/0
+R1(config-if)#ip address 192.168.1.10 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#
+```
+
+Wait a few seconds; you will see messages like the following appear:
+
+```
+*Mar  1 00:16:01.151: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
+*Mar  1 00:16:02.151: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+```
+
+Exit the interface configuration mode and assign the router a static route of a single hop to connect to the gateway, using the following commands:
+
+```
+R1(config-if)#exit
+R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1
+R1(config)#end
+R1#
+```
+
+Once again, wait a few seconds for the messages to clear:
+
+```
+*Mar  1 00:16:39.299: %SYS-5-CONFIG_I: Configured from console by console
+```
+
+Next, save the changes to the running configuration, then replace the startup configuration file with the running configuration; this will make the changes permanent: 
+
+```
+R1#write memory
+Building configuration...
+[OK]
+R1#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R1#
+```
+
+Press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, right click on **R1**, and click on **Reload**:
+
+![Reload the Router](img/a33.png)
+
