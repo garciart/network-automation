@@ -353,39 +353,69 @@ You are now connected to the router through the Console port. Before we continue
 
 When we first configured the router, we gave it a default IOS image (c3745-adventerprisek9-mz.124-25d.bin). However, when the router first starts, it looks for an IOS image in flash memory. This is because the 3745 can store multiple IOS's in flash memory; you tell the router which one you want to use, by inputting ```boot system flash:<the IOS filename>.bin``` at a configuration prompt and saving it in the start-up configuration file. If the router does not find an IOS there, it will look in its Read-Only Memory (ROM) for a default IOS.
 
-Our router will do this because we have not formatted our flash memory, preventing us from uploading another IOS. As a mtter of fact, you may see the following error:
+Our router will do this because we have not formatted our flash memory, preventing us from uploading another IOS. As a matter of fact, you may see the following error:
 
 ```
 PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
 ```
 
-In this lab, we will not need another IOS, but we do want to use our flash memory. Therefore, using Cisco's Tool Command Language (TCL), let us fix our memory issue, by inputting the following command:
+In this lab, we will not need another IOS, but we do want to use our flash memory, so let us fix our memory issue, by inputting the following command:
 
 ```
-R1#erase flash:
+R1#format flash:
+```
+
+You will be asked to confirm the format operation twice. Press <kbd>Enter</kbd> both times:
+
+```
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
 ```
 
 You should see output similar to the following:
 
 ```
-Erasing the flash filesystem will remove all files! Continue? [confirm]
-Current DOS File System flash card in flash: will be formatted into Low End File System flash card!  Continue? [confirm]
-Erasing device... eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee ...erased
-Erase of flash: complete
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete 
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+R1#show flash
+No files on device
+
+66875392 bytes available (0 bytes used)
+
+R1#
 ```
 
 Input ```show flash``` to see what is in the drive:
 
 ```
-System CompactFlash directory:
-No files in System CompactFlash
-[0 bytes used, 67108860 available, 67108860 total]
-65536K bytes of ATA System CompactFlash (Read/Write)
+No files on device
+
+66875392 bytes available (0 bytes used)
+
+R1#
 ```
 
-Now, normally, you would enter the ```reload``` command to restart the router. However, this is not possible in GNS3 using Dynamips, so press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, right click on **R1**, and click on **Reload**:
+Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, click the red **Stop** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to stop all devices?", click Yes::
 
-![Reload the Router](img/a33.png)
+>Do not click on **Reload**!
+
+![Stop the Router](img/a33.png)
+
+After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to start all devices?", click **Yes**:
+
+![Confirm Start All](img/a31.png)
+
+All the nodes shoud turn green.
 
 In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
 
@@ -432,11 +462,18 @@ Wait a few seconds; you will see messages like the following appear:
 *Mar  1 00:16:02.151: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
 ```
 
-Exit the interface configuration mode and assign the router a static route of a single hop to connect to the gateway, using the following commands:
+Exit the interface configuration mode, using the following commands:
 
 ```
 R1(config-if)#exit
-R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1
+```
+
+Before we leave, we have to set a basic password, so we can access the device, otherwise, you will receive a ```Password required, but none set``` error.
+
+```
+R1(config)#line vty 0 4
+R1(config)#password cisco
+R1(config)#login
 R1(config)#end
 R1#
 ```
@@ -460,7 +497,38 @@ Building configuration...
 R1#
 ```
 
-Press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, right click on **R1**, and click on **Reload**:
+Press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, but this time, right click on R1, and click on Reload:
 
-![Reload the Router](img/a33.png)
+![Reload the Router](img/a34.png)
 
+Normally, when you reload a device, it will load the default settings, erasing any changes you made. However, since you transfered the running configuration to the startup configuration in the NVRAM, the router will now remember your settings.
+
+Ping the device from the Terminal:
+
+```
+$ ping -c 4 192.168.1.10
+PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.
+64 bytes from 192.168.1.10: icmp_seq=1 ttl=255 time=16.6 ms
+64 bytes from 192.168.1.10: icmp_seq=2 ttl=255 time=10.9 ms
+64 bytes from 192.168.1.10: icmp_seq=3 ttl=255 time=10.9 ms
+64 bytes from 192.168.1.10: icmp_seq=4 ttl=255 time=2.02 ms
+
+--- 192.168.1.10 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3003ms
+rtt min/avg/max/mdev = 2.028/10.153/16.660/5.237 ms
+```
+
+Now, instead of telneting through a port, you will telnet into the device using the IP address you assigned it earlier: 
+
+```
+$ telnet 192.168.1.10
+Trying 192.168.1.10...
+Connected to 192.168.1.10.
+Escape character is '^]'.
+
+
+User Access Verification
+
+Password: 
+R1>
+```
