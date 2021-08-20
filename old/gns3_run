@@ -2,22 +2,22 @@
 # Get interface address from user
 echo "Setting up GNS3..."
 echo "Available ethernet interfaces:"
-host_interface=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ && $3 ~ /^<NO-CARRIER/ {print substr($2, 1, length($2)-1)}')
+host_interface=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ {print substr($2, 1, length($2)-1)}')
 
-# choices=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ && $3 ~ /^<NO-CARRIER/ {print substr($2, 1, length($2)-1)}')
-# echo "$choices"
-# while :
-# do
-#   read -r -p "Enter an ethernet interface for GNS3 to use: " host_interface
-#   valid="^(em|en|et).*[0-9]$"
-#   if [[ $host_interface =~ $valid ]] && [[ "$host_interface" == *"$choices"* ]];
-#   then
-#       echo "Good to go!"
-#       break
-#   else
-#       echo "Invalid interface name. Please try again."
-#   fi
-# done
+choices=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ {print substr($2, 1, length($2)-1)}')
+echo "$choices"
+while :
+do
+  read -r -p "Enter an ethernet interface for GNS3 to use: " host_interface
+  valid="^(em|en|et).*[0-9]$"
+  if [[ $host_interface =~ $valid ]] && [[ "$host_interface" == *"$choices"* ]];
+  then
+      echo "Good to go!"
+      break
+  else
+      echo "Invalid interface name. Please try again."
+  fi
+done
 
 sudo ip tuntap add tap0 mode tap # Add the tap device
 sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
@@ -27,7 +27,6 @@ sudo brctl addif br0 tap0 # Add the tap to the bridge
 sudo brctl addif br0 "$host_interface" # Add the selected Ethernet connection to the bridge
 sudo ifconfig br0 up # Start the bridge
 sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
-sudo route add default gw 192.168.1.1 # Setup the default gateway
 echo
 echo -e "Network interface configuration:"
 ifconfig # Verify the devices exist
