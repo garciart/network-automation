@@ -1,16 +1,16 @@
 # Adventures in Network Automation
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely-available Dynamips images.***
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely available Dynamips images.***
 
 ***In addition, Cisco Packet Tracer, while an excellent tool, is not suitable for our purposes, since it cannot interact with the host or integrated development environments (IDEs) on those hosts.***
 
-## Introduction
+##Introduction
 
-Recently, for personal and professional reasons, I've delved into programming networking devices from within and without. Normally, in order to interact with a device like a switch, you must connect to it physically, via a serial or Ethernet cable. Once connected, you would access the command-line interface (CLI), and enter commands manually or upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, I've delved into working with network devices using Python. Normally, in order to interact with a device like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command-line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
 
-This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can become a full-time job. Wouldn't it be easier to write an application, let's say in Python, that can connect to a device and enter the commands for you? The answer is yes; you can write such a script, especially with Python, using modules such as subprocess and pexpect.
+This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can be exhausting. Wouldn't it be easier to automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
-The bad news is that, normally, to test the script, you will need a physical device. You just can't download an Internetwork Operating System (IOS) image, and then interact with it using a hypervisor like VirtualBox. However, there are some great tools, like the Graphical Network Simulator-3 (GNS3), which can virtualize IOS images. Also, with a little tweaking, they can let you test your code against a virtual network device.
+The bad news is that, normally, to test the script, you would need a physical device. You just can't run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -24,7 +24,7 @@ This tutorial is broken down into three parts:
 
 ## Installing GNS3 in CentOS
 
-Installing GNS on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install"), or Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), and CentOS.
+Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
 >**NOTE** - Why are we using CentOS for this tutorial?
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
@@ -39,33 +39,31 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 
 - [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
 
->**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and we will not repeat those steps here.
+>**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and we will not repeat those steps here. However, whether you use VirtualBox or VMWare, make sure you:
 > 
->However, whether you use VirtualBox or VMWare, make sure you:
-> 
-> 1. Allocate **2048 MB** of RAM to your machine  (e.g., in VirtualBox...):
+> 1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
 > 
 >    ![Memory size](img/a00.png "Settings -> Memory size")
 >  
->2. Allocate at least **16 GB** of hard disk space to your machine (e.g., in VirtualBox...):
+>2. Allocate at least **16 GB** of hard disk space for your machine (e.g., in VirtualBox...):
 > 
 >    ![File location and size](img/a01.png "Settings -> File location and size")**
 > 
->3. Allocate **two** processors to your machine (e.g., in VirtualBox...):
+>3. Allocate **two** processors for your machine (e.g., in VirtualBox...):
 > 
 >    ![Settings -> System](img/a02.png "Settings -> System")
 > 
->4. Add another network interface to your system. Make it private and isolate it from the outside world, by attaching it to an **Internal Network** in VirtualBox (shown) or connecting it to a **LAN segment** in VMWare:
+>4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
 > 
 >    ![Network Settings](img/a03.png "Settings -> Network")
 >
-> In VMWare, you can make all the above changes to your VM, in **Settings**:
+> In VMWare, you can make all the above changes to your VM in **Settings**:
 > 
 >    ![Settings](img/a04.png)
 
-Once you have finished creating your virtual machine, update and upgrade the OS.
+Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
->**NOTE** - If you are uing VirtualBox, we recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste from the host, etc. Check out [Aaron Kili's great article for TecMint on how to do that.](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands before running the Guest Additions' ISO:
+>**NOTE** - If you are using VirtualBox, we recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the Guest Additions' ISO:
 >
 >```
 >sudo yum -y install epel-release
@@ -74,21 +72,21 @@ Once you have finished creating your virtual machine, update and upgrade the OS.
 >sudo export KERN_DIR=/usr/src/kernels/$(uname -r)
 >```
 >
->Don't forget to reboot as well.
+>Don't forget to reboot your VM as well.
 
-Open a Terminal and install git:
+Next, open a Terminal and install git:
 
 ```sudo yum -y install git```
 
-Next, clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```):
+Clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```):
 
 ```
-[gns3user@localhost ~]$ git clone https://github.com/garciart/Automation.git
+git clone https://github.com/garciart/Automation.git
 ```
 
-Now for the setup: There are a lot of good posts and articles on how to install GNS3 on CentOS. However, each of them are slightly different, so, to make life easier, we distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, we highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
+Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, we distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, we highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
 
-Using elevated privileges, make the shell script executable and run it, piping the output into a text file. The install will take a few minutes, but once it is complete, check the text file for any errors.:
+Using elevated privileges, make the shell script executable and run it, piping the output into a text file:
 
 ```
 sudo chmod +x gns3_setup_centos
@@ -96,16 +94,16 @@ sudo ./gns3_setup_centos > setup_output.txt
 grep -i -e "error" -e "warning" setup_output.txt
 ```
 
-Examine and correct any errors; if necessary, delete the VM and start over again. Otherwise, if there are no errors, you can delete the output file and reboot the VM:
+Installation will take a few minutes, but once it is complete, check the text file for any errors. Correct any errors or, if necessary, delete the VM and start over again. Otherwise, if there are no errors, you can delete the output file and reboot the VM:
 
 ```
 rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their Internetwork Operating Systems (IOS) are available for download, and they are sufficient for our labs.
+>**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") attempts to download the file from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the IOS' from other websites, and we have included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware (you can use our included script, [hash_checker.py](hash_checker.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
+>The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and we have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
 >
 >- **Cisco 3745 Multiservice Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -144,10 +142,21 @@ Before we start, here's the subnet information for the network:
 - IP Class and Type: C (Private)
 ```
 
-In CentOS, network interfaces for Ethernet will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.). Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
+Now, let us create a virtual network. As we stated before, we will create virtual network devices in GNS3, which will exist within their own virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome. Our host machine is much more capable, with its Terminal and IDEs. We want to code on our host machine, and test the code in GNS3. Therefore, we want to connect the GNS3 VLAN to our host machine. To do this, we will:
+
+- Create a virtual network bridge.
+- Connect the host's isolated network interface to the bridge.
+- Assign the bridge an IPv4 address.
+- Bind the GNS3 VLAN gateway to the bridge.
+- Connect the router to the bridge through the gateway.
+
+However, before we start, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
+
+Per RedHat's [Consistent Network Device Naming conventions](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming "Consistent Network Device Naming"), network interfaces for Ethernet will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.) in CentOS. Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
 
 ```
-[gns3user@localhost ~]$ ip addr show label e*
+$ ip addr show label e*
+
 2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
     link/ether 08:00:27:cf:12:5e brd ff:ff:ff:ff:ff:ff
     inet 10.0.2.15/24 brd 10.0.2.255 scope global noprefixroute dynamic enp0s3
@@ -156,23 +165,41 @@ In CentOS, network interfaces for Ethernet will start with ```em```, ```en```, a
        valid_lft forever preferred_lft forever
 3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
     link/ether 08:00:27:87:ff:e2 brd ff:ff:ff:ff:ff:ff
-[gns3user@localhost ~]$ 
 ```
 
-Look for the interface that does not have an IP address. In this case, the isolated interface is named ```enp0s8```. Give the interface an IPv4 address, by inputting ```sudo ip addr add 192.168.1.1/24 dev enp0s8```. Do not forget to add the subnet (```/24```), or the ```ip``` program, by default, will set a netmask of 255.255.255.255 (```/32```), which will allow only one host on the isolated network, instead of a netmask of 255.255.255.0  (```/24```), which will allow the 256 hosts we want:
+Look for the interface that does not have an IP address (i.e., no inet). In this case, the isolated interface is named ```enp0s8```. 
+
+We will now "bridge" the host machine and GNS3 together:
 
 ```
-[gns3user@localhost ~]$ sudo ip addr add 192.168.1.1/24 dev enp0s8
-[sudo] password for gns3user: 
-[gns3user@localhost ~]$ ip addr show enp0s8
-3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether 08:00:27:87:ff:e2 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.1/24 scope global enp0s8
-       valid_lft forever preferred_lft forever
-[gns3user@localhost ~]$ 
+sudo ifconfig enp0s8 0.0.0.0 promisc up # Zero out the selected Ethernet connection
+sudo brctl addbr br0 # Create the bridge
+sudo brctl addif br0 enp0s8 # Add the selected Ethernet connection to the bridge
+sudo ifconfig br0 up # Start the bridge
+sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
 ```
 
-Open a Terminal and start GNS3:
+Check the configuration and the bridge by inputting ```ifconfig br0``` and ```brctl show br0```:
+
+```
+$ ifconfig br0 # Verify the bridge is set up
+
+br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::a00:27ff:fe87:ffe2  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:87:ff:e2  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 25  bytes 3854 (3.7 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+$ brctl show br0
+
+bridge name	bridge id		STP enabled	interfaces
+br0		8000.08002787ffe2	no		enp0s8
+```
+
+Start GNS3:
 
 ```
 gns3
@@ -442,8 +469,8 @@ FastEthernet0/0 is administratively down, line protocol is down
 Okay, FastEthernet0/0 is down and not configured. We will give it an IP address of 192.168.1.10 and and bring the port up:
 
 ```
-R1#enable
-R1#configure terminal
+R1#enable ; Enter User EXEC mode
+R1#configure terminal ; Enter Privileged EXEC mode
 ```
 
 When you see the message ```Enter configuration commands, one per line.  End with CNTL/Z.```, interface with the Ethernet port. Assign it an IP address and bring it up, using the following commands:
@@ -451,7 +478,7 @@ When you see the message ```Enter configuration commands, one per line.  End wit
 ```
 R1(config)#interface FastEthernet0/0
 R1(config-if)#ip address 192.168.1.10 255.255.255.0
-R1(config-if)#no shutdown
+R1(config-if)#no shutdown ; Bring F0/0 up
 R1(config-if)#
 ```
 
@@ -468,13 +495,14 @@ Exit the interface configuration mode, using the following commands:
 R1(config-if)#exit
 ```
 
-Before we leave, we have to set a basic password, so we can access the device, otherwise, you will receive a ```Password required, but none set``` error.
+Before we leave, we have to set basic passwords so we can access the device and enter User EXEC mode; otherwise, you will receive a ```Password required, but none set``` error.
 
 ```
-R1(config)#line vty 0 4
-R1(config)#password cisco
-R1(config)#login
-R1(config)#end
+R1(config)#enable password cisco ; Set cisco as the User EXEC mode password
+R1(config)#line vty 0 4 ; Assign five virtual connection ports for Telnet and SSH and access the virtual teletype prompt
+R1(config-line)#password cisco ; Set cisco as the VTY password
+R1(config-line)#login ; Require Telnet and SSH login
+R1(config-line)#end
 R1#
 ```
 
@@ -530,5 +558,7 @@ Escape character is '^]'.
 User Access Verification
 
 Password: 
-R1>
+R1>enable
+Password:
+R1#
 ```
