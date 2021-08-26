@@ -14,6 +14,7 @@ sudo yum -y install python3-tools
 # Install Git
 sudo yum -y install git
 # Install GNS3 dependencies
+sudo yum -y install "Development Tools" # Only need gcc to run GNS3, but will need the other tools when programming
 sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
@@ -63,8 +64,7 @@ sudo make install
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
 # wget -P ~/GNS3/configs https://raw.githubusercontent.com/garciart/Automation/master/R1_3745_i1_startup-config.cfg
-# Can be used to create TUN/TAP interfaces to connect hosts and GNS3
-# TUN (network TUNnel) works with IP packets (Layer 3/Network). TAP (network TAP) works with Ethernet frames (Layer 2/Data)
+# Used to create interfaces to connect the host to GNS3
 sudo yum -y install bridge-utils
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P /usr/bin/gns3_run https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
