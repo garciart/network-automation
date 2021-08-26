@@ -17,6 +17,8 @@ do
       echo "Invalid interface name. Please try again."
   fi
 done
+# OPTIONAL - Add tuntap to connect to Layer 2 TAP, instead of connecting directly to Layer 3 Bridge 
+# TUN (network TUNnel) works with IP packets (Layer 3/Network). TAP (network TAP) works with Ethernet frames (Layer 2/Data)
 # sudo ip tuntap add tap0 mode tap # Add the tap device
 # sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
 sudo ifconfig "$host_interface" 0.0.0.0 promisc up # Zero out the selected Ethernet connection
