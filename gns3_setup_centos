@@ -68,9 +68,9 @@ wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.
 sudo yum -y install bridge-utils
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P /usr/bin/gns3_run https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
-# Place the start-up script in /usr/bin and make it executable 
-sudo cp gns3_run /usr/bin/gns3_run
-sudo chmod 755 /usr/bin/gns3_run
+# Make the start-up script executable and place it in /usr/bin
+sudo chmod 755 gns3_run
+sudo cp gns3_run /usr/bin/
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."
