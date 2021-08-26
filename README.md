@@ -218,11 +218,11 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
->**NOTE** - If a **Project** window appears instead, click on **Cancel**. select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ``192.168.1.1```:
+>**NOTE** - If a **Project** window appears instead, click on **Cancel**. select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```:
 >
 >![Preferences](img/a11.png)
 
-In **Local sever configuration**, under **Host binding**, select the bridge's IP address (``192.168.1.1```):
+In **Local sever configuration**, under **Host binding**, select the bridge's IP address (```192.168.1.1```):
 
 ![Local sever configuration](img/a06.png)
 
@@ -234,7 +234,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
->**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ``192.168.1.1```: 
+>**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```: 
 >
 >![Preferences](img/a11.png)
 
