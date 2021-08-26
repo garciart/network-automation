@@ -88,6 +88,8 @@ Now for the setup: There are a few good posts and articles on how to install GNS
 
 Using elevated privileges, make the shell script executable and run it, piping the output into a text file:
 
+>**NOTE** - Do not run any commands as root! Otherwise, some files and executables will have the wrong permissions.
+
 ```
 sudo chmod +x gns3_setup_centos
 sudo ./gns3_setup_centos > setup_output.txt
@@ -227,14 +229,6 @@ At the **Summary** pop-up dialog, click **Finish**:
 >
 >![Preferences](img/a09.png)
 
-## Running the Labs
-
-Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have given your isolated Ethernet interface an IP address of ```192.168.1.1```, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
-
-A pop-up dialog will appear, asking you to create a new project. Enter ```lab000``` in the ***Name*** textbox and click the **OK** button.
-
-![Project Dialog](img/a10.png)
-
 When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is ```192.168.1.1```:
 
 ![Preferences - Server](img/a11.png)
@@ -316,11 +310,17 @@ This brings you back to the template details window. Take a moment to look it ov
 
 ![Preferences](img/a25.png)
 
-Once you are done, click **OK** to return to the the GNS3 Graphical User Interface (GUI).
+## Running the Labs
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Now that you have finished setting up your lab environment, click **View** -> **Docks** -> **All templates**:
+Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
+
+A pop-up dialog will appear, asking you to create a new project. Enter ```lab000``` in the ***Name*** textbox and click the **OK** button.
+
+![Project Dialog](img/a10.png)
+
+Click **View** -> **Docks** -> **All templates**:
 
 ![All devices](img/a26.png)
 
@@ -434,7 +434,7 @@ R1#
 
 Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, click the red **Stop** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to stop all devices?", click Yes::
 
->Do not click on **Reload**!
+>Do not click on **Reload**! **Reload** will load the default settings, erasing any changes you have made. You will learn how to save configurations later.
 
 ![Stop the Router](img/a33.png)
 
@@ -442,13 +442,19 @@ After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above 
 
 ![Confirm Start All](img/a31.png)
 
-All the nodes shoud turn green.
+All the nodes should turn green.
+
+***ADD PYTHON CODE***
+
+***END OF LAB 1***
+
+***START LAB 2***
 
 In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
 
 Telnet back into the router using ```telnet 192.168.1.1 5001```.
 
-Using Cisco's Tool Command Language (TCL), check the status of the router's internet protocol interfaces:
+Check the status of the router's internet protocol interfaces:
 
 ```
 R1#show ip interface brief
