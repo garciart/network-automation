@@ -6,11 +6,11 @@
 
 ##Introduction
 
-Recently, I've delved into working with network devices using Python. Normally, in order to interact with a device like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command-line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, I have delved into working with network devices using Python. Normally, in order to interact with a device like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command-line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
 
-This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can be exhausting. Wouldn't it be easier to automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
+This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can be exhausting. Would it not be easier to automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
-The bad news is that, normally, to test the script, you would need a physical device. You just can't run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
+The bad news is that, normally, to test the script, you would need a physical device. You just cannot run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -24,7 +24,7 @@ This tutorial is broken down into three parts:
 
 ## Installing GNS3 in CentOS
 
-Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 doesn't work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
+Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
 >**NOTE** - Why are we using CentOS for this tutorial?
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
@@ -72,7 +72,7 @@ Once you have finished creating your virtual machine, spin it up, and update and
 >sudo export KERN_DIR=/usr/src/kernels/$(uname -r)
 >```
 >
->Don't forget to reboot your VM as well.
+>Do not forget to reboot your VM as well.
 
 Next, open a Terminal and install git:
 
@@ -86,13 +86,14 @@ git clone https://github.com/garciart/Automation.git
 
 Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, we distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, we highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
 
-Using elevated privileges, make the shell script executable and run it, piping the output into a text file:
+Using elevated privileges, make the shell script executable and run it, piping the output into a text file. This will take a while:
 
->**NOTE** - Do not run any commands as root! Otherwise, some files and executables will have the wrong permissions.
+>**NOTE** - Do not run any commands as **root**! Otherwise, some files and executables will end up in the wrong place or have the wrong permissions, and GNS3 will not work.
 
 ```
+cd Automation
 sudo chmod +x gns3_setup_centos
-sudo ./gns3_setup_centos > setup_output.txt
+./gns3_setup_centos *> setup_output.txt # DO NOT SUDO OR 
 grep -i -e "error" -e "warning" setup_output.txt
 ```
 
@@ -130,7 +131,7 @@ sudo reboot now
 
 ## Setting up the environment
 
-Before we start, here's the subnet information for the network:
+Before we start, here is the subnet information for the network:
 
 ```
 - Network Address: 192.168.1.0/24
@@ -152,7 +153,9 @@ Now, let us create a virtual network. As we stated before, we will create virtua
 - Bind the GNS3 VLAN gateway to the bridge.
 - Connect the router to the bridge through the gateway.
 
-However, before we start, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
+>**NOTE** - All of the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). We highly recommend that you first setup and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
+
+First, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
 
 Per RedHat's [Consistent Network Device Naming conventions](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming "Consistent Network Device Naming"), network interfaces for Ethernet will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.) in CentOS. Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
 
@@ -180,6 +183,8 @@ sudo brctl addif br0 enp0s8 # Add the selected Ethernet connection to the bridge
 sudo ifconfig br0 up # Start the bridge
 sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
 ```
+
+>**NOTE** - In the **gns3_run** script, there are commented-out commands for creating a Layer 2 TAP interface using tuntap. You can uncomment them later on, if you are uncomfortable connecting directly to a Layer 3 bridge, or if you need to connect to a Layer 2 device instead.
 
 Check the configuration and the bridge by inputting ```ifconfig br0``` and ```brctl show br0```:
 
@@ -213,7 +218,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
-In **Local sever configuration**, under **Host binding**, select the isolated interface:
+In **Local sever configuration**, under **Host binding**, select the bridge's IP address (``192.168.1.1```):
 
 ![Local sever configuration](img/a06.png)
 
@@ -225,15 +230,11 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
->**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and set the **Host binding** to the the isolated interface's IP address: 
+>**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ``192.168.1.1```: 
 >
 >![Preferences](img/a09.png)
 
-When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Server** and ensure that the value in the ***Host Binding*** textbox is ```192.168.1.1```:
-
-![Preferences - Server](img/a11.png)
-
-Once again, look in the left-hand menu in **Preferences**, and select **Dynamips -> IOS Routers** and click on **New:**
+When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Dynamips -> IOS Routers** and click on **New:**
 
 ![Preferences - Dynamips](img/a12.png)
 
@@ -334,7 +335,7 @@ Select the "Add a link" icon at the bottom of the Devices Toolbar:
 
 ![Add a link icon](img/a27i.png)
 
-Move the cross-hair over **Cloud1** and select your isolated Ethernet interface name (e.g., **enp0s8**):
+Move the cross-hair over **Cloud1** and select your bridge interface name (e.g., **br0**):
 
 ![Connect to the Cloud](img/a28.png)
 
