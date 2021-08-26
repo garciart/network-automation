@@ -218,7 +218,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
->**NOTE** - If a **Project** window appears instead, click on **Cancel**. Select Edit -> Preferences, or press Ctrl+Shift+P. Select Server and make sure that Enable local server is checked and Host binding is set to ``192.168.1.1```:
+>**NOTE** - If a **Project** window appears instead, click on **Cancel**. select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ``192.168.1.1```:
 >
 >![Preferences](img/a11.png)
 
