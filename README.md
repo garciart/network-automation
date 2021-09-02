@@ -505,7 +505,7 @@ child.sendline('q\r')
 print("Successfully connected to the device and formatted the flash memory.")
 ```
 
-This is a bare-bones script that automates everything we did earlier. I have also included a script with error detection in the **labs** folder, named [lab000.py](labs/lab000.py "Telnet lab").
+This is a bare-bones script that automates everything we did earlier. I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab").
 
 Congratulations! You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
 
