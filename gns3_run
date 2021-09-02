@@ -17,16 +17,21 @@ do
       echo "Invalid interface name. Please try again."
   fi
 done
-# OPTIONAL - Add tuntap to connect to Layer 2 TAP, instead of connecting directly to Layer 3 Bridge 
+# Add tuntap to connect to Layer 2 TAP, instead of connecting directly to Layer 3 Bridge 
 # TUN (network TUNnel) works with IP packets (Layer 3/Network). TAP (network TAP) works with Ethernet frames (Layer 2/Data)
-# sudo ip tuntap add tap0 mode tap # Add the tap device
-# sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
-sudo ifconfig "$host_interface" 0.0.0.0 promisc up # Zero out the selected Ethernet connection
 sudo brctl addbr br0 # Create the bridge
-# sudo brctl addif br0 tap0 # Add the tap to the bridge
+sudo ip tuntap add tap0 mode tap # Add the tap device
+# sudo ifconfig tap0 0.0.0.0 promisc up # Configure the tap
+sudo ip link set tap0 up promisc on # Configure the tap
+sudo brctl addif br0 tap0 # Add the tap to the bridge
+# sudo ifconfig "$host_interface" 0.0.0.0 promisc up # Zero out the selected Ethernet connection
+sudo ip link set "$host_interface" up promisc on # Configure selected Ethernet connection
 sudo brctl addif br0 "$host_interface" # Add the selected Ethernet connection to the bridge
-sudo ifconfig br0 up # Start the bridge
-sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
+# sudo ifconfig br0 up # Start the bridge
+sudo ip link set br0 up # Start the bridge
+# sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
+sudo ip addr add 192.168.1.1/24 dev br0
+sudo brctl stp br0 on # Enable Spanning Tree Protocol (STP)
 echo
 echo -e "Network interface configuration:"
 ifconfig # Verify the devices exist
@@ -37,16 +42,19 @@ echo
 echo -e "Starting GNS3..."
 gns3 # Start GNS3
 # Upon exit from GNS3, reset the default Ethernet connection to access the Internet
-sudo ifconfig br0 down # Stop the bridge
+# sudo ifconfig br0 down # Stop the bridge
+sudo ip link set br0 down # Stop the bridge
 sudo brctl delif br0 "$host_interface" # Remove the default Ethernet connection from the bridge
-# sudo brctl delif br0 tap0 # Remove the tap from the bridge
+sudo brctl delif br0 tap0 # Remove the tap from the bridge
 sudo brctl delbr br0 # Delete the bridge
 # sudo ifconfig tap0 down # Stop the tap
-# sudo ip link delete tap0 # Delete the tap
+sudo ip link set tap0 down # Stop the tap
+sudo ip link delete tap0 # Delete the tap
 # Reset the default Ethernet connection
 echo
 echo -e "Resetting the network (please wait 30 seconds...)"
-sudo ifconfig "$host_interface" -promisc
+# sudo ifconfig "$host_interface" -promisc
+sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
 # sudo /etc/init.d/network restart
 sudo systemctl restart network # Check your OS; may use service networking restart 
 sleep 30
