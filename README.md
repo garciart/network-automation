@@ -195,7 +195,7 @@ sudo ip addr add 192.168.1.1/24 dev br0
 sudo brctl stp br0 on # Enable Spanning Tree Protocol (STP)
 ```
 
->**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, later, we will need several Layer 2 TAP interfaces to break up subnetworks, so just get into the habit of connecting to a TAP instead of directly to the bridge.
+>**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, later, we will create subnetworks in GNS3, separating their connections through Layer 2 TAP interfaces, so just get into the habit of connecting to a TAP instead of directly to the bridge.
 
 Check the configuration and the bridge by inputting ```ip addr show dev br0``` and ```brctl show br0```:
 
@@ -341,6 +341,8 @@ Click **View** -> **Docks** -> **All templates**:
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
+>**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. We recommend both **Snap to grid**, which will keep your workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
+
 Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is **R1**:
 
 ![Populate Workspace](img/a27.png)
@@ -454,132 +456,35 @@ After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above 
 
 All the nodes should turn green.
 
+***Install pexpect here (subprocess is a standard module)? Or add to setup***
+
+```
+$ pip install pexpect
+
+Defaulting to user installation because normal site-packages is not writeable
+Collecting pexpect
+  Using cached pexpect-4.8.0-py2.py3-none-any.whl (59 kB)
+Collecting ptyprocess>=0.5
+  Using cached ptyprocess-0.7.0-py2.py3-none-any.whl (13 kB)
+Installing collected packages: ptyprocess, pexpect
+Successfully installed pexpect-4.8.0 ptyprocess-0.7.0
+```
+
 ***ADD PYTHON CODE***
+
+```
+#!/usr/bin/python
+from __future__ import print_function
+
+import pexpect
+
+
+```
+
 
 ***END OF LAB 1***
 
-***START LAB 2***
-
-In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
-
-Telnet back into the router using ```telnet 192.168.1.1 5001```.
-
-Check the status of the router's internet protocol interfaces:
-
-```
-R1#show ip interface brief
-Interface                  IP-Address      OK? Method Status                Protocol
-FastEthernet0/0            unassigned      YES unset  administratively down down
-...
-Vlan1                      unassigned      YES unset  up                    down
-```
-
-Let us get a little more information about the port we will use for our Ethernet connection, FastEthernet0/0:
-
-```
-R1#show ip interface FastEthernet0/0
-FastEthernet0/0 is administratively down, line protocol is down
-  Internet protocol processing disabled
-```
-
-Okay, FastEthernet0/0 is down and not configured. We will give it an IP address of 192.168.1.10 and and bring the port up:
-
-```
-R1#enable ; Enter User EXEC mode
-R1#configure terminal ; Enter Privileged EXEC mode
-```
-
-When you see the message ```Enter configuration commands, one per line.  End with CNTL/Z.```, interface with the Ethernet port. Assign it an IP address and bring it up, using the following commands:
-
-```
-R1(config)#interface FastEthernet0/0
-R1(config-if)#ip address 192.168.1.10 255.255.255.0
-R1(config-if)#no shutdown ; Bring F0/0 up
-R1(config-if)#
-```
-
-Wait a few seconds; you will see messages like the following appear:
-
-```
-*Mar  1 00:16:01.151: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
-*Mar  1 00:16:02.151: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
-```
-
-Exit the interface configuration mode, using the following commands:
-
-```
-R1(config-if)#exit
-```
-
-Before we leave, we have to set basic passwords so we can access the device and enter User EXEC mode; otherwise, you will receive a ```Password required, but none set``` error.
-
-```
-R1(config)#enable password cisco ; Set cisco as the User EXEC mode password
-R1(config)#line vty 0 4 ; Assign five virtual connection ports for Telnet and SSH and access the virtual teletype prompt
-R1(config-line)#password cisco ; Set cisco as the VTY password
-R1(config-line)#login ; Require Telnet and SSH login
-R1(config-line)#end
-R1#
-```
-
-Once again, wait a few seconds for the messages to clear:
-
-```
-*Mar  1 00:16:39.299: %SYS-5-CONFIG_I: Configured from console by console
-```
-
-Next, save the changes to the running configuration, then replace the startup configuration file with the running configuration; this will make the changes permanent: 
-
-```
-R1#write memory
-Building configuration...
-[OK]
-R1#copy running-config startup-config
-Destination filename [startup-config]? 
-Building configuration...
-[OK]
-R1#
-```
-
-Press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, but this time, right click on R1, and click on Reload:
-
-![Reload the Router](img/a34.png)
-
-Normally, when you reload a device, it will load the default settings, erasing any changes you made. However, since you transfered the running configuration to the startup configuration in the NVRAM, the router will now remember your settings.
-
-Ping the device from the Terminal:
-
-```
-$ ping -c 4 192.168.1.10
-PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.
-64 bytes from 192.168.1.10: icmp_seq=1 ttl=255 time=16.6 ms
-64 bytes from 192.168.1.10: icmp_seq=2 ttl=255 time=10.9 ms
-64 bytes from 192.168.1.10: icmp_seq=3 ttl=255 time=10.9 ms
-64 bytes from 192.168.1.10: icmp_seq=4 ttl=255 time=2.02 ms
-
---- 192.168.1.10 ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3003ms
-rtt min/avg/max/mdev = 2.028/10.153/16.660/5.237 ms
-```
-
-Now, instead of telneting through a port, you will telnet into the device using the IP address you assigned it earlier: 
-
-```
-$ telnet 192.168.1.10
-Trying 192.168.1.10...
-Connected to 192.168.1.10.
-Escape character is '^]'.
-
-
-User Access Verification
-
-Password: 
-R1>enable
-Password:
-R1#
-```
-
-Remember to shut down the bridge and restart the network:
+Remember to shut down the bridge and restart the network when you are finished:
 
 ```
 sudo ip link set br0 down # Stop the bridge
@@ -591,3 +496,5 @@ sudo ip link delete tap0 # Delete the tap
 sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
 sudo systemctl restart network # Check your OS; may use service networking restart 
 ```
+
+As we stated before, we added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin```. Now that you have learned how to setup the network environment for GNS3 manually, we recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal; by the way, we still recommend running GNS3 from the Terminal, instead of from the Application menu icon, so you can see any network errors or issues that may occur.
