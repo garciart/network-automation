@@ -2,16 +2,24 @@
 # -*- coding: utf-8 -*-
 """Lab 000: Telnet into a device and format the flash memory.
 To run this lab:
-* Start GNS3 by executing "./gn3_run" in a Terminal window.
+
+* Start GNS3 by executing "gn3_run" in a Terminal window.
 * Select lab000 from the Projects library.
 * Start all devices.
+* Run this script (i.e., "python lab000.py")
 
-If lab000 does not exist, follow the instructions in README.md to create the lab.
+Developer Notes:
+
+* Remember to make this script executable (i.e., "sudo chmod 755 lab000.py")
+* If lab000 does not exist, follow the instructions in README.md to create the lab.
 
 Project: Automation
 
 Requirements:
-- Python 2.7.5
+
+* Python 2.7+
+* pexpect
+* GNS3
 """
 from __future__ import print_function
 
@@ -27,15 +35,18 @@ __license__ = "MIT"
 
 def main():
     try:
+        print("Connecting to the device and formatting the flash memory...")
         # Connect to the device and allow time for the boot sequence to finish
-        child = pexpect.spawn("telnet 192.168.1.100 5001")
-        time.sleep(30)
+        child = pexpect.spawn("telnet 192.168.1.1 5001")
+        time.sleep(10)
         child.sendline("\r")
+        # Check for a prompt, either R1> or R1#.
+        child.expect_exact(["R1>", "R1#", ])
         # Enter Privileged EXEC Mode
         child.sendline("enable\r")
         child.expect_exact("R1#")
         # Format the flash memory
-        child.sendline("format flash:")
+        child.sendline("format flash:\r")
         # Expect "Format operation may take a while. Continue? [confirm]"
         child.expect_exact("Continue? [confirm]")
         child.sendline("\r")
@@ -43,13 +54,16 @@ def main():
         child.expect_exact("Continue? [confirm]")
         child.sendline("\r")
         child.expect_exact("Format of flash complete", timeout=120)
-        child.sendline("show flash")
+        child.sendline("show flash\r")
         # Expect "66875392 bytes available (0 bytes used)"
         child.expect_exact("(0 bytes used)")
-        # TODO: Disconnect from device
+        # Disconnect from device
+        child.sendcontrol("]")
+        child.sendline('q\r')
+        print("Successfully connected to the device and formatted the flash memory.")
     except BaseException:
         e_type, e_value, e_traceback = sys.exc_info()
-        print("Type {0}: {1} in {2} at line {3}.".format(
+        print("Error: Type {0}: {1} in {2} at line {3}.".format(
             e_type.__name__,
             e_value,
             e_traceback.tb_frame.f_code.co_filename,
@@ -59,5 +73,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Hello, friend")
+    print("Hello, friend.")
     main()

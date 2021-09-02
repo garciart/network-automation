@@ -6,11 +6,11 @@
 
 ## Introduction
 
-Recently, I have delved into working with network devices using Python. Normally, in order to interact with Layer 2 devices, like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
+Normally, to interact with certain network devices, such as unconfigured Layer-3 switches, you would need to connect to them physically, via serial or Ethernet cables, through their console or auxilary ports. Once connected, you would use their command line interface (CLI) to enter Internetwork Operating System (IOS) commands manually, or to upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). This is fine if you have one device. However, manually configuring dozens or hundreds of devices can be exhausting.
 
-This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can be exhausting. Would it not be easier to automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
+Any chance we can automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
-The bad news is that to test the script, you would need a physical device. You just cannot run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
+The bad news is that to test the script, you would need a physical device. You just cannot run an IOS image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -27,12 +27,12 @@ This tutorial is broken down into three parts:
 Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
 >**NOTE** - Why are we using CentOS for this tutorial?
+>- I use Fedora, RHEL, and CentOS, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS.
+>- It is harder, and it will help you can become familiar with GNS3's dependencies if you want to use another OS.
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
 >- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
->- I use Fedora, RHEL, or CentOS quite a bit, and I could not find a tutorial that captured all the steps involved in integrating GNS3 with the Fedora OS family.
->- It will help you can become familiar with GNS3's dependencies if you want to use another OS.
 
-To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, we recommend you review the instructions on the following sites:
+To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, I recommend you review the instructions on the following sites:
 
 - [Oracle VM VirtualBox User Manual](https://www.virtualbox.org/manual/ "Oracle VM VirtualBox User Manual")
 
@@ -40,7 +40,7 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 
 - [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
 
->**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and we will not repeat those steps here. However, whether you use VirtualBox or VMWare, make sure you:
+>**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and I will not repeat those steps here. However, whether you use VirtualBox or VMWare, make sure you:
 > 
 > 1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
 > 
@@ -69,7 +69,7 @@ sudo yum -y update
 sudo yum -y upgrade
 ```
 
->**NOTE** - If you are using VirtualBox, we recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the Guest Additions' ISO:
+>**NOTE** - If you are using VirtualBox, I recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the Guest Additions' ISO:
 >
 >```
 >sudo yum -y install epel-release
@@ -90,7 +90,7 @@ Clone this repository; it should appear in your home directory (e.g., ```/home/g
 git clone https://github.com/garciart/Automation.git
 ```
 
-Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, we distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, we highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
+Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, I highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
 
 Using elevated privileges, make the shell script executable and run it, piping the output into a text file. This will take a while:
 
@@ -112,7 +112,7 @@ sudo reboot now
 
 >**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and we have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
+>The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
 >
 >- **Cisco 3745 Multiservice Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -160,7 +160,7 @@ Now, let us create a virtual network. As we stated before, we will create virtua
 - Connect the router to the bridge through the TAP.
 - Bind the GNS3 VLAN gateway to the bridge.
 
->**NOTE** - All of the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). We highly recommend that you first setup and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
+>**NOTE** - All of the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that you first setup and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
 
 First, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
 
@@ -307,7 +307,7 @@ For WAN Interface Cards (WICs), we have three slots, but only two options:
 ![WIC Adapters](img/a21.png)
 
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
-CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, we have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
+CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, I have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
 
 Finally, accept the default Idle-PC value and click **Finish:** 
 
@@ -341,7 +341,7 @@ Click **View** -> **Docks** -> **All templates**:
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
->**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. We recommend both **Snap to grid**, which will keep your workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
+>**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. I recommend both **Snap to grid**, which will keep your workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
 
 Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is **R1**:
 
@@ -355,7 +355,7 @@ Move the cross-hair over **Cloud1** and select the TAP interface name (e.g., **t
 
 ![Connect to the Cloud](img/a28.png)
 
-Connect the other end to built-in **FastEthernet0/0** port in **R1**:
+Connect the other end to the built-in **FastEthernet0/0** port in **R1**:
 
 ![Connect to the Router](img/a29.png)
 
@@ -456,35 +456,58 @@ After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above 
 
 All the nodes should turn green.
 
-***Install pexpect here (subprocess is a standard module)? Or add to setup***
+## The Code:
 
-```
-$ pip install pexpect
+To recap, we:
 
-Defaulting to user installation because normal site-packages is not writeable
-Collecting pexpect
-  Using cached pexpect-4.8.0-py2.py3-none-any.whl (59 kB)
-Collecting ptyprocess>=0.5
-  Using cached ptyprocess-0.7.0-py2.py3-none-any.whl (13 kB)
-Installing collected packages: ptyprocess, pexpect
-Successfully installed pexpect-4.8.0 ptyprocess-0.7.0
-```
+1. Accessed the device through Telnet.
+2. Entered Privileged EXEC Mode
+3. Formated the device's flash memory.
+4. Closed the connection.
 
-***ADD PYTHON CODE***
+Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script:
 
 ```
 #!/usr/bin/python
+"""Lab 000: Telnet into a device and format the flash memory."""
 from __future__ import print_function
+
+import sys
+import time
 
 import pexpect
 
-
+print("Connecting to the device and formatting the flash memory...")
+# Connect to the device and allow time for the boot sequence to finish
+child = pexpect.spawn("telnet 192.168.1.1 5001")
+time.sleep(10)
+child.sendline("\r")
+# Check for a prompt, either R1> or R1#.
+child.expect_exact(["R1>", "R1#", ])
+# Enter Privileged EXEC Mode
+child.sendline("enable\r")
+child.expect_exact("R1#")
+# Format the flash memory
+child.sendline("format flash:\r")
+# Expect "Format operation may take a while. Continue? [confirm]"
+child.expect_exact("Continue? [confirm]")
+child.sendline("\r")
+# Expect "Format operation will destroy all data in "flash:".  Continue? [confirm]"
+child.expect_exact("Continue? [confirm]")
+child.sendline("\r")
+child.expect_exact("Format of flash complete", timeout=120)
+child.sendline("show flash\r")
+# Expect "66875392 bytes available (0 bytes used)"
+child.expect_exact("(0 bytes used)")
+# Disconnect from device
+child.sendcontrol("]")
+child.sendline('q\r')
+print("Successfully connected to the device and formatted the flash memory.")
 ```
 
+This is a bare-bones script that automates everything we did earlier. I have also included a script with error detection in the **labs** folder, named [lab000.py](labs/lab000.py "Telnet lab").
 
-***END OF LAB 1***
-
-Remember to shut down the bridge and restart the network when you are finished:
+Congratulations! You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
 
 ```
 sudo ip link set br0 down # Stop the bridge
@@ -497,4 +520,6 @@ sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
 sudo systemctl restart network # Check your OS; may use service networking restart 
 ```
 
-As we stated before, we added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin```. Now that you have learned how to setup the network environment for GNS3 manually, we recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal; by the way, we still recommend running GNS3 from the Terminal, instead of from the Application menu icon, so you can see any network errors or issues that may occur.
+## P.S.
+
+As I stated before, I added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin```. Now that you have learned how to setup the network environment for GNS3 manually, I recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal; by the way, I still recommend running GNS3 from the Terminal, instead of from the Application menu icon, so you can see any network errors or issues that may occur.
