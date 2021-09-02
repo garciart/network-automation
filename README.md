@@ -1,16 +1,16 @@
 # Adventures in Network Automation
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as QEMU or those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely available Dynamips images.***
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use freely available Dynamips images.***
 
-***In addition, Cisco Packet Tracer, while an excellent tool, is not suitable for our purposes, since it cannot interact with the host or integrated development environments (IDEs) on those hosts.***
+***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and is too limited for our purposes.***
 
-##Introduction
+## Introduction
 
-Recently, I have delved into working with network devices using Python. Normally, in order to interact with a device like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command-line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
+Recently, I have delved into working with network devices using Python. Normally, in order to interact with Layer 2 devices, like a switch, you would connect to it physically, via a serial or Ethernet cable. Once connected, you would access its command line interface (CLI) to enter commands manually or to upload a script, usually written in Cisco's Tool Command Language (TCL).
 
 This is fine if you have one switch or router, but if you have dozens or hundreds of devices, this can be exhausting. Would it not be easier to automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
-The bad news is that, normally, to test the script, you would need a physical device. You just cannot run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
+The bad news is that to test the script, you would need a physical device. You just cannot run an Internetwork Operating System (IOS) image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -30,6 +30,7 @@ Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installa
 >- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
 >- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 >- I use Fedora, RHEL, or CentOS quite a bit, and I could not find a tutorial that captured all the steps involved in integrating GNS3 with the Fedora OS family.
+>- It will help you can become familiar with GNS3's dependencies if you want to use another OS.
 
 To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, we recommend you review the instructions on the following sites:
 
@@ -62,6 +63,11 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 >    ![Settings](img/a04.png)
 
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
+
+```
+sudo yum -y update
+sudo yum -y upgrade
+```
 
 >**NOTE** - If you are using VirtualBox, we recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the Guest Additions' ISO:
 >
@@ -145,13 +151,14 @@ Before we start, here is the subnet information for the network:
 - IP Class and Type: C (Private)
 ```
 
-Now, let us create a virtual network. As we stated before, we will create virtual network devices in GNS3, which will exist within their own virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome. Our host machine is much more capable, with its Terminal and IDEs. We want to code on our host machine, and test the code in GNS3. Therefore, we want to connect the GNS3 VLAN to our host machine. To do this, we will:
+Now, let us create a virtual network. As we stated before, we will create virtual network devices in GNS3, which will exist within their own virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. We want to code on our host machine and test the code in GNS3. Therefore, we want to connect the GNS3 VLAN to our host machine. To do this, we will:
 
 - Create a virtual network bridge.
-- Connect the host's isolated network interface to the bridge.
 - Assign the bridge an IPv4 address.
+- Connect the host's isolated network interface to the bridge.
+- Create a Layer 2 TAP interface.
+- Connect the router to the bridge through the TAP.
 - Bind the GNS3 VLAN gateway to the bridge.
-- Connect the router to the bridge through the gateway.
 
 >**NOTE** - All of the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). We highly recommend that you first setup and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
 
@@ -177,33 +184,36 @@ Look for the interface that does not have an IP address (i.e., no inet). In this
 We will now "bridge" the host machine and GNS3 together:
 
 ```
-sudo ifconfig enp0s8 0.0.0.0 promisc up # Zero out the selected Ethernet connection
 sudo brctl addbr br0 # Create the bridge
+sudo ip tuntap add tap0 mode tap # Add the tap device
+sudo ip link set tap0 up promisc on # Configure the tap
+sudo brctl addif br0 tap0 # Add the tap to the bridge
+sudo ip link set enp0s8 up promisc on # Configure selected Ethernet connection
 sudo brctl addif br0 enp0s8 # Add the selected Ethernet connection to the bridge
-sudo ifconfig br0 up # Start the bridge
-sudo ifconfig br0 192.168.1.1/24 # Configure the bridge
+sudo ip link set br0 up # Start the bridge
+sudo ip addr add 192.168.1.1/24 dev br0
+sudo brctl stp br0 on # Enable Spanning Tree Protocol (STP)
 ```
 
->**NOTE** - In the **gns3_run** script, there are commented-out commands for creating a Layer 2 TAP interface using tuntap. You can uncomment them later on, if you are uncomfortable connecting directly to a Layer 3 bridge, or if you need to connect to a Layer 2 device instead.
+>**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, later, we will need several Layer 2 TAP interfaces to break up subnetworks, so just get into the habit of connecting to a TAP instead of directly to the bridge.
 
-Check the configuration and the bridge by inputting ```ifconfig br0``` and ```brctl show br0```:
+Check the configuration and the bridge by inputting ```ip addr show dev br0``` and ```brctl show br0```:
 
 ```
-$ ifconfig br0 # Verify the bridge is set up
+$ ip addr show dev br0
 
-br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
-        inet6 fe80::a00:27ff:fe87:ffe2  prefixlen 64  scopeid 0x20<link>
-        ether 08:00:27:87:ff:e2  txqueuelen 1000  (Ethernet)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 25  bytes 3854 (3.7 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+8: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 08:00:27:87:ff:e2 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.1/24 scope global br0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fe87:ffe2/64 scope link 
+       valid_lft forever preferred_lft forever
 
 $ brctl show br0
 
-bridge name	bridge id		STP enabled	interfaces
-br0		8000.08002787ffe2	no		enp0s8
+bridge name  bridge id          STP enabled  interfaces
+br0          8000.08002787ffe2  yes          enp0s8
+                                             tap0
 ```
 
 Start GNS3:
@@ -339,7 +349,7 @@ Select the "Add a link" icon at the bottom of the Devices Toolbar:
 
 ![Add a link icon](img/a27i.png)
 
-Move the cross-hair over **Cloud1** and select your bridge interface name (e.g., **br0**):
+Move the cross-hair over **Cloud1** and select the TAP interface name (e.g., **tap0**):
 
 ![Connect to the Cloud](img/a28.png)
 
@@ -394,7 +404,7 @@ PCMCIA disk 0 is formatted from a different router or PC. A format in this route
 In this lab, we will not need another IOS, but we do want to use our flash memory, so let us fix our memory issue, by inputting the following command:
 
 ```
-R1#format flash:
+format flash:
 ```
 
 You will be asked to confirm the format operation twice. Press <kbd>Enter</kbd> both times:
@@ -419,11 +429,6 @@ Format: Total bytes in formatted partition: 67026432
 Format: Operation completed successfully.
 
 Format of flash complete
-R1#show flash
-No files on device
-
-66875392 bytes available (0 bytes used)
-
 R1#
 ```
 
@@ -572,4 +577,17 @@ Password:
 R1>enable
 Password:
 R1#
+```
+
+Remember to shut down the bridge and restart the network:
+
+```
+sudo ip link set br0 down # Stop the bridge
+sudo brctl delif br0 enp0s8 # Remove the default Ethernet connection from the bridge
+sudo brctl delif br0 tap0 # Remove the tap from the bridge
+sudo brctl delbr br0 # Delete the bridge
+sudo ip link set tap0 down # Stop the tap
+sudo ip link delete tap0 # Delete the tap
+sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
+sudo systemctl restart network # Check your OS; may use service networking restart 
 ```

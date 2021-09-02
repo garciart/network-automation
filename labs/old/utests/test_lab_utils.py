@@ -10,7 +10,7 @@ Requirements:
 import sys
 import unittest
 
-import labs.lab_utils as lu
+import labs.old.lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
