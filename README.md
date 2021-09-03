@@ -61,6 +61,10 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 > In VMWare, you can make all the above changes to your VM in **Settings**:
 > 
 >    ![Settings](img/a04.png)
+>
+> In Virtual Machine Manager, you can make all the above changes to your VM in **Virtual Machine Details**:
+> 
+>    ![Settings](img/a04a.png)
 
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
