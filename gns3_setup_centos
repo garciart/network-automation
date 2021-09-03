@@ -34,7 +34,8 @@ sudo python3 -m pip install gns3-server
 sudo python3 -m pip install gns3-gui
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
-sudo python3 -m pip install pexpect # To control interactions with external devices
+sudo yum -y install pexpect # To control interactions with external devices (Python 2.7+)
+sudo python3 -m pip install pexpect # To control interactions with external devices (Python 3.6+)
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
 # QEMU: type 2 hypervisor that runs in user space / KVM (e.g., QEMU-KVM): Type 1 hypervisor that runs in kernel space
