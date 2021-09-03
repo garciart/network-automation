@@ -289,9 +289,17 @@ The Cisco 3745 is a customizable router, capable of supporting different network
 
 For network adapter modules, you have three options:
 
-- NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Module
-- NM-4T 4 port Synchronous Serial Network Module
-- NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Module
+- NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Adapter
+
+![NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Adapter](img/nm-1fe-tx.gif)
+
+- NM-4T 4 port Synchronous Serial Network Adapter
+
+![NM-4T 4 port Synchronous Serial Network Adapter](img/nm-4t.png)
+
+- NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Adapter
+
+![NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Adapter](img/nm-16esw123.gif)
 
 Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters. Fill open slots 1, 2, and 3 with a module:
 
@@ -299,9 +307,14 @@ Did you notice that, aside from the built-in GT96100-FE module, there are six op
 
 For WAN Interface Cards (WICs), we have three slots, but only two options:
 
-- WIC-1T One port serial (DB60, Cisco 60-pin "5-in-1" connector )
-- WIC-2T Two port serial (DB60, Cisco 60-pin "5-in-1" connector )
+- WIC-1T One port serial module (DB60, Cisco 60-pin "5-in-1" connector )
 
+![WIC-1T One port serial module](img/wic-1t.png)
+
+- WIC-2T Two port serial module (DB60, Cisco 60-pin "5-in-1" connector )
+
+![WIC-2T Two port serial module](img/wic-2t.png)
+ 
  Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty:
 
 ![WIC Adapters](img/a21.png)
@@ -390,6 +403,7 @@ Press ENTER to get the prompt.
 *Mar  1 00:00:04.627: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
 ...
 *Mar  1 00:00:07.499: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet3/6, changed state to down
+
 R1#
 ```
 
@@ -431,6 +445,7 @@ Format: Total bytes in formatted partition: 67026432
 Format: Operation completed successfully.
 
 Format of flash complete
+
 R1#
 ```
 
@@ -438,7 +453,6 @@ Input ```show flash``` to see what is in the drive:
 
 ```
 No files on device
-
 66875392 bytes available (0 bytes used)
 
 R1#
@@ -465,11 +479,20 @@ To recap, we:
 3. Formated the device's flash memory.
 4. Closed the connection.
 
-Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script:
+Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
+
+This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result:
 
 ```
 #!/usr/bin/python
-"""Lab 000: Telnet into a device and format the flash memory."""
+"""Lab 000: Telnet into a device and format the flash memory.
+To run this lab:
+
+* Start GNS3 by executing "gn3_run" in a Terminal window.
+* Select lab000 from the Projects library.
+* Start all devices.
+* Run this script (i.e., "python lab000.py")
+"""
 from __future__ import print_function
 
 import sys
@@ -478,36 +501,54 @@ import time
 import pexpect
 
 print("Connecting to the device and formatting the flash memory...")
-# Connect to the device and allow time for the boot sequence to finish
+
+# Connect to the device and allow time for any boot messages to clear
 child = pexpect.spawn("telnet 192.168.1.1 5001")
 time.sleep(10)
 child.sendline("\r")
-# Check for a prompt, either R1> or R1#.
-child.expect_exact(["R1>", "R1#", ])
-# Enter Privileged EXEC Mode
-child.sendline("enable\r")
-child.expect_exact("R1#")
-# Format the flash memory
+
+# Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
+# and enable Privileged EXEC Mode if in User EXEC mode.
+index = child.expect_exact(["R1>", "R1#", ])
+if index == 0:
+    child.sendline("enable\r")
+    child.expect_exact("R1#")
+
+# Format the flash memory. Look for the final characters of the following strings:
+# "Format operation may take a while. Continue? [confirm]"
+# "Format operation will destroy all data in "flash:".  Continue? [confirm]"
+# "66875392 bytes available (0 bytes used)"
+#
 child.sendline("format flash:\r")
-# Expect "Format operation may take a while. Continue? [confirm]"
 child.expect_exact("Continue? [confirm]")
 child.sendline("\r")
-# Expect "Format operation will destroy all data in "flash:".  Continue? [confirm]"
 child.expect_exact("Continue? [confirm]")
 child.sendline("\r")
 child.expect_exact("Format of flash complete", timeout=120)
 child.sendline("show flash\r")
-# Expect "66875392 bytes available (0 bytes used)"
 child.expect_exact("(0 bytes used)")
-# Disconnect from device
+
+# Close Telnet and disconnect from device
 child.sendcontrol("]")
 child.sendline('q\r')
+
 print("Successfully connected to the device and formatted the flash memory.")
 ```
 
-This is a bare-bones script that automates everything we did earlier. I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab").
+Output:
 
-Congratulations! You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
+```
+$ python test.py
+
+Hello, friend.
+Connecting to the device and formatting the flash memory...
+Successfully connected to the device and formatted the flash memory.
+Script complete. Have a nice day.
+```
+
+ I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+
+**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
 
 ```
 sudo ip link set br0 down # Stop the bridge
@@ -520,6 +561,29 @@ sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
 sudo systemctl restart network # Check your OS; may use service networking restart 
 ```
 
-## P.S.
+## P.S. -
 
-As I stated before, I added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin```. Now that you have learned how to setup the network environment for GNS3 manually, I recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal; by the way, I still recommend running GNS3 from the Terminal, instead of from the Application menu icon, so you can see any network errors or issues that may occur.
+As I stated before, when you installed GNS3 with my script, it added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin``` folder. Now that you have learned how to setup the network environment for GNS3 manually, I recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal, and select the isolated Ethernet interface; enter your password, if prompted. Do not run as ```sudo```, or GNS3 will incorrectly use the ```root``` directories, instead of the user directories:
+
+```
+Setting up GNS3...
+Available ethernet interfaces:
+enp0s3
+enp0s8
+Enter an ethernet interface for GNS3 to use: enp0s8
+Good to go!
+[sudo] password for gns3user: 
+
+Network interface configuration:
+br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+...
+...
+Bridge information:
+bridge name	bridge id		STP enabled	interfaces
+br0		8000.08002787ffe2	yes		enp0s8
+							tap0
+
+Starting GNS3...
+```
+
+By the way, I still recommend running GNS3 from the Terminal, instead of from the Application menu icon, so you can see any network errors or issues that may occur.

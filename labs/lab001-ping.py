@@ -36,21 +36,25 @@ __license__ = "MIT"
 def main():
     try:
         print("Connecting to the device and configuring for Layer 3 connectivity...")
-        # Connect to the device and allow time for the boot sequence to finish
+
+        # Connect to the device and allow time for any boot messages to clear
         child = pexpect.spawn("telnet 192.168.1.1 5001")
         time.sleep(10)
         child.sendline("\r")
-        # Check for a prompt, either R1> or R1#.
-        child.expect_exact(["R1>", "R1#", ])
-        # Enter Privileged EXEC Mode
-        child.sendline("enable\r")
-        child.expect_exact("R1#")
+
+        # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
+        # and enable Privileged EXEC Mode if in User EXEC mode.
+        index = child.expect_exact(["R1>", "R1#", ])
+        if index == 0:
+            child.sendline("enable\r")
+            child.expect_exact("R1#")
 
 
-        # Disconnect from device
+        # Close Telnet and disconnect from device
         child.sendcontrol("]")
         child.sendline('q\r')
-        print("Successfully connected to the device and configured it for Layer 3 connectivity.")
+
+        print("Successfully connected to the device and formatted the flash memory.")
     except BaseException:
         e_type, e_value, e_traceback = sys.exc_info()
         print("Error: Type {0}: {1} in {2} at line {3}.".format(
