@@ -485,7 +485,7 @@ To recap, we:
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
 
-This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result. Remember to make the script executable (i.e., ```chmod 755 lab000-telnet.py```) befor running it (```python3 lab000-telnet.py```):
+This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result. Remember to make the script executable (i.e., ```chmod 755 lab000-telnet.py```) before running it (```python3 lab000-telnet.py```):
 
 ```
 #!/usr/bin/python3
@@ -543,7 +543,7 @@ print("Successfully connected to the device and formatted the flash memory.")
 Output:
 
 ```
-$ python test.py
+$ python3 lab000-telnet.py
 
 Hello, friend.
 Connecting to the device and formatting the flash memory...
@@ -551,7 +551,7 @@ Successfully connected to the device and formatted the flash memory.
 Script complete. Have a nice day.
 ```
 
- I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
 **Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
 
