@@ -92,14 +92,14 @@ git clone https://github.com/garciart/Automation.git
 
 Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, I highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
 
-Using elevated privileges, make the shell script executable and run it, piping the output into a text file. This will take a while:
+Using elevated privileges, make the shell script executable and run it, piping any errors and the output into a text file. This will take a while:
 
 >**NOTE** - Do not run any commands as **root**! Otherwise, some files and executables will end up in the wrong place or have the wrong permissions, and GNS3 will not work.
 
 ```
 cd Automation
 sudo chmod +x gns3_setup_centos
-./gns3_setup_centos | tee setup_output.txt # DO NOT RUN AS SUDO 
+./gns3_setup_centos 2>&1 | tee setup_output.txt # DO NOT RUN AS SUDO 
 grep -i -e "error" -e "warning" setup_output.txt
 ```
 
