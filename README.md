@@ -99,7 +99,7 @@ Using elevated privileges, make the shell script executable and run it, piping t
 ```
 cd Automation
 sudo chmod +x gns3_setup_centos
-./gns3_setup_centos *> setup_output.txt # DO NOT SUDO OR 
+./gns3_setup_centos | tee setup_output.txt # DO NOT RUN AS SUDO 
 grep -i -e "error" -e "warning" setup_output.txt
 ```
 
