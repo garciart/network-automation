@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """Lab 001: Configure a device for Ethernet (Layer 3) connections.
 To run this lab:
@@ -6,7 +6,8 @@ To run this lab:
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Select lab001 from the Projects library.
 * Start all devices.
-* Run this script (i.e., "python lab001.py")
+* Make this script executable (i.e., "chmod 755 lab000-ping.py")
+* Run this script (i.e., "python3 lab001-ping.py")
 
 Developer Notes:
 
