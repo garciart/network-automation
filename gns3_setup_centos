@@ -14,7 +14,7 @@ sudo yum -y install python3-tools
 # Install Git
 sudo yum -y install git
 # Install GNS3 dependencies
-sudo yum -y install "Development Tools" # Only need gcc to run GNS3, but will need the other tools when programming
+sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but will need the other tools when programming
 sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
