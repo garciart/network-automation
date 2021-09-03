@@ -485,7 +485,7 @@ To recap, we:
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
 
-This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result:
+This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result. Remember to make the script executable (i.e., ```chmod 755 lab000-telnet.py```) befor running it (```python lab000-telnet.py```):
 
 ```
 #!/usr/bin/python
@@ -495,7 +495,8 @@ To run this lab:
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Select lab000 from the Projects library.
 * Start all devices.
-* Run this script (i.e., "python lab000.py")
+* Make this script executable (i.e., "chmod 755 lab000-telnet.py")
+* Run this script (i.e., "python lab000-telnet.py")
 """
 from __future__ import print_function
 
