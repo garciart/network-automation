@@ -36,30 +36,37 @@ __license__ = "MIT"
 def main():
     try:
         print("Connecting to the device and formatting the flash memory...")
-        # Connect to the device and allow time for the boot sequence to finish
+
+        # Connect to the device and allow time for any boot messages to clear
         child = pexpect.spawn("telnet 192.168.1.1 5001")
         time.sleep(10)
         child.sendline("\r")
-        # Check for a prompt, either R1> or R1#.
-        child.expect_exact(["R1>", "R1#", ])
-        # Enter Privileged EXEC Mode
-        child.sendline("enable\r")
-        child.expect_exact("R1#")
-        # Format the flash memory
+
+        # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
+        # and enable Privileged EXEC Mode if in User EXEC mode.
+        index = child.expect_exact(["R1>", "R1#", ])
+        if index == 0:
+            child.sendline("enable\r")
+            child.expect_exact("R1#")
+
+        # Format the flash memory. Look for the final characters of the following strings:
+        # "Format operation may take a while. Continue? [confirm]"
+        # "Format operation will destroy all data in "flash:".  Continue? [confirm]"
+        # "66875392 bytes available (0 bytes used)"
+        #
         child.sendline("format flash:\r")
-        # Expect "Format operation may take a while. Continue? [confirm]"
         child.expect_exact("Continue? [confirm]")
         child.sendline("\r")
-        # Expect "Format operation will destroy all data in "flash:".  Continue? [confirm]"
         child.expect_exact("Continue? [confirm]")
         child.sendline("\r")
         child.expect_exact("Format of flash complete", timeout=120)
         child.sendline("show flash\r")
-        # Expect "66875392 bytes available (0 bytes used)"
         child.expect_exact("(0 bytes used)")
-        # Disconnect from device
+
+        # Close Telnet and disconnect from device
         child.sendcontrol("]")
         child.sendline('q\r')
+
         print("Successfully connected to the device and formatted the flash memory.")
     except BaseException:
         e_type, e_value, e_traceback = sys.exc_info()
