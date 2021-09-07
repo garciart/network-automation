@@ -280,6 +280,10 @@ When it comes to customizing the router's details, use the default values for bo
 
 ![Memory](img/a18.png)
 
+The **Network adapters** dialog appears, prefilled with a built-in adapter:
+
+![Network Adapters](img/a20a.png)
+
 The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
 
 ![Cisco 3745 Rear View](img/a19.png)
@@ -290,7 +294,7 @@ The Cisco 3745 is a customizable router, capable of supporting different network
  - Built-in Modules:
      - A console (labeled in light blue) and an auxilary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
      - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
-     - Two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through the Ethernet cable, using either Telnet or SSH.
+     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through Ethernet ports.
 - Four (4) network adapter module slots (two uncovered and two covered in the image).
 
 For network adapter modules, you have three options:
@@ -309,9 +313,13 @@ For network adapter modules, you have three options:
 
 Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
 
-Fill open slots 1, 2, and 3 with a module:
+Fill open slots 1, 2, and 3 with a module and click on **Next >**:
 
-![Network Adapters](img/a20.png)
+![Network Adapters](img/a20b.png)
+
+The **WIC modules** dialog appears:
+
+![Network Adapters](img/a21a.png)
 
 For WAN Interface Cards (WICs), we have three slots, but only two options:
 
@@ -323,9 +331,9 @@ For WAN Interface Cards (WICs), we have three slots, but only two options:
 
 ![WIC-2T Two port serial module](img/wic-2t.png)
  
- Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty:
+ Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty. Click on **Next >** when done:
 
-![WIC Adapters](img/a21.png)
+![WIC Adapters](img/a21b.png)
 
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
 CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, I have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
