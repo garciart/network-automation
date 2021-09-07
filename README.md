@@ -1,5 +1,7 @@
 # Adventures in Network Automation
 
+![All Devices Started](img/a32.png)
+
 ***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use freely available Dynamips images.***
 
 ***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and is too limited for our purposes.***
@@ -305,7 +307,9 @@ For network adapter modules, you have three options:
 
 ![NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Adapter](img/nm-16esw123.gif)
 
-Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters. Fill open slots 1, 2, and 3 with a module:
+Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
+
+Fill open slots 1, 2, and 3 with a module:
 
 ![Network Adapters](img/a20.png)
 

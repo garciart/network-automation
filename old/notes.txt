@@ -1,45 +1,12 @@
-Install CentOS and GNS3
-
-Add a tap/loopback interface in Linux (see gns3_run.sh script for latest and greatest)
-
-IMPORTANT! Setup GNS3 server (see gns3_setup.png)
-File -> Preferences -> Server -> Host binding: -> 192.168.1.1
-
-Get applicances (I suggest a Cisco 3745 router, since it has both Fast Ethernet and Serial Ports):
-wget -P ~/GNS3/appliances http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin
-
-More C3745 info:
-md5sum c3745-adventerprisek9-mz.124-25d.bin
-563797308a3036337c3dee9b4ab54649  c3745-adventerprisek9-mz.124-25d.bin
-
-Filename:c3745-adventerprisek9-mz.124-25d.bin
-File size:38,986,688 Bytes
-Checksum type:MD5 SHA1 SHA-256
-File checksum:563797308A3036337C3DEE9B4AB54649
-
-C3745#
-The c3745 has 2 FastEthernet interfaces on its motherboard (GT96100-FE), 3 subslots for WICs (maximum of 6 serial ports) and 4 Network Module slots (maximum of 32 FastEthernet ports or 16 serial ports).
-
-IOS version 12.4.25d (Mainline)#
-File name: c3745-adventerprisek9-mz.124-25d.bin MD5: 563797308a3036337c3dee9b4ab54649 Minimum RAM: 256MB Proposed idle-PC value: 0x60aa1da0
-
-You can also use:
-http://tfr.org/cisco-ios/37xx/3725/c3725-adventerprisek9-mz.124-15.T14.bin
-http://tfr.org/cisco-ios/catalysts/cat3750/c3750-ipbasek9-mz.122-25.SEE2.bin
 
 Need to research:
 http://www.gns3.xyz/files/Downloads/
 https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/
 
-Start GNS3 (need to explain)
+
 Add the router to the templates (need to explain: https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/#using-a-c3725-as-an-etherswitch-router)
-Don't forget to set PCMCIA disk0: 1 MiB
+
 Use FastEthernet0/0 or FastEthernet0/1 (they are routed ports, not switchports)
-
-
-Add a cloud -> Configure -> Tap Interfaces -> tap0
-Add a router (Cisco 3745 124-25d)
-Connect cloud (tap0) to router (FastEthernet0/0)
 
 
 Configure the router:
