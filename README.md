@@ -176,13 +176,13 @@ Per RedHat's [Consistent Network Device Naming conventions](https://access.redha
 $ ip addr show label e*
 
 2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether 08:00:27:cf:12:5e brd ff:ff:ff:ff:ff:ff
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global noprefixroute dynamic enp0s3
+    link/ether 09:af:18:be:27:cd brd ff:ff:ff:ff:ff:ff
+    inet 10.0.1.100/24 brd 10.0.1.255 scope global noprefixroute dynamic enp0s3
        valid_lft 81729sec preferred_lft 81729sec
-    inet6 fe80::91fc:27c4:403f:848f/64 scope link noprefixroute 
+    inet6 fe80::1122:3344:5566:abcd/64 scope link noprefixroute 
        valid_lft forever preferred_lft forever
 3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    link/ether 08:00:27:87:ff:e2 brd ff:ff:ff:ff:ff:ff
+    link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
 ```
 
 Look for the interface that does not have an IP address (i.e., no inet). In this case, the isolated interface is named ```enp0s8```. 
@@ -190,15 +190,20 @@ Look for the interface that does not have an IP address (i.e., no inet). In this
 We will now "bridge" the host machine and GNS3 together:
 
 ```
-sudo brctl addbr br0 # Create the bridge
-sudo ip tuntap add tap0 mode tap # Add the tap device
-sudo ip link set tap0 up promisc on # Configure the tap
-sudo brctl addif br0 tap0 # Add the tap to the bridge
-sudo ip link set enp0s8 up promisc on # Configure selected Ethernet connection
-sudo brctl addif br0 enp0s8 # Add the selected Ethernet connection to the bridge
-sudo ip link set br0 up # Start the bridge
-sudo ip addr add 192.168.1.1/24 dev br0
-sudo brctl stp br0 on # Enable Spanning Tree Protocol (STP)
+# Configure the bridge
+sudo ip link add br0 type bridge # Create the bridge
+sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
+sudo ip link set br0 up # Enable the bridge
+
+# Configure the tap
+sudo ip tuntap add tap0 mode tap # Create the tap
+sudo ip link set tap0 up # Enable the tap
+sudo ip link set tap0 master br0 # Connect the tap to the bridge
+
+# Configure the isolated Ethernet network adapter 
+sudo ip address add 192.168.1.111/24 dev enp0s8 # Set the adapter IP address
+sudo ip link set enp0s8 up # Enable the adapter
+sudo ip link set enp0s8 master br0 # Connect the adapter to the bridge
 ```
 
 >**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, later, we will create subnetworks in GNS3, separating their connections through Layer 2 TAP interfaces, so just get into the habit of connecting to a TAP instead of directly to the bridge.
@@ -209,10 +214,11 @@ Check the configuration and the bridge by inputting ```ip addr show dev br0``` a
 $ ip addr show dev br0
 
 8: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 08:00:27:87:ff:e2 brd ff:ff:ff:ff:ff:ff
+    link/ether a1:b2:c3:d4:e5:f6 brd ff:ff:ff:ff:ff:ff
     inet 192.168.1.1/24 scope global br0
        valid_lft forever preferred_lft forever
-    inet6 fe80::a00:27ff:fe87:ffe2/64 scope link 
+    inet6 fe80::0123:4567:89ab:cdef/64 scope link 
+       valid_lft forever preferred_lft foreverk 
        valid_lft forever preferred_lft forever
 
 $ brctl show br0
@@ -565,17 +571,17 @@ Script complete. Have a nice day.
 
 I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
-**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and restart the network when you are finished:
+**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 
 ```
-sudo ip link set br0 down # Stop the bridge
-sudo brctl delif br0 enp0s8 # Remove the default Ethernet connection from the bridge
-sudo brctl delif br0 tap0 # Remove the tap from the bridge
-sudo brctl delbr br0 # Delete the bridge
-sudo ip link set tap0 down # Stop the tap
-sudo ip link delete tap0 # Delete the tap
-sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
-sudo systemctl restart network # Check your OS; may use service networking restart 
+sudo ip link set enp0s8 down # Disable the network adpater
+sudo ip link set tap0 down # Disable the tap
+sudo ip link delete tap0 # Remove the tap
+sudo ip link set br0 down # Disable the bridge
+sudo ip link delete br0 # Remove the bridge
+
+# Optional
+sudo systemctl restart network # Check your OS; may use service networking restart
 ```
 
 ## P.S. -
@@ -592,9 +598,21 @@ Good to go!
 [sudo] password for gns3user: 
 
 Network interface configuration:
-br0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-...
-...
+3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master br0 state UP group default qlen 1000
+    link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.111/24 scope global eth0
+       valid_lft forever preferred_lft forever
+8: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether a1:b2:c3:d4:e5:f6 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.1/24 scope global br0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::0123:4567:89ab:cdef/64 scope link 
+       valid_lft forever preferred_lft forever
+9: tap0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master br0 state UP group default qlen 1000
+    link/ether ab:cd:ef:01:23:45 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::fedc:ba98:7654:3210/64 scope link 
+       valid_lft forever preferred_lft forever
+
 Bridge information:
 bridge name	bridge id		STP enabled	interfaces
 br0		8000.08002787ffe2	yes		enp0s8
