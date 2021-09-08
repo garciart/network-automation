@@ -218,7 +218,6 @@ $ ip addr show dev br0
     inet 192.168.1.1/24 scope global br0
        valid_lft forever preferred_lft forever
     inet6 fe80::0123:4567:89ab:cdef/64 scope link 
-       valid_lft forever preferred_lft foreverk 
        valid_lft forever preferred_lft forever
 
 $ brctl show br0
