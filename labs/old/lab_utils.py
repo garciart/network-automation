@@ -150,6 +150,68 @@ def simple_cli_call(cmd, fail_content=None, pass_content=None, timeout=30):
         rval = ERROR, child_result
     return rval
 
+  def error_message(exc_info, **options):
+    """Formats exception or error information for logging and debugging.
+    https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
+
+    :param tuple exc_info: Exception details from sys module.
+    :param Exception options: The exception object for pexpect.ExceptionPexpect (pex) or the
+      exception object for subprocess.CalledProcessError (cpe).
+
+    :return: The formatted message.
+    """
+    # Inform the user the step failed
+    print('Fail')
+
+    # Get keyword arguments. Initialize default to None to prevent SonarLint reference error
+    pex = options.get('pex', pexpect.ExceptionPexpect(None))
+    cpe = options.get('cpe', subprocess.CalledProcessError(0, '', None))
+
+    # Unpack sys.exc_info() to get error information
+    e_type, e_value, e_traceback = exc_info
+    if pex.value:
+        # This code is for pexpect.ExceptionPexpect. It retrieves the device's response to
+        # pexpect.sendline() from the state of the spawned object (__str__ from ex) for
+        # logging. Otherwise, if you match TIMEOUT or EOF when calling expect or expect_exact,
+        # pexpect does not retain the state of the object, since it believes you will
+        # handle the exception by other means (e.g., generic message to the user, etc.).
+        # https://pexpect.readthedocs.io/en/stable/api/pexpect.html#spawn-class
+        # https://pexpect.readthedocs.io/en/stable/_modules/pexpect/exceptions.html#TIMEOUT
+
+        # Log what was actually found during the pexpect call
+        e_value = 'Expected {0}, found {1}'.format(
+            str(pex).split('searcher_string:\n    0: ')[1].split('\n')[0].strip('\r\n'),
+            str(pex).split('before (last 100 chars): ')[1].split('\n')[0].strip('\r\n')
+        )
+        # Remove any unwanted escape characters here, like backspaces, etc.
+        e_value = re.sub('[\b]', '', e_value)
+    elif cpe.output:
+        # This code is for subprocess.CalledProcessError. In Python 2.7, subprocess only
+        # returns the reason for a non-zero return code (i.e., the CLI's response) in a
+        # CalledProcessError object unless the shell option is set to True, which is unsafe due
+        # to potential shell injections.
+        # https://docs.python.org/2/library/subprocess.html#subprocess.check_output
+
+        e_value = '"{0}" failed: {1}'.format(cpe.cmd, cpe.output)
+
+    # Return the formatted message for logging
+    # Start with a linefeed to avoid tailing device OS messages
+    # Error message format:
+    # - e_type: Type of error.
+    # - e_value: Error message.
+    # - e_traceback.tb_frame.f_code.co_filename: The name of the file that caused the error.
+    # - e_traceback.tb_lineno: The line number where the error occurred. The ternary operator
+    #     checks if tb_next exists; if so, it moves up the error stack to retrieve the line
+    #     number where the error or exception actually occurred in a function or method,
+    #     instead of the line number where the function or method was called.
+    msg = ('\nType {0}: {1} in {2} at line {3}.\n'.format(
+        e_type.__name__,
+        e_value,
+        e_traceback.tb_frame.f_code.co_filename,
+        e_traceback.tb_lineno if e_traceback.tb_next is None
+        else e_traceback.tb_next.tb_lineno))
+    print('Configuration failed: {0}'.format(msg))
+    return msg
 
 if __name__ == "__main__":
     log_message("Script {0} cannot be run independently from this application.".format(sys.argv[0]))
