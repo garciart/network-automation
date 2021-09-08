@@ -1,0 +1,59 @@
+#!/usr/bin/bash
+# Get interface address from user
+echo "Setting up GNS3..."
+echo "Available Ethernet interfaces:"
+# host_interface=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ {print substr($2, 1, length($2)-1)}')
+choices=$(ip addr show | awk '$2 ~ /^(em|en|et).*[0-9]:/ {print substr($2, 1, length($2)-1)}')
+echo "$choices"
+while :
+do
+  read -r -p "Enter an Ethernet interface for GNS3 to use: " host_interface
+  valid="^(em|en|et).*[0-9]$"
+  if [[ $host_interface =~ $valid ]] && [[ "$choices" == *"$host_interface"* ]];
+  then
+      echo "Good to go!"
+      break
+  else
+      echo "Invalid interface name. Please try again."
+  fi
+done
+
+# Configure the bridge
+sudo ip link add br0 type bridge
+sudo ip address add 192.168.1.1/24 dev br0
+sudo ip link set br0 up
+
+# Configure the tap
+sudo ip tuntap add tap0 mode tap # Add the tap device
+sudo ip link set tap0 up # Configure the tap
+sudo ip link set tap0 master br0
+
+# Configure the internal Ethernet network adapter 
+sudo ip address add 192.168.1.145/24 dev "$host_interface"
+sudo ip link set "$host_interface" up
+sudo ip link set "$host_interface" master br0
+
+# Display configuration
+echo
+echo -e "Network interface configuration:"
+ip address show
+echo
+echo -e "Bridge information:"
+sudo brctl show br0 # Verify the bridge is set up
+echo
+echo -e "Starting GNS3..."
+gns3 # Start GNS3
+
+# After GNS3 closes, shutdown the connection
+echo
+echo -e "Resetting the network..."
+sudo ip link set "$host_interface" down
+sudo ip link set tap0 down
+sudo ip link delete tap0
+sudo ip link set br0 down
+sudo ip link delete br0
+echo
+echo -e "Network interface configuration:"
+ip address show
+echo
+echo -e "Script complete. Have a nice day."
