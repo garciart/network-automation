@@ -54,7 +54,7 @@ sudo ip link delete tap0 # Delete the tap
 echo
 echo -e "Resetting the network (please wait 30 seconds...)"
 # sudo ifconfig "$host_interface" -promisc
-sudo ip link set enp0s8 promisc off # Reset the selected Ethernet interface
+sudo ip link set "$host_interface" promisc off # Reset the selected Ethernet interface
 # sudo /etc/init.d/network restart
 sudo systemctl restart network # Check your OS; may use service networking restart 
 sleep 30
