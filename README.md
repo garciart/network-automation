@@ -4,7 +4,7 @@
 
 ***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use freely available Dynamips images.***
 
-***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and is too limited for our purposes.***
+***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and not suitable for our purposes.***
 
 ## Introduction
 
@@ -12,7 +12,7 @@ Normally, to interact with certain network devices, such as unconfigured Layer-3
 
 Any chance we can automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
-The bad news is that to test the script, you would need a physical device. You just cannot run an IOS image in a hypervisor like VirtualBox. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
+The bad news is that to test the script, you would need a physical device. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -42,7 +42,7 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 
 - [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
 
->**NOTE** - The focus of this tutorial is to use GNS3 to test our scripts, not to install operating systems or create virtual machines. There are many websites dedicated to setting up OS's and VM's, and I will not repeat those steps here. However, whether you use VirtualBox or VMWare, make sure you:
+>**NOTE** - There are many websites dedicated to creating virtual machines and installing operating systems, and I will not repeat those steps here. However, regardless of the hypervisor you use, make sure you:
 > 
 > 1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
 > 
