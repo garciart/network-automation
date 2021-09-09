@@ -19,19 +19,20 @@ do
 done
 
 # Configure the bridge
-sudo ip link add br0 type bridge
-sudo ip address add 192.168.1.1/24 dev br0
-sudo ip link set br0 up
+sudo ip link add br0 type bridge # Create the bridge
+sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
+sudo ip link set br0 up # Enable the bridge
 
 # Configure the tap
-sudo ip tuntap add tap0 mode tap # Add the tap device
-sudo ip link set tap0 up # Configure the tap
-sudo ip link set tap0 master br0
+sudo ip tuntap add tap0 mode tap # Create the tap
+sudo ip link set tap0 up # Enable the tap
+sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
-# Configure the internal Ethernet network adapter 
-sudo ip address add 192.168.1.145/24 dev "$host_interface"
-sudo ip link set "$host_interface" up
-sudo ip link set "$host_interface" master br0
+# Configure the internal Ethernet network adapter
+sudo ip address flush dev "$host_interface" # Clear out any old adapter IP address
+sudo ip address add 192.168.1.145/24 dev "$host_interface" # Set the adapter IP address
+sudo ip link set "$host_interface" up # Enable the adapter
+sudo ip link set "$host_interface" master br0 # Connect the adapter to the bridge
 
 # Display configuration
 echo

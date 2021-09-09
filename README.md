@@ -201,6 +201,7 @@ sudo ip link set tap0 up # Enable the tap
 sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
 # Configure the isolated Ethernet network adapter 
+sudo ip address flush dev "$host_interface" # Clear out any old adapter IP address
 sudo ip address add 192.168.1.111/24 dev enp0s8 # Set the adapter IP address
 sudo ip link set enp0s8 up # Enable the adapter
 sudo ip link set enp0s8 master br0 # Connect the adapter to the bridge
