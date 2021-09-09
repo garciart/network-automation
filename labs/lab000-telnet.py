@@ -7,7 +7,7 @@ To run this lab:
 * Select lab000 from the Projects library.
 * Start all devices.
 * Make this script executable (i.e., "chmod 755 lab000-telnet.py")
-* Run this script (i.e., "python3 lab000.py")
+* Run this script (i.e., "python3 lab000-telnet.py")
 
 Developer Notes:
 
