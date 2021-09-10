@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/Python
 # -*- coding: utf-8 -*-
 """Lab 001: Configure a device for Ethernet (Layer 3) connections.
 To run this lab:
@@ -7,7 +7,7 @@ To run this lab:
 * Select lab001 from the Projects library.
 * Start all devices.
 * Make this script executable (i.e., "chmod 755 lab000-ping.py")
-* Run this script (i.e., "python3 lab001-ping.py")
+* Run this script (i.e., "Python lab001-ping.py")
 
 Developer Notes:
 

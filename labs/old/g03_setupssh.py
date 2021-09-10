@@ -14,12 +14,12 @@ from __future__ import print_function
 import sys
 import telnetlib
 
-import lab_utils as lu
+from labs import lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
 __copyright__ = "Copyright 2020-2021, Rob Garcia"
-__email__ = "rgarcia@rgprogramming.com"
+__email__ = "rgarcia@rgcoding.com"
 __license__ = "MIT"
 
 # Initialize default values
@@ -50,7 +50,7 @@ def setup_ssh(tn_conn):
         print("Setting up SSH...")
         tn_conn.write("configure terminal\n")
         print(tn_conn.read_until("Enter configuration commands, one per line. End with CNTL/Z.", 30))
-        tn_conn.write("ip domain-name rgprogramming.com\n")
+        tn_conn.write("ip domain-name rgcoding.com\n")
         print(tn_conn.read_until(PROMPT_ENABLED, 30))
         tn_conn.write("crypto key generate rsa\n")
         print(tn_conn.read_until("How many bits in the modulus [512]:", 30))

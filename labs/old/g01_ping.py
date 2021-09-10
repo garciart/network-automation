@@ -17,12 +17,12 @@ import sys
 
 import pexpect
 
-import lab_utils as lu
+from labs import lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
 __copyright__ = "Copyright 2020-2021, Rob Garcia"
-__email__ = "rgarcia@rgprogramming.com"
+__email__ = "rgarcia@rgcoding.com"
 __license__ = "MIT"
 
 # Global variables and constants
