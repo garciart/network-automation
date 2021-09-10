@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/Python
 # -*- coding: utf-8 -*-
 """Lab 000: Telnet into a device and format the flash memory.
 To run this lab:
@@ -7,7 +7,7 @@ To run this lab:
 * Select lab000 from the Projects library.
 * Start all devices.
 * Make this script executable (i.e., "chmod 755 lab000-telnet.py")
-* Run this script (i.e., "python3 lab000-telnet.py")
+* Run this script (i.e., "Python lab000-telnet.py")
 
 Developer Notes:
 

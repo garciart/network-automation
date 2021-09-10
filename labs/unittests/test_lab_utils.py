@@ -7,15 +7,14 @@ Project: Automation
 Requirements:
 - Python 2.7.5
 """
-import sys
 import unittest
 
-import labs.old.lab_utils as lu
+from labs import lab_utils
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
 __copyright__ = "Copyright 2019-2020, Rob Garcia"
-__email__ = "rgarcia@rgprogramming.com"
+__email__ = "rgarcia@rgcoding.com"
 __license__ = "MIT"
 
 
@@ -26,17 +25,11 @@ class Test(unittest.TestCase):
     :type unittest.TestCase: class
     """
 
-    # Function return values
-    SUCCESS = 0
-    FAIL = 1
-    ERROR = 2
-
     def test_log_message_is_not_none(self):
-        """A NULL log message should return FAIL.
+        """A NULL log message should return a Runtime Error.
         """
         arg = None
-        result = lu.log_message(arg)
-        self.assertEqual(result, self.FAIL)
+        self.assertRaises(RuntimeError, lab_utils.log_message, arg)
 
 
 if __name__ == "__main__":

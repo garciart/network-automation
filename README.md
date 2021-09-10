@@ -271,10 +271,10 @@ Now we need to add a device. For our initial labs, we will use the Cisco 3745 Mu
  - Built-in Modules:
      - A console (labeled in light blue) and an auxiliary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
      - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
-     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through Ethernet ports.
+     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right.
 - Four (4) network adapter module slots (two uncovered and two covered in the image).
 
-By the way, while I will explain how to fill in the slots later in this tutorial, we will usually only need the built-in modules for our labs.
+I will explain how to fill in the slots later in this tutorial.
 
 When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Dynamips -> IOS Routers** and click on **New:**
 
@@ -320,13 +320,13 @@ For network adapters, you have three options:
 
 ![NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Adapter](img/nm-16esw123.gif)
 
-Practice filling open slots with an adapter, but ***DO NOT CLICK ON Next > !***:
+Practice filling open slots with an adapter, but ***DO NOT CLICK ON NEXT!***:
 
 ![Network Adapters](img/a20b.png)
 
 Did you notice that, aside from the built-in GT96100-FE adapter, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
 
-Besides the built-in network adapter, we will not need any additional network adapters yet, so empty all the slots, except for **slot 0**, and click on **Next >**:
+Aside from the built-in network adapter, we will not need any additional network adapters yet, so empty all the slots except for **slot 0** (GNS3 will not let you delete it anyway). When complete, click on **Next >**:
 
 ![Network Adapters](img/a20a.png)
 
@@ -344,7 +344,7 @@ For WAN Interface Cards (WICs), we have three slots, but only two options:
 
 ![WIC-2T Two port serial module](img/wic-2t.png)
  
-Go ahead and practice placing a WIC in open slots, but ***DO NOT CLICK ON Next > !***:
+Go ahead and practice placing a WIC in open slots, but ***DO NOT CLICK ON NEXT!***:
 
 ![WIC Modules](img/a21b.png)
 
@@ -421,7 +421,15 @@ You will see that all the nodes are now green, both in the Workspace and the Top
 
 By the way, note the console information for R1 in the Topology Summary. This means that, even though it does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745.
 
-Let us do that now: open a Terminal and input the following command:
+If the Console port number is difficult to see, you can get the information by right-clicking on the R1 node and selecting **Show node information**:
+
+![Show node information](img/a35.png)
+
+The pop-up dialog has a lot of good information, including which port number the Console port is using:
+
+![Node information](img/a36.png)
+
+Telnet into the device by opening a Terminal and inputting the following command:
 
 ```
 telnet 192.168.1.1 5001
@@ -516,18 +524,17 @@ To recap, we:
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
 
-This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result. Remember to make the script executable (i.e., ```chmod 755 lab000-telnet.py```) before running it (```python3 lab000-telnet.py```):
+This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result:
 
 ```
-#!/usr/bin/python3
+#!/usr/bin/python
 """Lab 000: Telnet into a device and format the flash memory.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Select lab000 from the Projects library.
 * Start all devices.
-* Make this script executable (i.e., "chmod 755 lab000-telnet.py")
-* Run this script (i.e., "python3 lab000-telnet.py")
+* Run this script (i.e., "python lab000-telnet.py")
 """
 from __future__ import print_function
 
@@ -571,10 +578,10 @@ child.sendline('q\r')
 print("Successfully connected to the device and formatted the flash memory.")
 ```
 
-Output:
+Run the script, and you will get the following output:
 
 ```
-$ python3 lab000-telnet.py
+$ python lab000-telnet.py
 
 Hello, friend.
 Connecting to the device and formatting the flash memory...
