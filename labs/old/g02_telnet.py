@@ -35,7 +35,7 @@ def main():
     try:
         # Initialize default values
         cloud_ip = "192.168.1.1"
-        device_ip = "192.168.1.10"
+        device_ip = "192.168.1.20"
         telnet_pw = "cisco"
         device_pw = "cisco"
 

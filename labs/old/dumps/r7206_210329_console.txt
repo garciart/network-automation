@@ -93,7 +93,7 @@ R1#enable
 R1#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
 R1(config)#interface FastEthernet0/0
-R1(config-if)#ip address 192.168.1.10 255.255.255.0
+R1(config-if)#ip address 192.168.1.20 255.255.255.0
 R1(config-if)#no shutdown
 R1(config-if)#exit
 R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1

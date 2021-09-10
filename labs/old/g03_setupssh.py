@@ -24,7 +24,7 @@ __license__ = "MIT"
 
 # Initialize default values
 cloud_ip = "192.168.1.1"
-device_ip = "192.168.1.10"
+device_ip = "192.168.1.20"
 device_netmask = "255.255.255.0"
 telnet_pw = "cisco"
 device_pw = "cisco"

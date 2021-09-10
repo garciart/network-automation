@@ -132,9 +132,9 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 23. When the **Console** window appears, press **[Enter]** and wait for the prompt to appear:
 
-![Priviledged EXEC Mode](../images/demo_24.png "Priviledged EXEC Mode")
+![Privileged EXEC Mode](../images/demo_24.png "Privileged EXEC Mode")
 
->**Note** - If the prompt reads ```R1>```, you are in **User EXEC Mode**. Type and enter ```enable``` at the prompt to enter **Priviledged EXEC Mode** (i.e., ```R1>enable```**[Enter]**).
+>**Note** - If the prompt reads ```R1>```, you are in **User EXEC Mode**. Type and enter ```enable``` at the prompt to enter **Privileged EXEC Mode** (i.e., ```R1>enable```**[Enter]**).
 
 24. Enter the following commands to reset the device; if prompted to ```[confirm]```, press **[Enter]**:
     
@@ -264,7 +264,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
     
 30. We can configure the router within this console, but since we are going to use Python instead, close the console, but make sure the router is still running.
 
-31. Normally, to configure the router, we would connect to it using an auxilary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.1:5001). Therefore, open a terminal and start a Python session:
+31. Normally, to configure the router, we would connect to it using an auxiliary or console port, and run commands using an emulator, such as Minicom or PuTTY. For this demo, we will connect to the router using Telnet, through our host's Port 5001 (192.168.1.1:5001). Therefore, open a terminal and start a Python session:
     
          [gns3user@localhost ~]$ python
          Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
@@ -281,7 +281,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
 
 >**Note** - If you see ```ImportError: No module named pexpect.```, you will need to install pexpect first. In CentOS/RHEL, open another terminal and run ```yum install pexpect```.
 
-33. Once the delay is over, let's take a look at the system information. First, we want to press **[Enter]** at least once to reach a clean prompt after any messages. Next, we want to make sure we are in **Priviledged EXEC Mode** by inputting the "enable" command. By the way, if we already are in **Priviledged EXEC Mode**, the "enable" command does not affect anything:
+33. Once the delay is over, let's take a look at the system information. First, we want to press **[Enter]** at least once to reach a clean prompt after any messages. Next, we want to make sure we are in **Privileged EXEC Mode** by inputting the "enable" command. By the way, if we already are in **Privileged EXEC Mode**, the "enable" command does not affect anything:
 
          >>> child.send("\r\n")
          2
@@ -333,7 +333,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
         R1>enable
         R1#configure terminal ! Enter Global Configuration Mode
         R1(config)#interface FastEthernet0/0 ! Enter Interface Configuration Mode
-        R1(config-if)#ip address 192.168.1.10 255.255.255.0 ! Set the IP address of the router
+        R1(config-if)#ip address 192.168.1.20 255.255.255.0 ! Set the IP address of the router
         R1(config-if)#no shutdown ! Bring up the interface
         R1(config-if)#exit ! Exit Interface Configuration Mode
         R1(config)#ip route 0.0.0.0 0.0.0.0 192.168.1.1 ! Configure the default gateway
@@ -358,7 +358,7 @@ This demo/tutorial explains how to create a lab in GNS3 and how to use Python au
         child.sendline('interface FastEthernet0/0\r')
         child.expect_exact('R1(config-if)#')
         # Set the IP address of the router
-        child.sendline('ip address 192.168.1.10 255.255.255.0\r')
+        child.sendline('ip address 192.168.1.20 255.255.255.0\r')
         child.expect_exact('R1(config-if)#')
         # Bring up the interface
         child.sendline('no shutdown\r')

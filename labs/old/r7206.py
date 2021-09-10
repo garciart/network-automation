@@ -942,7 +942,7 @@ if __name__ == "__main__":
 
         # Initialize default parameter values
         config_file_path = "R1_7206_i1_startup-config.cfg"
-        device_ip_address = "192.168.1.10"
+        device_ip_address = "192.168.1.20"
         subnet_mask = "255.255.255.0"
         host_ip_address = "192.168.1.1"
         device_ethernet_interface = "FastEthernet0/0"

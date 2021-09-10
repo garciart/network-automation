@@ -28,11 +28,12 @@ sudo ip tuntap add tap0 mode tap # Create the tap
 sudo ip link set tap0 up # Enable the tap
 sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
-# Configure the internal Ethernet network adapter
+# Configure the isolated Ethernet network adapter
 sudo ip address flush dev "$host_interface" # Clear out any old adapter IP address
-sudo ip address add 192.168.1.145/24 dev "$host_interface" # Set the adapter IP address
 sudo ip link set "$host_interface" up # Enable the adapter
 sudo ip link set "$host_interface" master br0 # Connect the adapter to the bridge
+sleep 3
+sudo ip address add 192.168.1.10/24 dev "$host_interface" # Set the adapter IP address
 
 # Display configuration
 echo

@@ -62,7 +62,7 @@ git clone https://github.com/GNS3/ubridge.git
 cd ubridge || exit
 make
 sudo make install
-cd ~
+cd ~ || exit
 # Get router image and configuration file
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206

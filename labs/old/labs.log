@@ -8,24 +8,24 @@
 2021-01-07 01:11:21,882UTC: DEBUG:root:Hello, world!
 2021-01-07 01:15:52,240UTC: ERROR:root:Type RuntimeError: What? in c:\Users\Rob\source\repos\Automation\Labs\lab_utils.py at line 104.
 2021-01-07 01:15:52,242UTC: DEBUG:root:Hello, world!
-2021-01-22 01:37:01,245UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 01:39:32,093UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 01:46:02,873UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 02:46:40,033UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 02:50:40,314UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 02:51:41,238UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 03:21:23,619UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 2999ms\r\n\r\n'
-2021-01-22 03:31:51,697UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 2999ms\r\n\r\n'
-2021-01-22 03:51:31,314UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
-2021-01-22 03:59:27,438UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3011ms\r\n\r\n'
-2021-01-22 04:01:06,428UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
-2021-01-22 04:01:40,478UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 04:07:21,541UTC: DEBUG:root:1: Error - Code 1, output b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\n\n--- 192.168.1.10 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3005ms\n\n'.
-2021-01-22 04:07:24,666UTC: DEBUG:root:ping -c 4 192.168.1.10: Operation timed out.
-2021-01-22 04:08:24,552UTC: DEBUG:root:1: Error - Code 1, output b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\n\n--- 192.168.1.10 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3001ms\n\n'.
-2021-01-22 04:08:37,663UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
-2021-01-22 04:10:03,942UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - Code 1, Output b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\n\n--- 192.168.1.10 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3009ms\n\n'.
-2021-01-22 04:10:17,059UTC: DEBUG:root:ping -c 4 192.168.1.10: Error - b'PING 192.168.1.10 (192.168.1.10) 56(84) bytes of data.\r\n\r\n--- 192.168.1.10 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3003ms\r\n\r\n'
+2021-01-22 01:37:01,245UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 01:39:32,093UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 01:46:02,873UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 02:46:40,033UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 02:50:40,314UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 02:51:41,238UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 03:21:23,619UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 2999ms\r\n\r\n'
+2021-01-22 03:31:51,697UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 2999ms\r\n\r\n'
+2021-01-22 03:51:31,314UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
+2021-01-22 03:59:27,438UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3011ms\r\n\r\n'
+2021-01-22 04:01:06,428UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
+2021-01-22 04:01:40,478UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 04:07:21,541UTC: DEBUG:root:1: Error - Code 1, output b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\n\n--- 192.168.1.20 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3005ms\n\n'.
+2021-01-22 04:07:24,666UTC: DEBUG:root:ping -c 4 192.168.1.20: Operation timed out.
+2021-01-22 04:08:24,552UTC: DEBUG:root:1: Error - Code 1, output b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\n\n--- 192.168.1.20 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3001ms\n\n'.
+2021-01-22 04:08:37,663UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3000ms\r\n\r\n'
+2021-01-22 04:10:03,942UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - Code 1, Output b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\n\n--- 192.168.1.20 ping statistics ---\n4 packets transmitted, 0 received, 100% packet loss, time 3009ms\n\n'.
+2021-01-22 04:10:17,059UTC: DEBUG:root:ping -c 4 192.168.1.20: Error - b'PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.\r\n\r\n--- 192.168.1.20 ping statistics ---\r\n4 packets transmitted, 0 received, 100% packet loss, time 3003ms\r\n\r\n'
 2021-01-23 02:47:28,407UTC: DEBUG:root:ls -l: Pass content not found - b'total 40\r\n-rw-rw-r--. 1 gns3user gns3user 1172 Jan 21 23:41 g000_serial.py\r\n-rw-rw-r--. 1 gns3user gns3user 3606 Jan 21 23:41 g001_ping.py\r\n-rw-rw-r--. 1 gns3user gns3user 2105 Jan 21 23:41 g002_telnet.py\r\n-rw-rw-r--. 1 gns3user gns3user 3830 Jan 19 22:55 g003_setupssh.py\r\n-rw-rw-r--. 1 gns3user gns3user  502 Jan 19 22:55 g063_tftp.py\r\n-rw-rw-r--. 1 gns3user gns3user  140 Jan 21 19:04 __init__.py\r\n-rw-rw-r--. 1 gns3user gns3user 3914 Jan 21 23:10 labs.log\r\n-rw-rw-r--. 1 gns3user gns3user 5317 Jan 22 21:47 lab_utils.py\r\ndrwxrwxr-x. 2 gns3user gns3user   69 Jan 22 21:47 __pycache__\r\ndrwxrwxr-x. 2 gns3user gns3user   31 Jan  7 22:50 utests\r\n-rw-rw-r--. 1 gns3user gns3user  357 Jan 22 21:46 xtest.py\r\n'
 2021-01-23 02:50:14,547UTC: DEBUG:root:Script /home/gns3user/repos/Automation/labs/lab_utils.py cannot be run independently from this application.
 2021-01-23 04:22:04,385UTC: DEBUG:root:ls -l: Pass content not found - total 44

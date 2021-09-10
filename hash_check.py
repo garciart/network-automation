@@ -20,11 +20,11 @@ from __future__ import print_function
 import hashlib
 
 
-def main(mystring):
-    print("The hashes for {0} are:".format(mystring))
-    print("- MD5:    {0}".format(hashlib.md5(mystring).hexdigest()))
-    print("- SHA1:   {0}".format(hashlib.sha1(mystring).hexdigest()))
-    print("- SHA256: {0}\n".format(hashlib.sha256(mystring).hexdigest()))
+def main(string):
+    print("The hashes for {0} are:".format(string))
+    print("- MD5:    {0}".format(hashlib.md5(string).hexdigest()))
+    print("- SHA1:   {0}".format(hashlib.sha1(string).hexdigest()))
+    print("- SHA256: {0}\n".format(hashlib.sha256(string).hexdigest()))
 
 
 if __name__ == "__main__":
