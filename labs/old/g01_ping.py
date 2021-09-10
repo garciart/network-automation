@@ -26,7 +26,7 @@ __email__ = "rgarcia@rgprogramming.com"
 __license__ = "MIT"
 
 # Global variables and constants
-DEVICE_ADDRESS = "192.168.1.10"
+DEVICE_ADDRESS = "192.168.1.20"
 # DEVICE_ADDRESS = "8.8.8.8"
 
 

@@ -29,7 +29,7 @@ __license__ = 'MIT'
 
 def main():
     try:
-        child = pexpect.spawn('telnet 192.168.1.100 5001')
+        child = pexpect.spawn('telnet 192.168.1.200 5001')
         time.sleep(10)
         child.sendline('\r')
         # Enter Privileged EXEC Mode
@@ -44,7 +44,7 @@ def main():
         child.sendline('interface FastEthernet0/0\r')
         child.expect_exact('R1(config-if)#')
         # Set the IP address of the router
-        child.sendline('ip address 192.168.1.10 255.255.255.0\r')
+        child.sendline('ip address 192.168.1.20 255.255.255.0\r')
         child.expect_exact('R1(config-if)#')
         # Bring up the interface
         child.sendline('no shutdown\r')

@@ -32,7 +32,7 @@ def main(filename):
 
 if __name__ == "__main__":
     print("Welcome to the File Hash Checker!\n")
-    filename = input(
+    file_to_hash = input(
         "Enter the filename (current directory) or full path of the file to check: ")
-    main(filename)
+    main(file_to_hash)
     print("Script complete. Have a nice day.")

@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Normally, to interact with certain network devices, such as unconfigured Layer-3 switches, you would need to connect to them physically, via serial or Ethernet cables, through their console or auxilary ports. Once connected, you would use their command line interface (CLI) to enter Internetwork Operating System (IOS) commands manually, or to upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). This is fine if you have one device. However, manually configuring dozens or hundreds of devices can be exhausting.
+Normally, to interact with certain network devices, such as non-configured Layer-3 switches, you would need to connect to them physically, via serial or Ethernet cables, through their console or auxiliary ports. Once connected, you would use their command line interface (CLI) to enter Internetwork Operating System (IOS) commands manually, or to upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). This is fine if you have one device. However, manually configuring dozens or hundreds of devices can be exhausting.
 
 Any chance we can automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
 
@@ -116,15 +116,15 @@ rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will need images for the Cisco 3745 Multiservice Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
+>**NOTE** - For the labs, you will need images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes). Here are the names of the files, their hashes, and some additional information:
+>The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes. Here are the names of the files, their hashes, and some additional information:
 >
->- **Cisco 3745 Multiservice Access Router:**
+>- **Cisco 3745 Multi-Service Access Router:**
 >   * IOS version 12.4.25d (Mainline):
 >   * File Name: c3745-adventerprisek9-mz.124-25d.bin
 >   * MD5: 563797308a3036337c3dee9b4ab54649
->   * Flash Memory: 64MB
+>   * Flash Memory: 64 MB
 >   * DRAM: 256MB
 >   * End-of-Sale Date: 2007-03-27
 >   * End-of-Support Date: 2012-03-27
@@ -133,7 +133,7 @@ sudo reboot now
 >   * IOS version 12.4.25g (Mainline):
 >   * File Name: c7200-a3jk9s-mz.124-25g.bin
 >   * MD5: 3a78cb61831b3ef1530f7402f5986556
->   * Flash Memory: 64MB
+>   * Flash Memory: 64 MB
 >   * DRAM: 256MB
 >   * End-of-Sale Date: 2012-09-29 
 >   * End-of-Support Date: 2017-09-30
@@ -147,14 +147,14 @@ Before we start, here is the subnet information for the network:
 
 ```
 - Network Address: 192.168.1.0/24
-- Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
-- GNS3 Host Device IP Address: 192.168.1.1/32
-- Gateway IP Address: 192.168.1.1/32
-- Total Number of Hosts: 256
-- Number of Usable Hosts: 254
-- Usable IP Range: 192.168.1.2 - 192.168.1.254
-- Broadcast Address: 192.168.1.255
 - IP Class and Type: C (Private)
+- Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
+- Gateway IP Address: 192.168.1.1
+- Broadcast Address: 192.168.1.255
+- Usable IP Range: 192.168.1.2 - 192.168.1.254
+- Number of Available Hosts: 254
+- Host Device IP Address: 192.168.1.10
+- GNS3 Device Starting IP: 192.168.1.20
 ```
 
 Now, let us create a virtual network. As we stated before, we will create virtual network devices in GNS3, which will exist within their own virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. We want to code on our host machine and test the code in GNS3. Therefore, we want to connect the GNS3 VLAN to our host machine. To do this, we will:
@@ -166,7 +166,7 @@ Now, let us create a virtual network. As we stated before, we will create virtua
 - Connect the router to the bridge through the TAP.
 - Bind the GNS3 VLAN gateway to the bridge.
 
->**NOTE** - All of the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that you first setup and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
+>**NOTE** - All the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that you first set up and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
 
 First, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
 
@@ -202,9 +202,10 @@ sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
 # Configure the isolated Ethernet network adapter 
 sudo ip address flush dev enp0s8 # Clear out any old adapter IP address
-sudo ip address add 192.168.1.111/24 dev enp0s8 # Set the adapter IP address
 sudo ip link set enp0s8 up # Enable the adapter
 sudo ip link set enp0s8 master br0 # Connect the adapter to the bridge
+sleep 3 # Allow time to make the connection
+sudo ip address add 192.168.1.10/24 dev enp0s8 # Set the adapter IP address
 ```
 
 >**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, later, we will create subnetworks in GNS3, separating their connections through Layer 2 TAP interfaces, so just get into the habit of connecting to a TAP instead of directly to the bridge.
@@ -256,9 +257,24 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
->**NOTE** - If you run into any errors or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```: 
+>**NOTE** - If you run into any errors, or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```: 
 >
 >![Preferences](img/a11.png)
+
+Now we need to add a device. For our initial labs, we will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
+
+![Cisco 3745 Rear View](img/a19.png)
+
+ In between the power supply modules, from top to bottom, the 3745 has:
+ 
+ - Three (3) WAN interface card (WIC) slots (uncovered in the image).
+ - Built-in Modules:
+     - A console (labeled in light blue) and an auxiliary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
+     - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
+     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through Ethernet ports.
+- Four (4) network adapter module slots (two uncovered and two covered in the image).
+
+By the way, while I will explain how to fill in the slots later in this tutorial, we will usually only need the built-in modules for our labs.
 
 When the GNS3 graphical user interface reappears, click **Edit -> Preferences** or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. The **Preferences** window should appear. In the left-hand menu, click on **Dynamips -> IOS Routers** and click on **New:**
 
@@ -290,20 +306,7 @@ The **Network adapters** dialog appears, prefilled with a built-in adapter:
 
 ![Network Adapters](img/a20a.png)
 
-The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
-
-![Cisco 3745 Rear View](img/a19.png)
-
- In between the power supply modules, from top to bottom, the 3745 has:
- 
- - Three (3) WAN interface card (WIC) slots (uncovered in the image).
- - Built-in Modules:
-     - A console (labeled in light blue) and an auxilary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
-     - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
-     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right. Our Python scripts will interact with the router through Ethernet ports.
-- Four (4) network adapter module slots (two uncovered and two covered in the image).
-
-For network adapter modules, you have three options:
+For network adapters, you have three options:
 
 - NM-1FE-TX 1-Port 10/100 Mbps Fast Ethernet Network Adapter
 
@@ -317,15 +320,19 @@ For network adapter modules, you have three options:
 
 ![NM-16ESW 16-Port 10/100 Mbps Fast Ethernet Switch (EtherSwitch) Adapter](img/nm-16esw123.gif)
 
-Did you notice that, aside from the built-in GT96100-FE module, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
-
-Fill open slots 1, 2, and 3 with a module and click on **Next >**:
+Practice filling open slots with an adapter, but ***DO NOT CLICK ON Next > !***:
 
 ![Network Adapters](img/a20b.png)
 
+Did you notice that, aside from the built-in GT96100-FE adapter, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
+
+Besides the built-in network adapter, we will not need any additional network adapters yet, so empty all the slots, except for **slot 0**, and click on **Next >**:
+
+![Network Adapters](img/a20a.png)
+
 The **WIC modules** dialog appears:
 
-![Network Adapters](img/a21a.png)
+![WIC Modules](img/a21a.png)
 
 For WAN Interface Cards (WICs), we have three slots, but only two options:
 
@@ -337,9 +344,15 @@ For WAN Interface Cards (WICs), we have three slots, but only two options:
 
 ![WIC-2T Two port serial module](img/wic-2t.png)
  
- Go ahead and place a WIC in open slots 1 and 2, and leave slot 3 empty. Click on **Next >** when done:
+Go ahead and practice placing a WIC in open slots, but ***DO NOT CLICK ON Next > !***:
 
-![WIC Adapters](img/a21b.png)
+![WIC Modules](img/a21b.png)
+
+This time, since the 3745 has three WIC slots, you can populate each of them with different modules, or even the same module.
+
+We will not need any WIC modules yet, so empty all the slots and click on **Next >**:
+
+![WIC Modules](img/a21a.png)
 
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
 CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, I have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
@@ -394,7 +407,7 @@ Connect the other end to the built-in **FastEthernet0/0** port in **R1**:
 
 ![Connect to the Router](img/a29.png)
 
-Notice that, while the devices are connect, nothing is being transmitted, because the router is not on:
+Notice that, while the devices are connected, nothing is being transmitted, because the router is not on:
 
 ![Router off](img/a30.png)
 
@@ -402,11 +415,11 @@ Let us fix that. Click on the green **Play** icon in the GNS3 Toolbar above the 
 
 ![Confirm Start All](img/a31.png)
 
-You will see that all the nodes are now green, both in the Workspace and the Topology Summary in the top left hand corner:
+You will see that all the nodes are now green, both in the Workspace and the Topology Summary in the top left-hand corner:
 
 ![All Devices Started](img/a32.png)
 
-By the way, note the console information for R1 in the the Topology Summary. This means that, even though it does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745.
+By the way, note the console information for R1 in the Topology Summary. This means that, even though it does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745.
 
 Let us do that now: open a Terminal and input the following command:
 
@@ -498,7 +511,7 @@ To recap, we:
 
 1. Accessed the device through Telnet.
 2. Entered Privileged EXEC Mode
-3. Formated the device's flash memory.
+3. Formatted the device's flash memory.
 4. Closed the connection.
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
@@ -571,7 +584,7 @@ Script complete. Have a nice day.
 
 I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
-**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
+**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 
 ```
 sudo ip link set enp0s8 down # Disable the network adpater
@@ -586,7 +599,7 @@ sudo systemctl restart network # Check your OS; may use service networking resta
 
 ## P.S. -
 
-As I stated before, when you installed GNS3 with my script, it added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin``` folder. Now that you have learned how to setup the network environment for GNS3 manually, I recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal, and select the isolated Ethernet interface; enter your password, if prompted. Do not run as ```sudo```, or GNS3 will incorrectly use the ```root``` directories, instead of the user directories:
+As I stated before, when you installed GNS3 with my script, it added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin``` folder. Now that you have learned how to set up the network environment for GNS3 manually, I recommend you use the script from now on to run GNS3. Simply type in ```gns3_run``` in a Terminal, and select the isolated Ethernet interface; enter your password, if prompted. Do not run as ```sudo```, or GNS3 will incorrectly use the ```root``` directories, instead of the user directories:
 
 ```
 Setting up GNS3...
@@ -600,7 +613,7 @@ Good to go!
 Network interface configuration:
 3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master br0 state UP group default qlen 1000
     link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.111/24 scope global eth0
+    inet 192.168.1.10/24 scope global eth0
        valid_lft forever preferred_lft forever
 8: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
     link/ether a1:b2:c3:d4:e5:f6 brd ff:ff:ff:ff:ff:ff

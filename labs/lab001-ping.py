@@ -58,7 +58,7 @@ def main():
         child.sendline("interface FastEthernet0/0\r")
         child.expect_exact("R1(config-if)#")
         # Assign an IPv4 address and subnet mask
-        child.sendline("ip address 192.168.1.10 255.255.255.0\r")
+        child.sendline("ip address 192.168.1.20 255.255.255.0\r")
         child.expect_exact("R1(config-if)#")
         # Bring FastEthernet0/0 up
         child.sendline("no shutdown\r")
@@ -114,14 +114,14 @@ def main():
 
         print("Checking connectivity...")
         # Ping the host from the device
-        child.sendline('ping 192.168.1.145\r')
+        child.sendline('ping 192.168.1.10\r')
         # Check for the fail condition first, since the child will always return a prompt
         index = child.expect(['Success rate is 0 percent', "R1#", ], timeout=60)
         if index == 0:
             raise RuntimeError('Unable to ping the host from the device.')
         else:
             # Ping the device from the host
-            cmd = 'ping -c 4 192.168.1.10'
+            cmd = 'ping -c 4 192.168.1.20'
             # No need to read the output. Ping returns a non-zero value if no packets are received,
             # which will cause a check_output exception
             subprocess.check_output(shlex.split(cmd))
@@ -131,11 +131,11 @@ def main():
         print("Connectivity to and from the device is good.")
 
         print("Checking security...")
-        child = pexpect.spawn("telnet 192.168.1.10")
+        child = pexpect.spawn("telnet 192.168.1.20")
         child.sendline("cisco\r")
         child.expect_exact("R1>")
         print("Security is good.")
-        
+
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
         child.sendline('q\r')

@@ -30,7 +30,7 @@ Router#configure terminal ! conf t
 Enter configuration commands, one per line. End with CNTL/Z.
 Router(config)#hostname R1 ! May already be named R1
 R1(config)#interface FastEthernet0/0 ! int f0/0
-R1(config-if)#ip address 192.168.1.10 255.255.255.0
+R1(config-if)#ip address 192.168.1.20 255.255.255.0
 R1(config-if)#no shutdown ! no shut
 R1(config-if)#
 MMM DD HH:MM:SSS.SSS: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up 
@@ -57,7 +57,7 @@ PING ROUTER
 
 R1#show ip int f0/0 ! Optional; just checking that everything went through
 FastEthernet0/0 is up, line protocol is up
-  Internet address is 192.168.1.10
+  Internet address is 192.168.1.20
   ...
   WCCP Redirect exclude is disabled
 R1#ping 192.168.1.1 ! Ping host from GNS3 router
@@ -70,20 +70,20 @@ R1#exit
 
 Close the console and open a terminal. Attempt to ping the router...
 
-$ ping -c 4 192.168.1.10 # Ping GNS3 router from Terminal
-PING 192.168.1.1 (192.168.1.10) 56(84) bytes of data.
-64 bytes from 192.168.1.10: icmp_seq=1 ttl=255 time=2.05 ms
-64 bytes from 192.168.1.10: icmp_seq=2 ttl=255 time=5.16 ms
-64 bytes from 192.168.1.10: icmp_seq=3 ttl=255 time=10.7 ms
-64 bytes from 192.168.1.10: icmp_seq=4 ttl=255 time=5.30 ms
+$ ping -c 4 192.168.1.20 # Ping GNS3 router from Terminal
+PING 192.168.1.1 (192.168.1.20) 56(84) bytes of data.
+64 bytes from 192.168.1.20: icmp_seq=1 ttl=255 time=2.05 ms
+64 bytes from 192.168.1.20: icmp_seq=2 ttl=255 time=5.16 ms
+64 bytes from 192.168.1.20: icmp_seq=3 ttl=255 time=10.7 ms
+64 bytes from 192.168.1.20: icmp_seq=4 ttl=255 time=5.30 ms
 
---- 192.168.1.10 ping statistics ---
+--- 192.168.1.20 ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3006ms
 rtt min/avg/max/mdev = 2.050/5.830/10.797/3.150 ms
 
 Next, telnet into the router:
-$ telnet 192.168.1.10
-Trying 192.168.1.10
+$ telnet 192.168.1.20
+Trying 192.168.1.20
 Escape character is '^]'.
 
 
@@ -94,8 +94,8 @@ R1> (enter "exit" to quit)
 Connection closed by foreign host.
 
 
-Note for Lab 3: Any issues, use vi to remove all reference to 192.168.1.10 in /home/wrsuser1/.ssh/known_hosts
-    Also, access the router from the terminal using "ssh admin@192.168.1.10"; password is "cisco"
+Note for Lab 3: Any issues, use vi to remove all reference to 192.168.1.20 in /home/wrsuser1/.ssh/known_hosts
+    Also, access the router from the terminal using "ssh admin@192.168.1.20"; password is "cisco"
 
 
 
