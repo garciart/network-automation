@@ -5,6 +5,7 @@ Project: Automation
 
 Requirements:
 - Python 2.7+
+- pexpect
 """
 from __future__ import print_function
 
@@ -16,6 +17,8 @@ import sys
 import time
 
 import pexpect
+
+__all__ = ['log_message', 'error_message']
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -29,12 +32,8 @@ logging.basicConfig(level=logging.NOTSET,
                     filename="{0}/labs.log".format(os.getcwd()),
                     format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
-# Set to True during development and to False during production
-DISPLAY_ERRORS = True
-DISPLAY_MESSAGES = True
 
-
-def log_message(msg, level=logging.ERROR):
+def log_message(msg, level=logging.ERROR, show_msg=False, show_err=False):
     """Utility to log messages, errors, or warnings.
 
     :param str msg: Information to log.
@@ -45,6 +44,8 @@ def log_message(msg, level=logging.ERROR):
         ERROR for exceptions that close the application;
         CRITICAL for exceptions that halt the application,
         defaults to logging.ERROR.
+    :param bool show_msg: Display message in stdout.
+    :param bool show_err: Display error in stdout.
 
     :return: None
     :rtype: None
@@ -63,23 +64,25 @@ def log_message(msg, level=logging.ERROR):
         40: logging.critical,
         50: logging.error,
     }
+    # Execute logging function based on level
     switcher[level](msg)
 
-    if DISPLAY_MESSAGES:
+    if show_msg:
         print(msg)
-    if DISPLAY_ERRORS:
+    elif show_err:
         print("Houston, we've had a problem:", msg)
 
 
 def error_message(exc_info, **options):
     """Formats exception or error information for logging and debugging.
-    https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
 
     :param tuple exc_info: Exception details from sys module.
-    :param Exception options: The exception object for pexpect.ExceptionPexpect (pex) or the
-      exception object for subprocess.CalledProcessError (cpe).
+    :param Exception options: The exception object for pexpect's ExceptionPexpect (pex) or
+        for subprocess' CalledProcessError (cpe).
 
     :return: The formatted message.
+
+    .. seealso:: https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
     """
     # Inform the user the step failed
     print('Fail')

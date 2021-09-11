@@ -1,6 +1,6 @@
 # Adventures in Network Automation
 
-## Lab 001 - Configure a device for Ethernet (Layer 3) connections.
+## Lab 002 - Configure a device for Ethernet (Layer 3) connections.
 
 In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
 
@@ -10,11 +10,11 @@ Start GNS3 by opening a terminal and inputting ```gns3_run```.
 
 Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```lab001``` in the ***Name*** textbox and click the **OK** button.
+A pop-up dialog will appear, asking you to create a new project. Enter ```lab002-ping``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](../img/a10.png)
 
-Complete the steps in Lab000 (Telnet), and Telnet back into the device by opening a Terminal and inputting the following command. Using the instructions in Lab000, make sure your use the right console port:
+Complete the steps in [Lab 1 (Telnet)](lab001-telnet.md "Lab 1 (Telnet)"), and Telnet back into the device by opening a Terminal and inputting the following command. Using the instructions in lab001-telnet, make sure your use the right console port:
 
 ```
 telnet 192.168.1.1 5001

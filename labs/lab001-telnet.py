@@ -1,18 +1,16 @@
 #!/usr/bin/Python
 # -*- coding: utf-8 -*-
-"""Lab 000: Telnet into a device and format the flash memory.
+"""Lab 001: Telnet into a device and format the flash memory.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab000 from the Projects library.
+* Select lab001-telnet from the Projects library.
 * Start all devices.
-* Make this script executable (i.e., "chmod 755 lab000-telnet.py")
-* Run this script (i.e., "Python lab000-telnet.py")
+* Run this script (i.e., "python lab001-telnet.py")
 
 Developer Notes:
 
-* Remember to make this script executable (i.e., "sudo chmod 755 lab000.py")
-* If lab000 does not exist, follow the instructions in README.md to create the lab.
+* If lab001-telnet does not exist, follow the instructions in lab001-telnet.md to create the lab.
 
 Project: Automation
 

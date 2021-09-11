@@ -5,12 +5,11 @@ Enter the full path of the file at the prompt. Example output:
 
 Welcome to My Hash Checker!
 
-Enter the filename (current directory) or full path of the file
-to check: c3745-adventerprisek9-mz.124-25d.bin
-The hashes for c3745-adventerprisek9-mz.124-25d.bin are:
-- MD5:    563797308a3036337c3dee9b4ab54649
-- SHA1:   a1e583a54843802520cbe0c47bddf8b6ebd0118c
-- SHA256: 158ec1c7a6bc5895a5d3408629dac1609304df76e3f35daea3241e116e9db5d4
+Enter the character string to hash: Network Automation
+The hashes for Network Automation are:
+- MD5:    a99099ad955b23a7489ea7126175d115
+- SHA1:   ee88670aacd4a73c28646c22815b8f85df614d80
+- SHA256: 27eeb88202a9e1b35c036ccf43a6849909ebe68b7d23a53857244e60e0a63fd8
 Script complete. Have a nice day.
 
 Project: Automation
@@ -21,6 +20,13 @@ import hashlib
 
 
 def main(string):
+    """Application entry point.
+
+    :param str string: The character string to be hashed.
+
+    :returns: None
+    :rtype: None
+    """
     print("The hashes for {0} are:".format(string))
     print("- MD5:    {0}".format(hashlib.md5(string).hexdigest()))
     print("- SHA1:   {0}".format(hashlib.sha1(string).hexdigest()))
@@ -29,6 +35,6 @@ def main(string):
 
 if __name__ == "__main__":
     print("Welcome to the Hash Checker!\n")
-    mystring = input("Enter the string to hash: ")
-    main(mystring.encode())
+    string_to_hash = raw_input("Enter the character string to hash: ")
+    main(string_to_hash.encode(encoding='UTF-8'))
     print("Script complete. Have a nice day.")

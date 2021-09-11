@@ -1,11 +1,6 @@
 # Adventures in Network Automation
 
-## Lab 001 - Configure a device for Ethernet (Layer 3) connections.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+## Lab 003 - Basic Network Device Security.
 
 In this lab, you will secure a GNS3 device by preventing anonymous access
 
@@ -17,13 +12,13 @@ Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</k
 not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (
 the **Project** window should appear).
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```lab002``` in the ***Name*** textbox and click
+A pop-up dialog will appear, asking you to create a new project. Enter ```lab003``` in the ***Name*** textbox and click
 the **OK** button.
 
 ![Project Dialog](../img/a10.png)
 
-Complete the steps in Lab001 (Ping), and Telnet back into the device by opening a Terminal and inputting the following
-command. Using the instructions in Lab000, make sure your use the right console port:
+Complete the steps in [Lab 2 (Ping)](lab002-ping.md "Lab 2 (Ping)"), and Telnet back into the device by opening a Terminal and inputting the following
+command. Using the instructions in [lab001-telnet](lab001-telnet "Lab 1 (Telnet)"), make sure your use the right console port:
 
 ```
 telnet 192.168.1.1 5003
