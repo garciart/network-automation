@@ -6,7 +6,6 @@ To run this lab:
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Select lab001 from the Projects library.
 * Start all devices.
-* Make this script executable (i.e., "chmod 755 lab000-ping.py")
 * Run this script (i.e., "Python lab001-ping.py")
 
 Developer Notes:
