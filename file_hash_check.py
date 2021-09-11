@@ -5,8 +5,7 @@ Enter the full path of the file at the prompt. Example output:
 
 Welcome to My Hash Checker!
 
-Enter the filename (current directory) or full path of the file
-to check: c3745-adventerprisek9-mz.124-25d.bin
+Enter the filename (current directory) or full path of the file to check: c3745-adventerprisek9-mz.124-25d.bin
 The hashes for c3745-adventerprisek9-mz.124-25d.bin are:
 - MD5:    563797308a3036337c3dee9b4ab54649
 - SHA1:   a1e583a54843802520cbe0c47bddf8b6ebd0118c
@@ -21,13 +20,17 @@ import hashlib
 
 
 def main(filename):
+    """Application entry point.
+
+    :param str filename: The file to be hashed.
+
+    :returns: None
+    :rtype: None
+    """
     print("The hashes for {0} are:".format(filename))
-    print(
-        "- MD5:    {0}".format(hashlib.md5(open(filename, 'rb').read()).hexdigest()))
-    print(
-        "- SHA1:   {0}".format(hashlib.sha1(open(filename, 'rb').read()).hexdigest()))
-    print(
-        "- SHA256: {0}\n".format(hashlib.sha256(open(filename, 'rb').read()).hexdigest()))
+    print("- MD5:    {0}".format(hashlib.md5(open(filename, 'rb').read()).hexdigest()))
+    print("- SHA1:   {0}".format(hashlib.sha1(open(filename, 'rb').read()).hexdigest()))
+    print("- SHA256: {0}\n".format(hashlib.sha256(open(filename, 'rb').read()).hexdigest()))
 
 
 if __name__ == "__main__":

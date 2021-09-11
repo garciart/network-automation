@@ -1,6 +1,6 @@
 # Adventures in Network Automation
 
-## Lab 000 - Telnet into a device and format the flash memory.
+## Lab 001 - Telnet into a device and format the flash memory.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -12,7 +12,7 @@ Start GNS3 by opening a terminal and inputting ```gns3_run```.
 
 Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```lab000``` in the ***Name*** textbox and click the **OK** button.
+A pop-up dialog will appear, asking you to create a new project. Enter ```lab001-telnet``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](../img/a10.png)
 
@@ -165,9 +165,9 @@ This is a bare-bones script that automates everything we did earlier. The heart 
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab000 from the Projects library.
+* Select lab001-telnet from the Projects library.
 * Start all devices.
-* Run this script (i.e., "python lab000-telnet.py")
+* Run this script (i.e., "python lab001-telnet.py")
 """
 from __future__ import print_function
 
@@ -214,7 +214,7 @@ print("Successfully connected to the device and formatted the flash memory.")
 Run the script, and you will get the following output:
 
 ```
-$ python lab000-telnet.py
+$ python lab001-telnet.py
 
 Hello, friend.
 Connecting to the device and formatting the flash memory...
@@ -222,6 +222,6 @@ Successfully connected to the device and formatted the flash memory.
 Script complete. Have a nice day.
 ```
 
-I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+I have also included a script with error detection in the **labs** folder, named [lab001-telnet](labs/lab001-telnet "Lab 1 (Telnet)"). If you want to experiment with debugging, stop the devices and run [lab001-telnet](labs/lab001-telnet "Lab 1 (Telnet)"). The script will fail, and provide you with detailed information on why.
 
 **Congratulations!** You have automated a common networking task using Python!

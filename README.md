@@ -241,9 +241,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
->**NOTE** - If a **Project** window appears instead, click on **Cancel**. select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```:
->
->![Preferences](img/a11.png)
+>**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eye_speech_bubble: below.
 
 In **Local sever configuration**, under **Host binding**, select the bridge's IP address (```192.168.1.1```):
 
@@ -257,9 +255,15 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
->**NOTE** - If you run into any errors, or you have to exit or restart GNS3, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that **Enable local server** is checked and **Host binding** is set to ```192.168.1.1```: 
->
->![Preferences](img/a11.png)
+:eye_speech_bubble: This will return to the main GNS3 workspace. However, before we start on the lab, we need to make some adjustments. From the GNS3 Toolbar at the top of the GUI, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that:
+
+- **Enable local server** is checked.
+- **Host binding** is set to ```192.168.1.1```.
+- **Console port range** is set to ```5000 TCP``` to ```5005 TCP```.
+
+![Preferences](img/a11.png)
+
+---
 
 Now we need to add a device. For our initial labs, we will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
 
@@ -532,7 +536,8 @@ This is a bare-bones script that automates everything we did earlier. The heart 
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab000 from the Projects library.
+* Add a Cloud and a C3745 router
+* Connect the cloud's tap interface to the router's FastEthernet0/0 interface
 * Start all devices.
 * Run this script (i.e., "python lab000-telnet.py")
 """
@@ -546,7 +551,14 @@ import pexpect
 print("Connecting to the device and formatting the flash memory...")
 
 # Connect to the device and allow time for any boot messages to clear
-child = pexpect.spawn("telnet 192.168.1.1 5001")
+console_ports = ("5000", "5001", "5002", "5003", "5004", "5005", None, )
+for port in console_ports:
+    child = pexpect.spawn("telnet 192.168.1.1 {0}".format(port))
+    index = child.expect(["Press RETURN to get started.", pexpect.EOF, ])
+    if port == None:
+        raise RuntimeError("Cannot connect to console port: Out of range.")
+    elif index == 0:
+        break
 time.sleep(10)
 child.sendline("\r")
 
@@ -589,7 +601,7 @@ Successfully connected to the device and formatted the flash memory.
 Script complete. Have a nice day.
 ```
 
-I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab000-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab001-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab001-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
 **Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 

@@ -1,17 +1,16 @@
 #!/usr/bin/Python
 # -*- coding: utf-8 -*-
-"""Lab 001: Configure a device for Ethernet (Layer 3) connections.
+"""Lab 002: Configure a device for Ethernet (Layer 3) connections.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab001 from the Projects library.
+* Select "lab002-ping" from the Projects library.
 * Start all devices.
-* Run this script (i.e., "Python lab001-ping.py")
+* Run this script (i.e., "python lab002-ping.py")
 
 Developer Notes:
 
-* Remember to make this script executable (i.e., "sudo chmod 755 lab001.py")
-* If lab001 does not exist, follow the instructions in lab001-ping.md to create the lab.
+* If lab002-ping does not exist in GNS3, follow the instructions in lab002-ping.md to create the lab.
 
 Project: Automation
 
@@ -145,7 +144,8 @@ def main():
             e_type.__name__,
             e_value,
             e_traceback.tb_frame.f_code.co_filename,
-            e_traceback.tb_lineno))
+            e_traceback.tb_lineno if e_traceback.tb_next is None
+            else e_traceback.tb_next.tb_lineno))
     finally:
         print("Script complete. Have a nice day.")
 
