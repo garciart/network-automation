@@ -2,37 +2,38 @@
 
 ![All Devices Started](img/a32.png)
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use freely available Dynamips images.***
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely available Dynamips images.***
 
 ***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and not suitable for our purposes.***
 
 ## Introduction
 
-Normally, to interact with certain network devices, such as non-configured Layer-3 switches, you would need to connect to them physically, via serial or Ethernet cables, through their console or auxiliary ports. Once connected, you would use their command line interface (CLI) to enter Internetwork Operating System (IOS) commands manually, or to upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). This is fine if you have one device. However, manually configuring dozens or hundreds of devices can be exhausting.
+Initially manually configuring one network device is not a difficult process. You simply access the device's command line interface (CLI) through its console or auxiliary port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). However, even on one device, you may accidentally skip a step or enter a wrong IP address.
 
-Any chance we can automate the process using Python? The answer is yes, and you can write such a script using modules such as subprocess and pexpect.
+Now, imagine if you had to configure or update dozens or hundreds of devices. Chances are that you will make a few mistakes along the way. In addition, depending on the number of devices, by the time you were done, you would need to do another update!  
 
-The bad news is that to test the script, you would need a physical device. However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images. Also, with a little tweaking, you can run your code against the virtual network device from a Terminal or an IDE.
+Any chance we can automate the process, using a scripting language such as Python? The answer is yes, but the bad news is that each time you would like to test a script, you would need to "spin-up" a physical device. This may not always be practical; you would have to take the device (and possibly the cabinet) offline, and, even then, the device may need time to reset, boot up, etc., reducing your debugging time. *And do not forget about the electric bill!*   
+
+However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images, and, with a little tweaking, will allow you to test your code against the virtual network device from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
-- [Installing GNS3 in CentOS](#installing-gns3-in-centos "Installing GNS3")
+- [Installing GNS3](#installing-gns3 "Installing GNS3")
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Running the Labs](#running-the-labs "Running the Labs")
 
->**NOTE** - Thanks to David Bombal, Paul Browning, and many other incredible network gurus and coders (you know who you are :thumbsup: ).
+>**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
 
 -----
 
-## Installing GNS3 in CentOS
+## Installing GNS3
 
 Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
->**NOTE** - Why are we using CentOS for this tutorial?
+>**NOTE** - Why did I pick CentOS for this tutorial?
+>- It was harder, but fun. Plus, I got to learn GNS3's dependencies, which will allow me to install it on other OS's.
 >- I use Fedora, RHEL, and CentOS, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS.
->- It is harder, and it will help you can become familiar with GNS3's dependencies if you want to use another OS.
->- Approximately [20% of servers running Linux](https://w3techs.com/technologies/details/os-linux "Usage statistics of Linux for websites") use Fedora, RHEL, and CentOS. RHEL is also second, behind Microsoft, in [paid enterprise OS subscriptions](https://www.idc.com/getdoc.jsp?containerId=US46684720 "Worldwide Server Operating Environments Market Shares, 2019").
->- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux (i.e., the "commercial" version of CentOS), since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
+>- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux, the commercial version of CentOS, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
 To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, I recommend you review the instructions on the following sites:
 
@@ -42,31 +43,31 @@ To get started, download the latest ISO image of CentOS 7 from [the CentOS downl
 
 - [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
 
->**NOTE** - There are many websites dedicated to creating virtual machines and installing operating systems, and I will not repeat those steps here. However, regardless of the hypervisor you use, make sure you:
-> 
-> 1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
-> 
->    ![Memory size](img/a00.png "Settings -> Memory size")
->  
->2. Allocate at least **16 GB** of hard disk space for your machine (e.g., in VirtualBox...):
-> 
->    ![File location and size](img/a01.png "Settings -> File location and size")**
-> 
->3. Allocate **two** processors for your machine (e.g., in VirtualBox...):
-> 
->    ![Settings -> System](img/a02.png "Settings -> System")
-> 
->4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
-> 
->    ![Network Settings](img/a03.png "Settings -> Network")
->
-> In VMWare, you can make all the above changes to your VM in **Settings**:
-> 
->    ![Settings](img/a04.png)
->
-> In Virtual Machine Manager, you can make all the above changes to your VM in **Virtual Machine Details**:
-> 
->    ![Settings](img/a04a.png)
+Regardless of the hypervisor you use, make sure you:
+
+1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
+
+![Memory size](img/a00.png "Settings -> Memory size")
+ 
+2. Allocate at least **16 GB** of hard disk space for your machine (e.g., in VirtualBox...):
+
+![File location and size](img/a01.png "Settings -> File location and size")**
+
+3. Allocate **two** processors for your machine (e.g., in VirtualBox...):
+
+![Settings -> System](img/a02.png "Settings -> System")
+
+4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
+
+![Network Settings](img/a03.png "Settings -> Network")
+
+In VMWare, you can make all the above changes to your VM in **Settings**:
+
+![Settings](img/a04.png)
+
+In Virtual Machine Manager, you can make all the above changes to your VM in **Virtual Machine Details**:
+
+![Settings](img/a04a.png)
 
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
@@ -90,20 +91,104 @@ Next, open a Terminal and install git:
 
 ```sudo yum -y install git```
 
-Clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```):
+Clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```), and then enter the repository:
 
 ```
 git clone https://github.com/garciart/Automation.git
+cd Automation
 ```
 
-Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, I highly recommend you open it in an editor and look at its commands and comments, so you can become familiar with GNS3's dependencies.
+Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, I highly recommend you look at its commands and comments, so you can become familiar with GNS3's dependencies:
+
+```
+#!/usr/bin/bash
+echo -e "Setting up GNS3..."
+echo -e "Using:"
+cat /etc/centos-release
+echo -e "Updating CentOS"
+sudo yum -y update
+sudo yum -y upgrade
+# Install Python 3 and pip
+sudo yum -y install python3 # Also installs python3-setuptools
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m ensurepip
+sudo yum -y install python3-devel
+sudo yum -y install python3-tools
+# Install Git
+sudo yum -y install git
+# Install GNS3 dependencies
+sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but we will need the other tools later
+sudo yum -y install elfutils-libelf-devel # For Dynamips
+sudo yum -y install libpcap-devel # For Dynamips
+sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
+sudo yum -y install glibc-static # For VCPS
+sudo yum -y install telnet # Yes, we will use Telnet
+# Install Qt GUI library
+sudo yum -y install qt5-qtbase
+sudo yum -y install qt5-qtbase-devel
+sudo yum -y install qt5-qtsvg
+sudo yum -y install qt5-qtsvg-devel
+# Install xterm, one of the consoles used by GNS, and resize its output
+sudo yum -y install xterm
+echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
+sudo xrdb -merge ~/.Xresources
+# Install GNS3
+sudo python3 -m pip install gns3-server
+sudo python3 -m pip install gns3-gui
+sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
+sudo python3 -m pip install pyqt5
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
+sudo yum -y install putty # Get from epel
+# KVM: A Linux kernel module that interacts with the virtualization features of the processor.
+# QEMU: Virtualization software that emulates virtual processors and peripherals.
+# QEMU-KVM: Type 1 hypervisor that runs in kernel space and QEMU: type 2 hypervisor that runs in user space
+sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
+# Install the Dynamips Cisco Emulator
+cd /tmp || exit
+git clone https://github.com/GNS3/dynamips.git
+cd dynamips || exit
+mkdir build
+cd build/ || exit
+cmake .. -DDYNAMIPS_CODE=stable
+make
+sudo make install
+# Install the Virtual PC Simulator (vpcs)
+cd /tmp || exit
+sudo yum -y install svn
+svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
+cd vpcs/src || exit
+./mk.sh 64
+sudo install -m 755 vpcs /usr/local/bin
+# Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
+cd /tmp || exit
+git clone https://github.com/GNS3/ubridge.git
+cd ubridge || exit
+make
+sudo make install
+cd ~ || exit
+# Get router image and configuration file
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
+# Used to create interfaces to connect the host to GNS3
+sudo yum -y install bridge-utils
+# Install pexpect to control interactions with external devices
+sudo yum -y install pexpect # (For Python 2.7+)
+sudo python3 -m pip install pexpect # (For Python 3.6+)
+# Get the script that creates a tap/loopback interface in Linux and launches GNS3
+wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
+# Make the start-up script executable and place it in /usr/bin
+sudo chmod 755 ~/gns3_run
+sudo mv ~/gns3_run /usr/bin/
+# Optional - Modify vimrc file
+echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
+echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."
+```
 
 Using elevated privileges, make the shell script executable and run it, piping any errors and the output into a text file. This will take a while:
 
 >**NOTE** - Do not run any commands as **root**! Otherwise, some files and executables will end up in the wrong place or have the wrong permissions, and GNS3 will not work.
 
 ```
-cd Automation
 sudo chmod +x gns3_setup_centos
 ./gns3_setup_centos 2>&1 | tee setup_output.txt # DO NOT RUN AS SUDO 
 grep -i -e "error" -e "warning" setup_output.txt
@@ -116,7 +201,7 @@ rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will need images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
+>**NOTE** - For the labs, you will use images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
 >
 >The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes. Here are the names of the files, their hashes, and some additional information:
 >
