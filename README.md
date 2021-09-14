@@ -1,6 +1,6 @@
 # Adventures in Network Automation
 
-![All Devices Started](img/a32.png)
+![All Devices Started](img/adventures-automation.gif)
 
 ***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely available Dynamips images.***
 
@@ -14,7 +14,7 @@ Now, imagine if you had to configure or update dozens or hundreds of devices. Ch
 
 Can we automate the process, using a scripting language such as Python? The answer is ***yes***, but the bad news is that each time you would like to test a script, you would need to "spin-up" a physical device. This may not always be practical; in some cases, you would have to take the device (and possibly the cabinet) offline.  
 
-However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images, and, with a little tweaking, allow you to test your code against *multiple* virtual network devices, from a Terminal or an IDE.
+However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images, and, with a little tweaking, allow you to test your code against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
