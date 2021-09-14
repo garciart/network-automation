@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Manually configuring a network device is not a difficult process. You simply access the device's command line interface (CLI) through its console or auxiliary port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). However, even on one device, you may accidentally skip a step or enter a wrong IP address.
+Manually configuring a network device is not a difficult process. You simply access the device's command line interface (CLI) through its console or auxiliary port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). Sometimes, though, you may accidentally skip a step or enter a wrong IP address, making the configuration process more difficult and time-consuming.
 
 Now, imagine if you had to configure or update dozens or hundreds of devices. Chances are that you will make a few mistakes along the way. In addition, depending on the number of devices, by the time you were done, you would need to do another update!  
 
@@ -553,7 +553,7 @@ Press RETURN to get started!
 *Mar  1 00:00:05.699: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
 ```
 
-Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the User EXEC mode prompt (```R1```) will appear:
+Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the Privileged EXEC mode prompt (```R1#```) will appear:
 
 ```
 R1#
@@ -637,34 +637,27 @@ This is a bare-bones script that automates everything we did earlier. The heart 
 
 ```
 #!/usr/bin/python
-"""Lab 000: Telnet into a device and format the flash memory.
+"""Lab 001: Telnet into a device and format the flash memory.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Add a Cloud and a C3745 router
 * Connect the cloud's tap interface to the router's FastEthernet0/0 interface
 * Start all devices.
-* Run this script (i.e., "python lab000-telnet.py")
+* Run this script (i.e., "python lab001-telnet.py")
 """
 from __future__ import print_function
 
-import sys
 import time
 
 import pexpect
 
+child = None
 print("Connecting to the device and formatting the flash memory...")
 
 # Connect to the device and allow time for any boot messages to clear
-console_ports = ("5000", "5001", "5002", "5003", "5004", "5005", None, )
-for port in console_ports:
-    child = pexpect.spawn("telnet 192.168.1.1 {0}".format(port))
-    index = child.expect(["Press RETURN to get started.", pexpect.EOF, ])
-    if port == None:
-        raise RuntimeError("Cannot connect to console port: Out of range.")
-    elif index == 0:
-        break
-time.sleep(10)
+child = pexpect.spawn("telnet 192.168.1.1 5001")
+time.sleep(5)
 child.sendline("\r")
 
 # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
@@ -698,7 +691,7 @@ print("Successfully connected to the device and formatted the flash memory.")
 Run the script, and you will get the following output:
 
 ```
-$ python lab000-telnet.py
+$ python lab001-telnet.py
 
 Hello, friend.
 Connecting to the device and formatting the flash memory...
@@ -732,7 +725,7 @@ No files on device
 R1#
 ```
 
-I have also included a script with error detection in the **labs** folder, named [lab000-telnet.py](labs/lab001-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab000-telnet.py](labs/lab001-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+I have also included a script with error detection in the **labs** folder, named [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
 **Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 
@@ -784,7 +777,7 @@ br0          8000.08002787ffe2  no           enp0s8
 Starting GNS3...
 ```
 
-Do not forget to go back the Terminal window when you exit GNS3 to finish execution of the script:
+Do not forget to return to the Terminal window when you exit GNS3 to finish execution of the script; enter your password if prompted:
 
 ```
 Resetting the network...

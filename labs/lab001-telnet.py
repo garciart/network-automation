@@ -3,14 +3,10 @@
 """Lab 001: Telnet into a device and format the flash memory.
 To run this lab:
 
-* Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab001-telnet from the Projects library.
+* Start GNS3 by executing "gns3_run" in a Terminal window.
+* Setup the lab environment according to lab001-telnet.md.
 * Start all devices.
 * Run this script (i.e., "python lab001-telnet.py")
-
-Developer Notes:
-
-* If lab001-telnet does not exist, follow the instructions in lab001-telnet.md to create the lab.
 
 Project: Automation
 
@@ -34,11 +30,19 @@ __license__ = "MIT"
 
 def main():
     try:
+        child = None
         print("Connecting to the device and formatting the flash memory...")
 
         # Connect to the device and allow time for any boot messages to clear
-        child = pexpect.spawn("telnet 192.168.1.1 5001")
-        time.sleep(10)
+        console_ports = ("5000", "5001", "5002", "5003", "5004", "5005", None,)
+        for port in console_ports:
+            child = pexpect.spawn("telnet 192.168.1.1 {0}".format(port))
+            index = child.expect(["Press RETURN to get started.", pexpect.EOF, ])
+            if port is None:
+                raise RuntimeError("Cannot connect to console port: Out of range.")
+            if index == 0:
+                break
+        time.sleep(5)
         child.sendline("\r")
 
         # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
@@ -79,5 +83,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Hello, friend.")
+    print("Welcome to Lab 001: Telnet into a device and format the flash memory.")
     main()

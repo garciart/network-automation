@@ -354,18 +354,16 @@ This is a bare-bones script that automates everything we did earlier. Lorem ipsu
 
 ```
 #!/usr/bin/python
-"""Lab 002: Secure a device.
+"""Lab 003: Basic Network Device Security.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab002 from the Projects library.
+* Setup the lab environment according to lab003-security.md.
 * Start all devices.
-* Run this script (i.e., "Python lab002-security.py")
+* Run this script (i.e., "Python lab003-security.py")
 """
 from __future__ import print_function
 
-import shlex
-import subprocess
 import sys
 import time
 
@@ -390,7 +388,6 @@ child.expect_exact("R1(config)#")
 # Set cisco as the User EXEC mode password
 child.sendline("enable secret cisco\r")
 child.expect_exact("R1(config)#")
-
 # Enter line configuration mode and specify the type of line
 child.sendline("line console 0\r")
 child.expect_exact("R1(config-line)#")
@@ -400,7 +397,6 @@ child.expect_exact("R1(config-line)#")
 # Require console terminal login
 child.sendline("login\r")
 child.expect_exact("R1(config-line)#")
-
 # Allow up to five connections for virtual teletype (vty) remote console access (Telnet, SSH, etc.)
 child.sendline("line vty 0 4\r")
 child.expect_exact("R1(config-line)#")
@@ -420,7 +416,7 @@ Building configuration...
 R1#
 """
 child.expect_exact("[OK]", timeout=120)
-# Set the configuration as default
+# Set the new configuration as default
 child.sendline("copy running-config startup-config\r")
 child.expect_exact("Destination filename [startup-config]?")
 child.sendline("\r")
@@ -431,24 +427,6 @@ R1#
 """
 child.expect_exact("[OK]", timeout=120)
 print("Configuration successful.")
-
-print("Checking connectivity...")
-# Ping the host from the device
-child.sendline('ping 192.168.1.10\r')
-# Check for the fail condition first, since the child will always return a prompt
-index = child.expect(['Success rate is 0 percent', "R1#", ], timeout=60)
-if index == 0:
-    raise RuntimeError('Unable to ping the host from the device.')
-else:
-    # Ping the device from the host
-    cmd = 'ping -c 4 192.168.1.20'
-    # No need to read the output. Ping returns a non-zero value if no packets are received,
-    # which will cause a check_output exception
-    subprocess.check_output(shlex.split(cmd))
-# Close Telnet and disconnect from device
-child.sendcontrol("]")
-child.sendline('q\r')
-print("Connectivity to and from the device is good.")
 
 print("Checking security...")
 child = pexpect.spawn("telnet 192.168.1.20")
@@ -465,7 +443,7 @@ print("Successfully configured the device and checked connectivity.")
 Run the script, and you will get the following output:
 
 ```
-$ python lab001-ping.py
+$ python lab003-security.py
 
 Hello, friend.
 
