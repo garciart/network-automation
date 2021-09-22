@@ -2,27 +2,25 @@
 
 ## Lab 001 - Telnet into a device and format the flash memory.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-In this lab, you will connect to a GNS3 device through its Console port.
-
-Start GNS3 by opening a terminal and inputting ```gns3_run```.
-
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
+Once you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, start GNS3 by inputting ```gns3_run``` in a Terminal (the **Project** window should appear).
 
 A pop-up dialog will appear, asking you to create a new project. Enter ```lab001-telnet``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](../img/a10.png)
 
-Click **View** -> **Docks** -> **All templates**:
+From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates**:
 
 ![All devices](../img/a26.png)
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
 >**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. I recommend both **Snap to grid**, which will keep your workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
+
+You may also use the "Browse all devices" to see all your available devices:
+
+![All devices](../img/a26i.png)
 
 Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is **R1**:
 
@@ -52,9 +50,9 @@ You will see that all the nodes are now green, both in the Workspace and the Top
 
 ![All Devices Started](../img/a32.png)
 
-By the way, note the console information for R1 in the Topology Summary. This means that, even though it does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745.
+By the way, note the console information for R1 in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745 using port 5001.
 
-If the Console port number is difficult to see, you can get the information by right-clicking on the R1 node and selecting **Show node information**:
+However, your port number may be different. If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the R1 node and selecting **Show node information**:
 
 ![Show node information](../img/a35.png)
 
@@ -62,13 +60,13 @@ The pop-up dialog has a lot of good information, including which port number the
 
 ![Node information](../img/a36.png)
 
-Telnet into the device by opening a Terminal and inputting the following command:
+Open a new Terminal and Telnet into the device by inputting the following command:
 
 ```
 telnet 192.168.1.1 5001
 ```
 
-You should see output similar to the following:
+You will see boot up messages appear on the screen, similar to the following:
 
 ```
 Trying 192.168.1.1...
@@ -76,10 +74,16 @@ Connected to 192.168.1.1.
 Escape character is '^]'.
 Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
 Press ENTER to get the prompt.
-*Mar  1 00:00:04.627: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
 ...
-*Mar  1 00:00:07.499: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet3/6, changed state to down
+Press RETURN to get started!
+...
+*Mar  1 00:00:05.603: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down
+*Mar  1 00:00:05.699: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
+```
 
+Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the Privileged EXEC mode prompt (```R1#```) will appear:
+
+```
 R1#
 ```
 
@@ -151,7 +155,7 @@ All the nodes should turn green.
 To recap, we:
 
 1. Accessed the device through Telnet.
-2. Entered Privileged EXEC Mode
+2. Entered Privileged EXEC Mode.
 3. Formatted the device's flash memory.
 4. Closed the connection.
 
@@ -161,26 +165,27 @@ This is a bare-bones script that automates everything we did earlier. The heart 
 
 ```
 #!/usr/bin/python
-"""Lab 000: Telnet into a device and format the flash memory.
+"""Lab 001: Telnet into a device and format the flash memory.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab001-telnet from the Projects library.
+* Add a Cloud and a C3745 router
+* Connect the cloud's tap interface to the router's FastEthernet0/0 interface
 * Start all devices.
 * Run this script (i.e., "python lab001-telnet.py")
 """
 from __future__ import print_function
 
-import sys
 import time
 
 import pexpect
 
+child = None
 print("Connecting to the device and formatting the flash memory...")
 
 # Connect to the device and allow time for any boot messages to clear
 child = pexpect.spawn("telnet 192.168.1.1 5001")
-time.sleep(10)
+time.sleep(5)
 child.sendline("\r")
 
 # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
@@ -222,6 +227,47 @@ Successfully connected to the device and formatted the flash memory.
 Script complete. Have a nice day.
 ```
 
-I have also included a script with error detection in the **labs** folder, named [lab001-telnet](labs/lab001-telnet "Lab 1 (Telnet)"). If you want to experiment with debugging, stop the devices and run [lab001-telnet](labs/lab001-telnet "Lab 1 (Telnet)"). The script will fail, and provide you with detailed information on why.
+By the way, if you are still are connected to the device through Telnet in a Terminal window, you will see your program run:
 
-**Congratulations!** You have automated a common networking task using Python!
+```
+R1#format flash:
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete 
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+R1#show flash
+No files on device
+
+66875392 bytes available (0 bytes used)
+
+R1#
+```
+
+I have also included a script with error detection in the **labs** folder, named [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
+
+**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Do not forget to return to the Terminal window when you exit GNS3 to finish execution of the script; enter your password if prompted:
+
+```
+Resetting the network...
+[sudo] password for gns3user: 
+
+Network interface configuration:
+3: enp0s8: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 08:00:27:c7:b0:0f brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.10/24 scope global enp0s8
+       valid_lft forever preferred_lft forever
+
+Script complete. Have a nice day.
+```
+
+Good luck!

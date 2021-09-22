@@ -1,12 +1,12 @@
 #!/usr/bin/Python
 # -*- coding: utf-8 -*-
-"""Lab 002: Configure a device for Ethernet (Layer 3) connections.
+"""Lab 003: Basic Network Device Security.
 To run this lab:
 
 * Start GNS3 by executing "gns3_run" in a Terminal window.
-* Setup the lab environment according to lab002-ping.md.
+* Setup the lab environment according to lab003-security.md.
 * Start all devices.
-* Run this script (i.e., "python lab002-ping.py")
+* Run this script (i.e., "python lab003-security.py")
 
 Project: Automation
 
@@ -19,8 +19,6 @@ Requirements:
 """
 from __future__ import print_function
 
-import shlex
-import subprocess
 import sys
 import time
 
@@ -56,18 +54,27 @@ def main():
         # Enter Privileged EXEC mode
         child.sendline("configure terminal\r")
         child.expect_exact("R1(config)#")
-        # Access Ethernet port
-        child.sendline("interface FastEthernet0/0\r")
-        child.expect_exact("R1(config-if)#")
-        # Assign an IPv4 address and subnet mask
-        child.sendline("ip address 192.168.1.20 255.255.255.0\r")
-        child.expect_exact("R1(config-if)#")
-        # Bring the Ethernet port up
-        child.sendline("no shutdown\r")
-        time.sleep(5)
-        child.expect_exact("R1(config-if)#")
-        child.sendline("exit\r")
+        # Set cisco as the User EXEC mode password
+        child.sendline("enable secret cisco\r")
         child.expect_exact("R1(config)#")
+        # Enter line configuration mode and specify the type of line
+        child.sendline("line console 0\r")
+        child.expect_exact("R1(config-line)#")
+        # Set cisco as the console terminal line password
+        child.sendline("password cisco\r")
+        child.expect_exact("R1(config-line)#")
+        # Require console terminal login
+        child.sendline("login\r")
+        child.expect_exact("R1(config-line)#")
+        # Allow up to five connections for virtual teletype (vty) remote console access (Telnet, SSH, etc.)
+        child.sendline("line vty 0 4\r")
+        child.expect_exact("R1(config-line)#")
+        # Set cisco as the remote console access password
+        child.sendline("password cisco\r")
+        child.expect_exact("R1(config-line)#")
+        # Require Telnet and SSH login
+        child.sendline("login\r")
+        child.expect_exact("R1(config-line)#")
         child.sendline("end\r")
         child.expect_exact("R1#")
         # Save the configuration
@@ -90,23 +97,11 @@ def main():
         child.expect_exact("[OK]", timeout=120)
         print("Configuration successful.")
 
-        print("Checking connectivity...")
-        # Ping the host from the device
-        child.sendline('ping 192.168.1.10\r')
-        # Check for the fail condition first, since the child will always return a prompt
-        index = child.expect(['Success rate is 0 percent', "R1#", ], timeout=60)
-        if index == 0:
-            raise RuntimeError('Unable to ping the host from the device.')
-        else:
-            # Ping the device from the host
-            cmd = 'ping -c 4 192.168.1.20'
-            # No need to read the output. Ping returns a non-zero value if no packets are received,
-            # which will cause a check_output exception
-            subprocess.check_output(shlex.split(cmd))
-        # Close Telnet and disconnect from device
-        child.sendcontrol("]")
-        child.sendline('q\r')
-        print("Connectivity to and from the device is good.")
+        print("Checking security...")
+        child = pexpect.spawn("telnet 192.168.1.20")
+        child.sendline("cisco\r")
+        child.expect_exact("R1>")
+        print("Security is good.")
 
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
@@ -125,5 +120,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Welcome to Lab 002: Configure a device for Ethernet (Layer 3) connections.")
+    print("Welcome to Lab 003: Basic Network Device Security.")
     main()

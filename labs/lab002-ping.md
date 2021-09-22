@@ -2,25 +2,17 @@
 
 ## Lab 002 - Configure a device for Ethernet (Layer 3) connections.
 
-In the real world, you interact with the router using Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
-
-Start GNS3 by opening a terminal and inputting ```gns3_run```.
-
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
+In the real world, you interact with the router through Ethernet, not the Console port. However, you will not be able to connect to the router through Ethernet until you give it an IP address.
+
+Click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, start GNS3 by inputting ```gns3_run``` in a Terminal (the **Project** window should appear).
 
 A pop-up dialog will appear, asking you to create a new project. Enter ```lab002-ping``` in the ***Name*** textbox and click the **OK** button.
 
-![Project Dialog](../img/a10.png)
+![Project Dialog](../img/l202.png)
 
-Complete the steps in [Lab 1 (Telnet)](lab001-telnet.md "Lab 1 (Telnet)"), and Telnet back into the device by opening a Terminal and inputting the following command. Using the instructions in lab001-telnet, make sure your use the right console port:
-
-```
-telnet 192.168.1.1 5001
-```
-
-Check the status of the router's internet protocol interfaces:
+Complete the steps in [Lab 1 (Telnet)](lab001-telnet.md "Lab 1 (Telnet)"), but do not exit GNS3. Open a Telnet Terminal (you can use any that are still open) and check the status of the router's internet protocol interfaces:
 
 ```
 R1#show ip interface brief
@@ -37,34 +29,33 @@ FastEthernet0/0 is administratively down, line protocol is down
   Internet protocol processing disabled
 ```
 
-Okay, FastEthernet0/0 is down and not configured. We will give it an IP address of 192.168.1.20 and bring the port up:
+Okay, FastEthernet0/0 is down and not configured. Let us fix that:
 
 ```
-R1#enable ; Enter User EXEC mode
-R1#configure terminal ; Enter Privileged EXEC mode
+R1#configure terminal ; Enter Global Configuration mode
 ```
 
-When you see the message ```Enter configuration commands, one per line.  End with CNTL/Z.```, interface with the Ethernet port. Assign it an IP address and bring it up, using the following commands:
+Wait until you see ```Enter configuration commands, one per line.  End with CNTL/Z.```. Assign the Ethernet port an IP address of 192.168.1.20 and bring it up, using the following commands:
 
 ```
-R1(config)#interface FastEthernet0/0
-R1(config-if)#ip address 192.168.1.20 255.255.255.0
-R1(config-if)#no shutdown ; Bring FastEthernet0/0 up
+R1(config)#interface FastEthernet0/0 ; Access Ethernet port
+R1(config-if)#ip address 192.168.1.20 255.255.255.0 ; Assign an IPv4 address and subnet mask
+R1(config-if)#no shutdown ; Bring the Ethernet port up
 R1(config-if)#
 ```
 
-Wait a few seconds; you will see messages like the following appear:
+Wait several seconds while the configuration messages appear:
 
 ```
 *Mar  1 00:16:01.151: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
 *Mar  1 00:16:02.151: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
 ```
 
-Exit the interface configuration mode, using the following commands:
+Once the messages are finished, exit the interface configuration mode, using the following commands:
 
 ```
 R1(config-if)#exit
-R1(config-line)#end
+R1(config)#end
 R1#
 ```
 
@@ -74,7 +65,7 @@ Next, save the changes to the running configuration, then replace the startup co
 R1#write memory ; Save the configuration
 Building configuration...
 [OK]
-R1#copy running-config startup-config ; Set the configuration as default
+R1#copy running-config startup-config ; Set the new configuration as default
 ```
 
 You will be prompted for the destination filename. Accept the default name by pressing <kbd>Enter</kbd>:
@@ -114,9 +105,12 @@ However, you will not be able to connect through an Ethernet port until you set 
 To recap, we:
 
 1. Accessed the device through Telnet.
-2. Entered Privileged EXEC Mode
-3. ...
-4. Closed the connection.
+2. Entered User EXEC Mode.
+3. Entered Global Configuration Mode.
+4. Accessed the port interface.
+5. Configured the port.
+6. Closed the connection.
+7. Verified the connection using ping.
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
 
@@ -124,19 +118,18 @@ This is a bare-bones script that automates everything we did earlier. Once again
 
 ```
 #!/usr/bin/python
-"""Lab 001: Configure a device for Ethernet (Layer 3) connections.
+"""Lab 002: Configure a device for Ethernet (Layer 3) connections.
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
-* Select lab001 from the Projects library.
+* Setup the lab environment according to lab002-ping.md.
 * Start all devices.
-* Run this script (i.e., "Python lab001-ping.py")
+* Run this script (i.e., "Python lab002-ping.py")
 """
 from __future__ import print_function
 
 import shlex
 import subprocess
-import sys
 import time
 
 import pexpect
