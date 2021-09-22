@@ -1,3 +1,26 @@
+GNS3 Desktop Shortcut
+
+cd /usr/local/share/applications
+sudo vim gns3.desktop
+
+Change:
+
+"Terminal=false" to "Terminal=true"
+"Exec=gns3 %f" to "Exec=gns3_run"
+"Name=GNS3" to "Name=My GNS3"
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=true
+Exec=gns3_run
+Name=My GNS3
+Comment=GNS3 Graphical Network Simulator
+Icon=gns3
+Categories=Education;Network;
+MimeType=application/x-gns3;application/x-gns3appliance;application/x-gns3project;
+Keywords=simulator;network;netsim;
+
 
 Need to research:
 http://www.gns3.xyz/files/Downloads/
