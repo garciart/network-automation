@@ -12,6 +12,7 @@ from __future__ import print_function
 import logging
 import os
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -84,9 +85,6 @@ def error_message(exc_info, **options):
 
     .. seealso:: https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
     """
-    # Inform the user the step failed
-    print('Fail')
-
     # Get keyword arguments. Initialize default to None to prevent SonarLint reference error
     pex = options.get('pex', pexpect.ExceptionPexpect(None))
     cpe = options.get('cpe', subprocess.CalledProcessError(0, '', None))
@@ -136,6 +134,101 @@ def error_message(exc_info, **options):
         else e_traceback.tb_next.tb_lineno))
     log_message(msg, level=logging.ERROR)
     return msg
+
+
+def open_ftp_port():
+    """Opens port 21 to connect to another device and port 20 to transfer data over FTP.
+    :return: None
+    :rtype: None
+    """
+    cmd = ('sudo firewall-cmd --zone=public --add-port=20/tcp',
+           'sudo firewall-cmd --zone=public --add-port=21/tcp',)
+    for c in cmd:
+        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, err = p.communicate()
+        rc = p.returncode
+        if rc != 0:
+            raise RuntimeError('Unable to enable FTP client: {0}'.format(err.strip()))
+
+
+def close_ftp_port():
+    """Closes ports 20 and 21 to prevent transferring data over FTP.
+    :return: None
+    :rtype: None
+    """
+    cmd = ('sudo firewall-cmd --zone=public --remove-port=20/tcp',
+           'sudo firewall-cmd --zone=public --remove-port=21/tcp',)
+    for c in cmd:
+        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, err = p.communicate()
+        rc = p.returncode
+        if rc != 0:
+            raise RuntimeError('Unable to disable FTP client: {0}'.format(err.strip()))
+
+
+def open_telnet_port():
+    """Opens port 23 to connect to another device via Telnet.
+    :return: None
+    :rtype: None
+    """
+    cmd = 'sudo firewall-cmd --zone=public --add-port=23/tcp'
+    p = subprocess.Popen(shlex.split(cmd), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    print(output, err)
+    rc = p.returncode
+    if rc != 0:
+        raise RuntimeError('Unable to open Telnet port 23/tcp: {0}'.format(err.strip()))
+
+
+def close_telnet_port():
+    """Closes port 23 to prevent connections over Telnet.
+    :return: None
+    :rtype: None
+    """
+    cmd = 'sudo firewall-cmd --zone=public --remove-port=23/tcp'
+    p = subprocess.Popen(shlex.split(cmd), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    _, err = p.communicate()
+    rc = p.returncode
+    if rc != 0:
+        raise RuntimeError('Unable to close Telnet port 23/tcp: {0}'.format(err.strip()))
+
+
+def enable_tftp():
+    """Allows data transfer over TFTP.
+    :return: None
+    :rtype: None
+    """
+    cmd = ('sudo mkdir -p -m755 /var/lib/tftpboot',
+           'sudo chmod 755 /var/lib/tftpboot',
+           'sudo firewall-cmd --zone=public --add-service=tftp',
+           'sudo systemctl start tftp',)
+    for c in cmd:
+        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, err = p.communicate()
+        rc = p.returncode
+        if rc != 0:
+            raise RuntimeError('Unable to enable TFTP: {0}'.format(err.strip()))
+
+
+def disable_tftp():
+    """Prevents data transfer over TFTP.
+    :return: None
+    :rtype: None
+    """
+    cmd = ('sudo firewall-cmd --zone=public --remove-service=tftp',
+           'sudo systemctl stop tftp',)
+    for c in cmd:
+        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, err = p.communicate()
+        rc = p.returncode
+        if rc != 0:
+            raise RuntimeError('Unable to disable TFTP: {0}'.format(err.strip()))
 
 
 if __name__ == "__main__":
