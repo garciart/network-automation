@@ -1,4 +1,4 @@
-#!/usr/bin/Python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Lab 002: Configure a device for Ethernet (Layer 3) connections.
 To run this lab:
@@ -92,25 +92,25 @@ def main():
 
         print("Checking connectivity...")
         # Ping the host from the device
-        child.sendline('ping 192.168.1.10\r')
+        child.sendline("ping 192.168.1.10\r")
         # Check for the fail condition first, since the child will always return a prompt
-        index = child.expect(['Success rate is 0 percent', "R1#", ], timeout=60)
+        index = child.expect(["Success rate is 0 percent", "R1#", ], timeout=60)
         if index == 0:
-            raise RuntimeError('Unable to ping the host from the device.')
+            raise RuntimeError("Unable to ping the host from the device.")
         else:
             # Ping the device from the host
-            cmd = 'ping -c 4 192.168.1.20'
+            cmd = "ping -c 4 192.168.1.20"
             # No need to read the output. Ping returns a non-zero value if no packets are received,
             # which will cause a check_output exception
             subprocess.check_output(shlex.split(cmd))
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
-        child.sendline('q\r')
+        child.sendline("q\r")
         print("Connectivity to and from the device is good.")
 
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
-        child.sendline('q\r')
+        child.sendline("q\r")
         print("Successfully configured the device and checked connectivity.")
     except BaseException:
         e_type, e_value, e_traceback = sys.exc_info()

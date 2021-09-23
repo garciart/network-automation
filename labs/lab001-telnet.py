@@ -1,4 +1,4 @@
-#!/usr/bin/Python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Lab 001: Telnet into a device and format the flash memory.
 To run this lab:
@@ -68,7 +68,7 @@ def main():
 
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
-        child.sendline('q\r')
+        child.sendline("q\r")
 
         print("Successfully connected to the device and formatted the flash memory.")
     except BaseException:

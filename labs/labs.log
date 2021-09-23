@@ -3,3 +3,92 @@
 2021-09-10 21:33:20,408UTC: WARNING:root:Script /home/gns3demo/Automation/labs/lab_utils.py cannot be run independently from this application.
 2021-09-11 16:19:57,877UTC: WARNING:root:Script C:/Users/Rob/source/repos/Automation/labs/lab_utils.py cannot be run independently from this application.
 2021-09-11 16:20:37,173UTC: WARNING:root:Script C:/Users/Rob/source/repos/Automation/labs/lab_utils.py cannot be run independently from this application.
+2021-09-23 14:59:54,746UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command: [sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+sudo: 3 incorrect password attempts
+ in /home/gns3user/Automation/labs/test.py at line 37.
+
+2021-09-23 15:03:05,434UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command:  in /home/gns3user/Automation/labs/test.py at line 37.
+
+2021-09-23 15:04:49,637UTC: CRITICAL:root:
+Type TypeError: string indices must be integers, not str in /home/gns3user/Automation/labs/test.py at line 38.
+
+2021-09-23 15:05:52,009UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command:  in /home/gns3user/Automation/labs/test.py at line 38.
+
+2021-09-23 15:06:40,283UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command:  in /home/gns3user/Automation/labs/test.py at line 38.
+
+2021-09-23 15:08:18,693UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command: sudo: 3 incorrect password attempts in /home/gns3user/Automation/labs/test.py at line 38.
+
+2021-09-23 15:21:53,085UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command: [sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+sudo: 3 incorrect password attempts in /home/gns3user/Automation/labs/test.py at line 38.
+
+2021-09-23 15:23:02,216UTC: CRITICAL:root:
+Type RuntimeError: Unable to execute command: sudo mkdir --parents /var/lib/tftpboot: [sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+sudo: 3 incorrect password attempts in /home/gns3user/Automation/labs/test.py at line 37.
+
+2021-09-23 17:39:08,304UTC: CRITICAL:root:
+Type TIMEOUT: Expected "success", found Sorry, try again. in /home/gns3user/Automation/labs/lab000-combo.py at line 85.
+
+2021-09-23 17:40:23,511UTC: WARNING:root:Script /home/gns3user/Automation/labs/lab_utils.py cannot be run independently from this application.
+2021-09-23 17:40:38,594UTC: CRITICAL:root:
+Type TypeError: object of type 'NoneType' has no len() in /home/gns3user/Automation/labs/lab000-combo.py at line 92.
+
+2021-09-23 17:46:01,439UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. Ensure device is started or reloaded. in /home/gns3user/Automation/labs/lab000-combo.py at line 95.
+
+2021-09-23 17:49:26,774UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 94.
+
+2021-09-23 17:54:09,035UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. Ensure device is started or reloaded. in /home/gns3user/Automation/labs/lab000-combo.py at line 95.
+
+2021-09-23 17:54:45,448UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. in /home/gns3user/Automation/labs/lab000-combo.py at line 95.
+
+2021-09-23 17:57:46,356UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-23 18:00:19,905UTC: CRITICAL:root:
+Type TypeError: 'NoneType' object is not iterable in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-23 18:02:04,033UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 94.
+
+2021-09-23 18:05:19,611UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1>", found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 114.
+
+2021-09-23 18:08:38,481UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1>", found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 329.
+
+2021-09-23 18:13:50,295UTC: CRITICAL:root:
+Type TypeError: 'NoneType' object is not iterable in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-23 18:16:33,856UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-23 18:17:00,362UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-23 18:17:43,448UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 91.
+
+2021-09-23 18:29:43,438UTC: CRITICAL:root:
+Type ValueError: Single '}' encountered in format string in /home/gns3user/Automation/labs/lab000-combo.py at line 154.
+

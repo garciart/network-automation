@@ -1,4 +1,4 @@
-#!/usr/bin/Python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Lab 003: Basic Network Device Security.
 To run this lab:
@@ -105,7 +105,7 @@ def main():
 
         # Close Telnet and disconnect from device
         child.sendcontrol("]")
-        child.sendline('q\r')
+        child.sendline("q\r")
         print("Successfully configured the device and checked connectivity.")
     except BaseException:
         e_type, e_value, e_traceback = sys.exc_info()

@@ -19,7 +19,7 @@ import time
 
 import pexpect
 
-__all__ = ['log_message', 'error_message']
+__all__ = ["log_message", "error_message"]
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -86,8 +86,8 @@ def error_message(exc_info, **options):
     .. seealso:: https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
     """
     # Get keyword arguments. Initialize default to None to prevent SonarLint reference error
-    pex = options.get('pex', pexpect.ExceptionPexpect(None))
-    cpe = options.get('cpe', subprocess.CalledProcessError(0, '', None))
+    pex = options.get("pex", pexpect.ExceptionPexpect(None))
+    cpe = options.get("cpe", subprocess.CalledProcessError(0, "", None))
 
     # Unpack sys.exc_info() to get error information
     e_type, e_value, e_traceback = exc_info
@@ -101,12 +101,12 @@ def error_message(exc_info, **options):
         # https://pexpect.readthedocs.io/en/stable/_modules/pexpect/exceptions.html#TIMEOUT
 
         # Log what was actually found during the pexpect call
-        e_value = 'Expected {0}, found {1}'.format(
-            str(pex).split('searcher_string:\n    0: ')[1].split('\n')[0].strip('\r\n'),
-            str(pex).split('before (last 100 chars): ')[1].split('\n')[0].strip('\r\n')
+        e_value = "Expected {0}, found \"{1}\"".format(
+            str(pex).split("searcher_string:\n    0: ")[1].split("\n")[0].strip("\r\n"),
+            str(pex).split("before (last 100 chars): ")[1].split("\n")[0].strip("\r\n")
         )
         # Remove any unwanted escape characters here, like backspaces, etc.
-        e_value = re.sub('[\b]', '', e_value)
+        e_value = re.sub("[\b]", "", e_value)
     elif cpe.output:
         # This code is for subprocess.CalledProcessError. In Python 2.7, subprocess only
         # returns the reason for a non-zero return code (i.e., the CLI's response) in a
@@ -114,7 +114,7 @@ def error_message(exc_info, **options):
         # to potential shell injections.
         # https://docs.python.org/2/library/subprocess.html#subprocess.check_output
 
-        e_value = '"{0}" failed: {1}'.format(cpe.cmd, cpe.output)
+        e_value = "'{0}' failed: {1}".format(cpe.cmd, cpe.output)
 
     # Return the formatted message for logging
     # Start with a linefeed to avoid tailing device OS messages
@@ -126,7 +126,7 @@ def error_message(exc_info, **options):
     #     checks if tb_next exists; if so, it moves up the error stack to retrieve the line
     #     number where the error or exception actually occurred in a function or method,
     #     instead of the line number where the function or method was called.
-    msg = ('\nType {0}: {1} in {2} at line {3}.\n'.format(
+    msg = ("\nType {0}: {1} in {2} at line {3}.\n".format(
         e_type.__name__,
         e_value,
         e_traceback.tb_frame.f_code.co_filename,
@@ -141,15 +141,15 @@ def open_ftp_port():
     :return: None
     :rtype: None
     """
-    cmd = ('sudo firewall-cmd --zone=public --add-port=20/tcp',
-           'sudo firewall-cmd --zone=public --add-port=21/tcp',)
+    cmd = ("sudo firewall-cmd --zone=public --add-port=20/tcp",
+           "sudo firewall-cmd --zone=public --add-port=21/tcp",)
     for c in cmd:
         p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         _, err = p.communicate()
         rc = p.returncode
         if rc != 0:
-            raise RuntimeError('Unable to enable FTP client: {0}'.format(err.strip()))
+            raise RuntimeError("Unable to enable FTP client: {0}".format(err.strip()))
 
 
 def close_ftp_port():
@@ -157,15 +157,15 @@ def close_ftp_port():
     :return: None
     :rtype: None
     """
-    cmd = ('sudo firewall-cmd --zone=public --remove-port=20/tcp',
-           'sudo firewall-cmd --zone=public --remove-port=21/tcp',)
+    cmd = ("sudo firewall-cmd --zone=public --remove-port=20/tcp",
+           "sudo firewall-cmd --zone=public --remove-port=21/tcp",)
     for c in cmd:
         p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         _, err = p.communicate()
         rc = p.returncode
         if rc != 0:
-            raise RuntimeError('Unable to disable FTP client: {0}'.format(err.strip()))
+            raise RuntimeError("Unable to disable FTP client: {0}".format(err.strip()))
 
 
 def open_telnet_port():
@@ -173,14 +173,14 @@ def open_telnet_port():
     :return: None
     :rtype: None
     """
-    cmd = 'sudo firewall-cmd --zone=public --add-port=23/tcp'
+    cmd = "sudo firewall-cmd --zone=public --add-port=23/tcp"
     p = subprocess.Popen(shlex.split(cmd), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     output, err = p.communicate()
     print(output, err)
     rc = p.returncode
     if rc != 0:
-        raise RuntimeError('Unable to open Telnet port 23/tcp: {0}'.format(err.strip()))
+        raise RuntimeError("Unable to open Telnet port 23/tcp: {0}".format(err.strip()))
 
 
 def close_telnet_port():
@@ -188,31 +188,32 @@ def close_telnet_port():
     :return: None
     :rtype: None
     """
-    cmd = 'sudo firewall-cmd --zone=public --remove-port=23/tcp'
+    cmd = "sudo firewall-cmd --zone=public --remove-port=23/tcp"
     p = subprocess.Popen(shlex.split(cmd), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     _, err = p.communicate()
     rc = p.returncode
     if rc != 0:
-        raise RuntimeError('Unable to close Telnet port 23/tcp: {0}'.format(err.strip()))
+        raise RuntimeError("Unable to close Telnet port 23/tcp: {0}".format(err.strip()))
 
 
 def enable_tftp():
     """Allows data transfer over TFTP.
+    Developer Note: TFTP must be installed: i.e., sudo yum -y install tftp tftp-server
     :return: None
     :rtype: None
     """
-    cmd = ('sudo mkdir -p -m755 /var/lib/tftpboot',
-           'sudo chmod 755 /var/lib/tftpboot',
-           'sudo firewall-cmd --zone=public --add-service=tftp',
-           'sudo systemctl start tftp',)
+    cmd = ("sudo mkdir -p -m755 /var/lib/tftpboot",
+           "sudo chmod 755 /var/lib/tftpboot",
+           "sudo firewall-cmd --zone=public --add-service=tftp",
+           "sudo systemctl start tftp",)
     for c in cmd:
         p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         _, err = p.communicate()
         rc = p.returncode
         if rc != 0:
-            raise RuntimeError('Unable to enable TFTP: {0}'.format(err.strip()))
+            raise RuntimeError("Unable to enable TFTP: {0}".format(err.strip()))
 
 
 def disable_tftp():
@@ -220,15 +221,15 @@ def disable_tftp():
     :return: None
     :rtype: None
     """
-    cmd = ('sudo firewall-cmd --zone=public --remove-service=tftp',
-           'sudo systemctl stop tftp',)
+    cmd = ("sudo firewall-cmd --zone=public --remove-service=tftp",
+           "sudo systemctl stop tftp",)
     for c in cmd:
         p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         _, err = p.communicate()
         rc = p.returncode
         if rc != 0:
-            raise RuntimeError('Unable to disable TFTP: {0}'.format(err.strip()))
+            raise RuntimeError("Unable to disable TFTP: {0}".format(err.strip()))
 
 
 if __name__ == "__main__":

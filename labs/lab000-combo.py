@@ -1,16 +1,20 @@
-#!/usr/bin/Python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Lab 000: Combo Lab
+
 Tasks:
 * Telnet into a device
 * Format the flash memory.
 * Save configuration
+
 To run this lab:
 * Start GNS3 by executing "gns3_run" in a Terminal window.
 * Setup the lab environment according to lab001-telnet.md.
 * Start all devices.
 * Run this script (i.e., "python lab001-telnet.py")
+
 Project: Automation
+
 Requirements:
 * Python 2.7+
 * pexpect
@@ -23,6 +27,7 @@ import socket
 import subprocess
 import sys
 import time
+from getpass import getpass
 
 import pexpect
 
@@ -32,15 +37,25 @@ import lab_utils
 __author__ = "Rob Garcia"
 __license__ = "MIT"
 
+GATEWAY_IP_ADDRESS = "192.168.1.1"
+HOST_IP_ADDRESS = "192.168.1.10"
+DEVICE_IP_ADDRESS = "192.168.1.20"
+SUBNET_MASK = "255.255.255.0"
+PROMPT_LIST = ["R1>", "R1#", "R1(", ]
+
+sudo_password = None
+
 
 def main():
     child = None
     try:
         print("Beginning lab...")
-        child = connect_using_telnet()
+        child = connect_using_telnet(GATEWAY_IP_ADDRESS)
         format_device_memory(child)
-        assign_device_ip(child)
-        disconnect_telnet(child)
+        assign_device_ip_addr(child, DEVICE_IP_ADDRESS, SUBNET_MASK)
+        check_l3_connectivity(child, HOST_IP_ADDRESS, DEVICE_IP_ADDRESS)
+
+        close_telnet_connection(child)
         print("Finished lab.")
     # Let the user know something went wrong and put the details in the log file.
     # Catch pexpect and subprocess exceptions first, so other exceptions
@@ -57,65 +72,42 @@ def main():
         print("Script complete. Have a nice day.")
 
 
-def connect_using_telnet():
+def connect_using_telnet(gateway_ip_address):
     """Connect to the device via Telnet.
     :return: The connection in a child application object.
-    :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+    :raise pexpect.ExceptionPexpect: If the result of a spawn or sendline command does not match the
       expected result (raised from the pexpect module).
     """
     print("Connecting to device using Telnet...")
+    # Open Telnet connection port
     child = pexpect.spawn("sudo firewall-cmd --zone=public --add-port=23/tcp")
     index = child.expect_exact(["success", "password", ])
     if index == 1:
-        password = raw_input("SUDO password: ")
-        child.sendline(password)
+        child.sendline(__prompt_for_password())
         child.expect_exact("success")
-    # Cannot use the firewall-cmd child for Telnet; will respawn later
+    # Close this child; you will spawn a new one for the actual connection
     child.close()
     # Connect to the device and allow time for any boot messages to clear
-    console_ports = ("5000", "5001", "5002", "5003", "5004", "5005", None,)
+    console_ports = [str(p) for p in range(5000, (5005 + 1))]
+    # Add a None as a flag to tell the loop that all ports were checked
+    console_ports.append(None)
     for port in console_ports:
-        child = pexpect.spawn("telnet 192.168.1.1 {0}".format(port))
-        index = child.expect_exact(["Press RETURN to get started", "R1>", "R1#", "R1(", pexpect.EOF, ])
+        child = pexpect.spawn("telnet {0} {1}".format(gateway_ip_address, port))
+        # Do not use extend, do not overwrite PROMPT_LIST
+        index = child.expect_exact(PROMPT_LIST + ["Press RETURN to get started", pexpect.EOF, ])
         if port is None:
-            raise RuntimeError("Cannot connect to console port. Ensure device is started or reloaded.")
-        if index in range(0, 3):
+            raise RuntimeError("Cannot connect to console port.")
+        if index in range(len(PROMPT_LIST) + 1):
             break
     time.sleep(5)
     child.sendline("\r")
+    child.expect_exact(PROMPT_LIST)
     print("Connected to device using Telnet.")
     return child
 
 
-def __reset_prompt(child):
-    """Resets the prompt to Privileged EXEC mode on Cisco devices.
-    Check for a prompt:
-         * "R1>" (User EXEC mode)
-         * "R1#" (Privileged EXEC Mode)
-         * "R1(" (Any Global Configuration mode: R1(config)#, R1(vlan)#, etc.)
-    Then set to Privileged EXEC Mode using the "enable" or "end" commands.
-    :param pexpect.spawn child: The connection in a child application object.
-    :return: None
-    :rtype: None
-    :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
-      expected result (raised from the pexpect module).
-    """
-    index = child.expect_exact(["R1>", "R1#", "R1(", ])
-    if index == 0:
-        child.sendline("enable\r")
-        child.expect_exact("R1#")
-    elif index == 2:
-        # "End" takes you back to Privileged EXEC Mode, while "exit" takes you back to the previous mode.
-        child.sendline("end\r")
-        child.expect_exact("R1#")
-
-
 def format_device_memory(child):
     """Format the device's flash memory.
-    Look for the final characters of the following strings:
-      * "Format operation may take a while. Continue? [confirm]"
-      * "Format operation will destroy all data in "flash:".  Continue? [confirm]"
-      * "66875392 bytes available (0 bytes used)"
     :param pexpect.spawn child: The connection in a child application object.
     :return: None
     :rtype: None
@@ -127,19 +119,24 @@ def format_device_memory(child):
     child.sendline("enable\r")
     child.expect_exact("R1#")
     child.sendline("format flash:\r")
+    # Expect "Format operation may take a while. Continue? [confirm]"
     child.expect_exact("Continue? [confirm]")
     child.sendline("\r")
+    # Expect "Format operation will destroy all data in "flash:".  Continue? [confirm]"
     child.expect_exact("Continue? [confirm]")
     child.sendline("\r")
     child.expect_exact("Format of flash complete", timeout=120)
     child.sendline("show flash\r")
+    # Expect "XXXXXXXX bytes available (0 bytes used)"
     child.expect_exact("(0 bytes used)")
     print("Flash memory formatted.")
 
 
-def assign_device_ip(child):
+def assign_device_ip_addr(child, new_device_ip, subnet_mask):
     """Configure a device for Ethernet (Layer 3) connections.
     :param pexpect.spawn child: The connection in a child application object.
+    :param str new_device_ip: The desired IPv4 address of the device.
+    :param str subnet_mask: The subnet mask for the network.
     :return: None
     :rtype: None
     :raise RuntimeError: If unable to set the IPv4 address.
@@ -156,7 +153,7 @@ def assign_device_ip(child):
     child.sendline("interface FastEthernet0/0\r")
     child.expect_exact("R1(config-if)#")
     # Assign an IPv4 address and subnet mask
-    child.sendline("ip address 192.168.1.20 255.255.255.0\r")
+    child.sendline("ip address {0} {1}\r".format(new_device_ip, subnet_mask))
     child.expect_exact("R1(config-if)#")
     # Bring the Ethernet port up
     child.sendline("no shutdown\r")
@@ -164,26 +161,25 @@ def assign_device_ip(child):
     child.expect_exact("R1(config-if)#")
     child.sendline("end\r")
     child.expect_exact("R1#")
-    __ping_check(child, "192.168.1.10", "192.168.1.20")
     print("Device configured for Ethernet (Layer 3) connections.")
 
 
-def __ping_check(child, host_ip, device_ip):
+def check_l3_connectivity(child, host_ip, device_ip):
     """Check connectivity between devices using ping.
     :param pexpect.spawn child: The connection in a child application object.
-    :param str host_ip: The IPv4 address of the host device.
-    :param str device_ip: The IPv4 address of the host device.
+    :param str host_ip: The IPv4 address of the host.
+    :param str device_ip: The IPv4 address of the device.
     :return: None
     :rtype: None
     :raise RuntimeError: If unable to configure the device.
     """
-    __reset_prompt(child)
     print("Checking connectivity...")
     try:
         socket.inet_pton(socket.AF_INET, host_ip)
         socket.inet_pton(socket.AF_INET, device_ip)
     except socket.error:
         raise RuntimeError("Invalid host or device IPv4 address.")
+    __reset_prompt(child)
     # Ping the host from the device
     child.sendline("ping {0}\r".format(host_ip))
     # Check for the fail condition first, since the child will always return a prompt
@@ -201,7 +197,7 @@ def __ping_check(child, host_ip, device_ip):
 
 def download_file_tftp(child, file_path, download_path="~/Downloads"):
     """Download a file from a device using TFTP.
-    Developer Note: TFTP must be installed.
+    Developer Note: TFTP must be installed: i.e., sudo yum -y install tftp tftp-server
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to download.
     :param str download_path: The location to save the file; default is ~/Downloads.
@@ -327,9 +323,11 @@ def upload_file_sftp(child, file_path, upload_path="flash:/"):
     print("{0} uploaded.".format(file_path))
 
 
-def disconnect_telnet(child):
+def close_telnet_connection(child):
     """Close Telnet and disconnect from device.
+
     :param pexpect.spawn child: The connection in a child application object.
+
     :return: None
     :rtype: None
     """
@@ -341,16 +339,55 @@ def disconnect_telnet(child):
     child.sendcontrol("]")
     child.sendline("q\r")
     child.expect_exact("Connection closed.")
-    # Cannot use the Telnet child for firewall-cmd; will respawn later
+    # Close the Telnet child process
     child.close()
+    # Span a new child process to close the firewall port
     child = pexpect.spawn("sudo firewall-cmd --zone=public --remove-port=23/tcp")
     index = child.expect_exact(["success", "password", ])
     if index == 1:
-        password = raw_input("SUDO password: ")
-        child.sendline(password)
+        child.sendline(__prompt_for_password())
         child.expect_exact("success")
     child.close()
     print("Telnet connection closed.")
+
+
+def __prompt_for_password(d=None):
+    """Allows running of sudo commands.
+
+    :param dict d: A dictionary that contains patterns and responses.
+
+    :return: None
+    :rtype: None
+    """
+    global sudo_password
+    if sudo_password is None:
+        sudo_password = getpass(prompt="SUDO password: ") + "\r\n"
+    return sudo_password
+
+
+def __reset_prompt(child):
+    """Resets the prompt to Privileged EXEC mode on Cisco devices.
+    Check for a prompt:
+         * "R1>" (User EXEC mode)
+         * "R1#" (Privileged EXEC Mode)
+         * "R1(" (Any Global Configuration mode: R1(config)#, R1(vlan)#, etc.)
+    Then set to Privileged EXEC Mode using the "enable" or "end" commands.
+    :param pexpect.spawn child: The connection in a child application object.
+    :return: None
+    :rtype: None
+    :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+      expected result (raised from the pexpect module).
+    """
+    # The script moves fast, so allow a second for a prompt to appear
+    time.sleep(1)
+    index = child.expect_exact(PROMPT_LIST)
+    if index == 0:
+        child.sendline("enable\r")
+        child.expect_exact("R1#")
+    elif index == 2:
+        # "End" takes you back to Privileged EXEC Mode, while "exit" takes you back to the previous mode.
+        child.sendline("end\r")
+        child.expect_exact("R1#")
 
 
 if __name__ == "__main__":
