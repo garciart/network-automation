@@ -378,8 +378,7 @@ def __reset_prompt(child):
     :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
       expected result (raised from the pexpect module).
     """
-    # The script moves fast, so allow a second for a prompt to appear
-    time.sleep(1)
+    child.sendline("\r")
     index = child.expect_exact(PROMPT_LIST)
     if index == 0:
         child.sendline("enable\r")
