@@ -111,7 +111,7 @@ def connect_via_telnet(gateway_ip_address):
 
 
 def get_device_info(child):
-    """Get the device's flash memory.
+    """Get the device's flash memory. This will only work after a reload.
     :param pexpect.spawn child: The connection in a child application object.
     :return: None
     :rtype: None
@@ -120,22 +120,24 @@ def get_device_info(child):
     """
     print("Getting device information...")
     __reset_prompt(child)
-
+    """
     try:
         child.expect(r'.*', timeout=.1)
     except pexpect.TIMEOUT:
         pass
-
+    """
     child.sendline("enable\r")
     child.expect_exact("R1#")
-    child.sendline("show version | include [IOSios] [Ss]oftware ; Version\r")
+    child.sendline("\r")
+    child.expect_exact("R1#")
+    child.sendline("show version | include [IOSios] [Ss]oftware\r")
+    child.expect_exact("R1#")
+    child.sendline("show inventory | include [Cc]hassis\r")
     child.expect_exact("R1#")
     print(child.before)
-    print(child.after)
-    child.sendline("show inventory | include [Cc]hassis ; Device Name\r")
+    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
     child.expect_exact("R1#")
-    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]; Serial Number\r")
-    child.expect_exact("R1#")
+    print(child.before)
 
 
 def format_device_memory(child):
