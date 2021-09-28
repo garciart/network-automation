@@ -104,3 +104,79 @@ Type TIMEOUT: Expected "R1>", found "" in lab000-combo.py at line 335.
 2021-09-23 22:02:21,084UTC: CRITICAL:root:
 Type TIMEOUT: Expected "R1>", found "" in lab000-combo.py at line 118.
 
+2021-09-27 18:29:35,298UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. in /home/gns3user/Automation/labs/lab000-combo.py at line 99.
+
+2021-09-27 18:33:07,839UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 86.
+
+2021-09-27 20:50:13,400UTC: WARNING:root:Script /home/gns3user/Automation/labs/lab_utils.py cannot be run independently from this application.
+2021-09-27 21:10:15,551UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:13:09,572UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:13:52,941UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:15:15,789UTC: CRITICAL:root:
+Type TypeError: 'NoneType' object has no attribute '__getitem__' in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:22:24,713UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:22:48,766UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:34:33,046UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 70.
+
+2021-09-27 21:41:49,653UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 71.
+
+2021-09-27 21:41:57,359UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 71.
+
+2021-09-27 21:44:44,363UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/test.py at line 72.
+
+2021-09-27 21:51:38,678UTC: CRITICAL:root:
+Type TypeError: expand() takes exactly one argument (0 given) in /home/gns3user/Automation/labs/test.py at line 71.
+
+2021-09-27 22:07:28,668UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile(".+"), found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 122.
+
+2021-09-27 22:10:47,522UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile(".+"), found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 122.
+
+2021-09-27 22:27:50,202UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 124.
+
+2021-09-27 22:29:01,049UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 124.
+
+2021-09-27 22:35:16,748UTC: CRITICAL:root:
+Type TypeError: not all arguments converted during string formatting in /home/gns3user/Automation/labs/lab000-combo.py at line 125.
+
+2021-09-27 22:35:52,773UTC: CRITICAL:root:
+Type TypeError: not all arguments converted during string formatting in /home/gns3user/Automation/labs/lab000-combo.py at line 125.
+
+2021-09-27 22:42:51,398UTC: CRITICAL:root:
+Type TIMEOUT: Expected "oftware, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 124.
+
+2021-09-27 22:53:53,376UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile("[Ss]oftware"), found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 125.
+
+2021-09-27 22:54:57,424UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile("[Ss]oftware"), found "ftware ; Version" in /home/gns3user/Automation/labs/lab000-combo.py at line 125.
+
+2021-09-27 23:09:10,936UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found ".986: %SYS-5-CONFIG_I: Configured from console by console" in /home/gns3user/Automation/labs/lab000-combo.py at line 122.
+
+2021-09-27 23:15:12,515UTC: CRITICAL:root:
+Type TypeError: 'str' object is not callable in /home/gns3user/Automation/labs/lab000-combo.py at line 121.
+
+2021-09-27 23:43:04,114UTC: CRITICAL:root:
+Type TIMEOUT: Expected "success", found "Sorry, try again." in /home/gns3user/Automation/labs/lab000-combo.py at line 88.
+
