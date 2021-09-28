@@ -17,9 +17,12 @@ do
       echo "Invalid interface name. Please try again."
   fi
 done
-
+# Get sudo password
+read -r -s -p "[sudo] sudo password for $(whoami): " s_pass
+echo
+echo "Configuring network..."
 # Configure the bridge
-sudo ip link add br0 type bridge # Create the bridge
+echo "$s_pass" | sudo -S ip link add br0 type bridge &> /dev/null # Create the bridge
 sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
 sudo ip link set br0 up # Enable the bridge
 
@@ -49,7 +52,7 @@ gns3 # Start GNS3
 # After GNS3 closes, shutdown the connection
 echo
 echo -e "Resetting the network..."
-sudo ip link set "$host_interface" down
+echo "$s_pass" | sudo -S ip link set "$host_interface" down &> /dev/null
 sudo ip link set tap0 down
 sudo ip link delete tap0
 sudo ip link set br0 down

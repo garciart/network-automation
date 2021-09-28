@@ -101,8 +101,10 @@ def error_message(exc_info, **options):
         # https://pexpect.readthedocs.io/en/stable/_modules/pexpect/exceptions.html#TIMEOUT
 
         # Log what was actually found during the pexpect call
+        pattern = r"\nsearcher:(.*):\n\s+0: "
+        _, _, tail = re.split(pattern, str(pex))
         e_value = "Expected {0}, found \"{1}\"".format(
-            str(pex).split("searcher_string:\n    0: ")[1].split("\n")[0].strip("\r\n"),
+            tail.split("\n")[0].strip("\r\n"),
             str(pex).split("before (last 100 chars): ")[1].split("\n")[0].strip("\r\n")
         )
         # Remove any unwanted escape characters here, like backspaces, etc.

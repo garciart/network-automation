@@ -50,12 +50,13 @@ def main():
     child = None
     try:
         print("Beginning lab...")
-        child = connect_using_telnet(GATEWAY_IP_ADDRESS)
+        child = connect_via_telnet(GATEWAY_IP_ADDRESS)
+        get_device_info(child)
         format_device_memory(child)
         assign_device_ip_addr(child, DEVICE_IP_ADDRESS, SUBNET_MASK)
         check_l3_connectivity(child, HOST_IP_ADDRESS, DEVICE_IP_ADDRESS)
 
-        close_telnet_connection(child)
+        close_telnet_conn(child)
         print("Finished lab.")
     # Let the user know something went wrong and put the details in the log file.
     # Catch pexpect and subprocess exceptions first, so other exceptions
@@ -72,7 +73,7 @@ def main():
         print("Script complete. Have a nice day.")
 
 
-def connect_using_telnet(gateway_ip_address):
+def connect_via_telnet(gateway_ip_address):
     """Connect to the device via Telnet.
     :return: The connection in a child application object.
     :raise pexpect.ExceptionPexpect: If the result of a spawn or sendline command does not match the
@@ -87,11 +88,14 @@ def connect_using_telnet(gateway_ip_address):
         child.expect_exact("success")
     # Close this child; you will spawn a new one for the actual connection
     child.close()
+    print("Checking designated ports...")
     # Connect to the device and allow time for any boot messages to clear
     console_ports = [str(p) for p in range(5000, (5005 + 1))]
     # Add a None as a flag to tell the loop that all ports were checked
     console_ports.append(None)
     for port in console_ports:
+        if child:
+            child.close()
         child = pexpect.spawn("telnet {0} {1}".format(gateway_ip_address, port))
         # Do not use extend, do not overwrite PROMPT_LIST
         index = child.expect_exact(PROMPT_LIST + ["Press RETURN to get started", pexpect.EOF, ])
@@ -104,6 +108,34 @@ def connect_using_telnet(gateway_ip_address):
     child.expect_exact(PROMPT_LIST)
     print("Connected to device using Telnet.")
     return child
+
+
+def get_device_info(child):
+    """Get the device's flash memory.
+    :param pexpect.spawn child: The connection in a child application object.
+    :return: None
+    :rtype: None
+    :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+      expected result (raised from the pexpect module).
+    """
+    print("Getting device information...")
+    __reset_prompt(child)
+
+    try:
+        child.expect(r'.*', timeout=.1)
+    except pexpect.TIMEOUT:
+        pass
+
+    child.sendline("enable\r")
+    child.expect_exact("R1#")
+    child.sendline("show version | include [IOSios] [Ss]oftware ; Version\r")
+    child.expect_exact("R1#")
+    print(child.before)
+    print(child.after)
+    child.sendline("show inventory | include [Cc]hassis ; Device Name\r")
+    child.expect_exact("R1#")
+    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]; Serial Number\r")
+    child.expect_exact("R1#")
 
 
 def format_device_memory(child):
@@ -323,7 +355,7 @@ def upload_file_sftp(child, file_path, upload_path="flash:/"):
     print("{0} uploaded.".format(file_path))
 
 
-def close_telnet_connection(child):
+def close_telnet_conn(child):
     """Close Telnet and disconnect from device.
 
     :param pexpect.spawn child: The connection in a child application object.
@@ -351,10 +383,8 @@ def close_telnet_connection(child):
     print("Telnet connection closed.")
 
 
-def __prompt_for_password(d=None):
+def __prompt_for_password():
     """Allows running of sudo commands.
-
-    :param dict d: A dictionary that contains patterns and responses.
 
     :return: None
     :rtype: None
