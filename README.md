@@ -14,7 +14,7 @@ Now, imagine if you had to configure or update dozens or hundreds of devices. Ch
 
 Can we automate the process, using a scripting language such as Python? The answer is ***yes***, but the bad news is that each time you would like to test a script, you would need to "spin-up" a physical device. This may not always be practical; in some cases, you would have to take the device (and possibly the cabinet) offline.  
 
-However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run IOS images, and, with a little tweaking, allow you to test your code against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
+However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run Cisco Internetwork Operating System (IOS) images, and, with a little tweaking, allow you to test your code against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
@@ -369,7 +369,7 @@ Now we need to add a device. For our initial labs, we will use the Cisco 3745 Mu
  - Three (3) WAN interface card (WIC) slots (uncovered in the image).
  - Built-in Modules:
      - A console (labeled in light blue) and an auxiliary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
-     - A CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards.
+     - An optional CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards. This card will correspond to Personal Computer Memory Card International Association (PCMCIA) disk1, accessible as ```slot0:``` in the IOS; more about this later.
      - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right.
 - Four (4) network adapter module slots (two uncovered and two covered in the image).
 
@@ -460,7 +460,12 @@ Finally, accept the default Idle-PC value and click **Finish:**
 
 ![Idle PC value](img/a22.png)
 
-The IOS template's details appear. Note the memory for the Personal Computer Memory Card International Association (PCMCIA) disk0. This is the device's CompactFlash (CF) memory card, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory. Click on **Edit** to change it:
+The IOS template's details appear. Note the memory settings for the Personal Computer Memory Card International Association (PCMCIA) disks:
+
+- **PCMCIA disk0** - This is the device's built-in CompactFlash (CF) memory card, accessible as ```flash:``` in the IOS, used to store the system image, configuration files, and more. It cannot be 0, and the cards hold 32, 64, and 128 MiB of memory.
+- **PCMCIA disk1** - This is the device's external and optional CF memory card, accessible as ```slot0:``` in the IOS. It can hold 0 (no card inserted), 32, 64, and 128 MiB of memory.
+
+Click on **Edit** to increase the device's flash memory from 0 to 64 MiB:
 
 ![Preferences](img/a23.png)
 

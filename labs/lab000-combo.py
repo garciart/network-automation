@@ -22,6 +22,7 @@ Requirements:
 """
 from __future__ import print_function
 
+import os
 import re
 import shlex
 import socket
@@ -53,12 +54,12 @@ def main():
         print("Beginning lab...")
         child = connect_via_telnet(GATEWAY_IP_ADDRESS)
         child.delaybeforesend = 0.5
-        # software_ver, device_name, serial_num = get_device_info(child)
+        # software_ver, device_name, serial_num
         _, _, _ = get_device_info(child)
         format_device_memory(child)
         assign_device_ip_addr(child, DEVICE_IP_ADDRESS, SUBNET_MASK)
         check_l3_connectivity(child, HOST_IP_ADDRESS, DEVICE_IP_ADDRESS)
-        download_file_tftp(child, "/home/gns3user/test.txt")
+        download_file_tftp(child, "startup-config")
         close_telnet_conn(child)
         print("Finished lab.")
     # Let the user know something went wrong and put the details in the log file.
@@ -86,6 +87,8 @@ def connect_via_telnet(gateway_ip_address):
     """
     print("Connecting to device using Telnet...")
     # Open Telnet connection port
+    __run_commands(["sudo firewall-cmd --zone=public --add-port=23/tcp", ])
+    """
     child = pexpect.spawn("sudo firewall-cmd --zone=public --add-port=23/tcp")
     index = child.expect_exact(["success", "password", ])
     if index == 1:
@@ -93,11 +96,13 @@ def connect_via_telnet(gateway_ip_address):
         child.expect_exact("success")
     # Close this child; you will spawn a new one for the actual connection
     child.close()
+    """
     print("Iterating through console port range...")
     # Connect to the device and allow time for any boot messages to clear
     console_ports = [str(p) for p in range(5000, (5005 + 1))]
     # Add a None as a flag to tell the loop that all ports were checked
     console_ports.append(None)
+    child = None
     for port in console_ports:
         if child:
             child.close()
@@ -164,8 +169,6 @@ def format_device_memory(child):
     """
     print("Formatting flash memory...")
     __reset_prompt(child)
-    child.sendline("enable\r")
-    child.expect_exact("R1#")
     child.sendline("format flash:\r")
     # Expect "Format operation may take a while. Continue? [confirm]"
     child.expect_exact("Continue? [confirm]")
@@ -192,9 +195,6 @@ def assign_device_ip_addr(child, new_device_ip, subnet_mask):
     """
     print("Configuring device for Ethernet (Layer 3) connections...")
     __reset_prompt(child)
-    # Enter Privileged EXEC mode
-    child.sendline("enable\r")
-    child.expect_exact("R1#")
     # Enter Global Configuration mode
     child.sendline("configure terminal\r")
     child.expect_exact("R1(config)#")
@@ -245,38 +245,48 @@ def check_l3_connectivity(child, host_ip, device_ip):
     print("Connectivity to and from the device is good.")
 
 
-def download_file_tftp(child, file_path, download_path="~/Downloads"):
+def download_file_tftp(child, file_path_to_download, new_file_name=None):
     """Download a file from a device using TFTP.
 
     Developer Note: TFTP must be installed: i.e., sudo yum -y install tftp tftp-server
 
     :param pexpect.spawn child: The connection in a child application object.
-    :param str file_path: The file to download.
-    :param str download_path: The location to save the file; default is ~/Downloads.
+    :param str file_path_to_download: The location of the file to download (i.e., startup-config, flash:/foo.txt, etc.)
+    :param str new_file_name: (Optional) A new name for the downloaded file.
     :return: None
     :rtype: None
     :raise RuntimeError: If unable to enable or disable TFTP services.
     """
-    print("Downloading {0} over TFTP...".format(file_path))
+    print("Downloading {0} over TFTP...".format(file_path_to_download))
     __reset_prompt(child)
-    # Open TFTP connection port
-    tftp_child = pexpect.spawn("sudo firewall-cmd --zone=public --add-service=tftp")
-    index = tftp_child.expect_exact(["success", "password", ])
-    if index == 1:
-        tftp_child.sendline(__prompt_for_password())
-        tftp_child.expect_exact("success")
-    # Use subprocess for all other calls to catch errors and return codes
-    __run_commands(["sudo systemctl start tftp", ])
-    print("Here!")
-    __run_commands(["sudo systemctl stop tftp", ])
-    # Close this child
-    tftp_child = pexpect.spawn("sudo firewall-cmd --zone=public --remove-service=tftp")
-    index = tftp_child.expect_exact(["success", "password", ])
-    if index == 1:
-        tftp_child.sendline(__prompt_for_password())
-        tftp_child.expect_exact("success")
-    tftp_child.close()
-    print("{0} downloaded.".format(file_path))
+    # Ensure parameters are valid. Do not use os.path.basename; you are downloading from the device, and it may use a
+    # different format from Linux
+    new_file_name = file_path_to_download.rsplit('/', 1)[-1] if new_file_name is None else new_file_name
+    __run_commands([
+        "sudo firewall-cmd --zone=public --add-service=tftp",
+        "sudo mkdir --parents --verbose /var/lib/tftpboot/Downloads",
+        "sudo chmod 777 --verbose /var/lib/tftpboot/Downloads",
+        "sudo touch /var/lib/tftpboot/Downloads/{0}".format(new_file_name),
+        "sudo chmod 777 --verbose /var/lib/tftpboot/Downloads/{0}".format(new_file_name),
+        "sudo systemctl enable tftp",
+        "sudo systemctl start tftp",
+    ])
+    cmd = "copy {0} tftp://{1}/Downloads/{2}\r".format(file_path_to_download, HOST_IP_ADDRESS,  new_file_name)
+    print(cmd)
+    child.sendline("copy {0} tftp://{1}/Downloads/{2}\r".format(file_path_to_download, HOST_IP_ADDRESS,  new_file_name))
+    child.expect_exact("Address or name of remote host")
+    child.sendline("\r")
+    child.expect_exact("Destination filename")
+    child.sendline("\r")
+    index = child.expect_exact(["bytes copied in", "Error", ])
+    if index != 0:
+        raise RuntimeError("Cannot download {0} from device using TFTP.".format(file_path_to_download))
+    __run_commands([
+        "sudo systemctl stop tftp",
+        "sudo systemctl disable tftp",
+        "sudo firewall-cmd --zone=public --remove-service=tftp",
+    ])
+    print("{0} downloaded.".format(file_path_to_download))
 
 
 def upload_file_tftp(child, file_path, upload_path="flash:/"):
@@ -423,21 +433,16 @@ def close_telnet_conn(child):
     child.expect_exact("Connection closed.")
     # Close the Telnet child process
     child.close()
-    # Span a new child process to close the firewall port
-    child = pexpect.spawn("sudo firewall-cmd --zone=public --remove-port=23/tcp")
-    index = child.expect_exact(["success", "password", ])
-    if index == 1:
-        child.sendline(__prompt_for_password())
-        child.expect_exact("success")
-    child.close()
+    # Close the firewall port
+    __run_commands(["sudo firewall-cmd --zone=public --remove-port=23/tcp", ])
     print("Telnet connection closed.")
 
 
 def __prompt_for_password():
     """Allows running of sudo commands.
 
-    :return: None
-    :rtype: None
+    :return: The sudo password
+    :rtype: str
     """
     global sudo_password
     if sudo_password is None:
@@ -480,12 +485,12 @@ def __run_commands(commands):
     :raise RuntimeError: If unable to run a command.
     """
     for c in commands:
-        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-        _, err = p.communicate()
-        rc = p.returncode
-        if rc != 0:
-            raise RuntimeError("Unable to {0}: {1}".format(c, err.strip()))
+        (command_output, exitstatus) = pexpect.run(c,
+                                                   events={"(?i)password": __prompt_for_password()},
+                                                   withexitstatus=True)
+        if exitstatus != 0:
+            raise RuntimeError("Unable to {0}: {1}".format(c, command_output.strip()))
+
 
 if __name__ == "__main__":
     print("Welcome to Lab 000!")
