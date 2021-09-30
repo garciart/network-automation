@@ -180,3 +180,69 @@ Type TypeError: 'str' object is not callable in /home/gns3user/Automation/labs/l
 2021-09-27 23:43:04,114UTC: CRITICAL:root:
 Type TIMEOUT: Expected "success", found "Sorry, try again." in /home/gns3user/Automation/labs/lab000-combo.py at line 88.
 
+2021-09-29 16:26:11,522UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile("include [IOSios] [Ss]oftware"), found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 134.
+
+2021-09-29 16:28:24,936UTC: CRITICAL:root:
+Type TIMEOUT: Expected re.compile("include [IOSios] [Ss]oftware"), found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 134.
+
+2021-09-29 16:42:46,509UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 135.
+
+2021-09-29 16:50:27,672UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 135.
+
+2021-09-29 17:05:19,506UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 136.
+
+2021-09-29 17:26:43,266UTC: CRITICAL:root:
+Type TIMEOUT: Expected EOF, found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)" in /home/gns3user/Automation/labs/lab000-combo.py at line 134.
+
+2021-09-29 17:48:37,406UTC: CRITICAL:root:
+Type TIMEOUT: Expected "subcommands, found " unable to find computer address" in /home/gns3user/Automation/labs/lab000-combo.py at line 132.
+
+2021-09-29 17:50:33,362UTC: CRITICAL:root:
+Type TIMEOUT: Expected "subcommands, found "le to find computer address" in /home/gns3user/Automation/labs/lab000-combo.py at line 133.
+
+2021-09-29 18:25:07,971UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1#, found "5/5), round-trip min/avg/max = 32/34/36 ms" in /home/gns3user/Automation/labs/lab000-combo.py at line 135.
+
+2021-09-29 18:34:56,039UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1#, found "5/5), round-trip min/avg/max = 32/35/40 ms" in /home/gns3user/Automation/labs/lab000-combo.py at line 129.
+
+2021-09-29 19:00:56,414UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1#, found "ent (5/5), round-trip min/avg/max = 32/32/36 ms" in /home/gns3user/Automation/labs/lab000-combo.py at line 129.
+
+2021-09-29 19:01:38,546UTC: CRITICAL:root:
+Type IndexError: list index out of range in /home/gns3user/Automation/labs/lab000-combo.py at line 132.
+
+2021-09-29 19:05:48,439UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 133.
+
+2021-09-29 19:07:08,958UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 133.
+
+2021-09-29 19:08:00,524UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. in /home/gns3user/Automation/labs/lab000-combo.py at line 104.
+
+2021-09-29 19:08:48,387UTC: CRITICAL:root:
+Type RuntimeError: Cannot connect to console port. in /home/gns3user/Automation/labs/lab000-combo.py at line 104.
+
+2021-09-29 19:11:20,610UTC: CRITICAL:root:
+Type TIMEOUT: Expected "R1#, found "" in /home/gns3user/Automation/labs/lab000-combo.py at line 129.
+
+2021-09-29 19:16:12,109UTC: CRITICAL:root:
+Type KeyboardInterrupt:  in /home/gns3user/Automation/labs/lab000-combo.py at line 133.
+
+2021-09-29 19:30:58,733UTC: CRITICAL:root:
+Type RuntimeError: Cannot get the device's name. in /home/gns3user/Automation/labs/lab000-combo.py at line 144.
+
+2021-09-29 19:33:57,189UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/lab000-combo.py at line 144.
+
+2021-09-29 20:54:34,919UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/lab000-combo.py at line 149.
+
+2021-09-30 00:46:14,726UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl start tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/lab000-combo.py at line 269.
+

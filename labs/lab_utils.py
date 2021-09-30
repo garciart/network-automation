@@ -128,7 +128,7 @@ def error_message(exc_info, **options):
     #     checks if tb_next exists; if so, it moves up the error stack to retrieve the line
     #     number where the error or exception actually occurred in a function or method,
     #     instead of the line number where the function or method was called.
-    msg = ("\nType {0}: {1} in {2} at line {3}.\n".format(
+    msg = ("\nType {0}: \"{1}\" in {2} at line {3}.\n".format(
         e_type.__name__,
         e_value,
         e_traceback.tb_frame.f_code.co_filename,

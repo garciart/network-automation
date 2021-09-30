@@ -22,6 +22,7 @@ Requirements:
 """
 from __future__ import print_function
 
+import re
 import shlex
 import socket
 import subprocess
@@ -51,11 +52,13 @@ def main():
     try:
         print("Beginning lab...")
         child = connect_via_telnet(GATEWAY_IP_ADDRESS)
-        get_device_info(child)
+        child.delaybeforesend = 0.5
+        # software_ver, device_name, serial_num = get_device_info(child)
+        _, _, _ = get_device_info(child)
         format_device_memory(child)
         assign_device_ip_addr(child, DEVICE_IP_ADDRESS, SUBNET_MASK)
         check_l3_connectivity(child, HOST_IP_ADDRESS, DEVICE_IP_ADDRESS)
-
+        download_file_tftp(child, "/home/gns3user/test.txt")
         close_telnet_conn(child)
         print("Finished lab.")
     # Let the user know something went wrong and put the details in the log file.
@@ -70,11 +73,13 @@ def main():
     finally:
         if child:
             child.close()
+        print("\n***Restart the device before running this script again.***\n")
         print("Script complete. Have a nice day.")
 
 
 def connect_via_telnet(gateway_ip_address):
     """Connect to the device via Telnet.
+
     :return: The connection in a child application object.
     :raise pexpect.ExceptionPexpect: If the result of a spawn or sendline command does not match the
       expected result (raised from the pexpect module).
@@ -88,7 +93,7 @@ def connect_via_telnet(gateway_ip_address):
         child.expect_exact("success")
     # Close this child; you will spawn a new one for the actual connection
     child.close()
-    print("Checking designated ports...")
+    print("Iterating through console port range...")
     # Connect to the device and allow time for any boot messages to clear
     console_ports = [str(p) for p in range(5000, (5005 + 1))]
     # Add a None as a flag to tell the loop that all ports were checked
@@ -112,36 +117,45 @@ def connect_via_telnet(gateway_ip_address):
 
 def get_device_info(child):
     """Get the device's flash memory. This will only work after a reload.
+
     :param pexpect.spawn child: The connection in a child application object.
-    :return: None
-    :rtype: None
+    :returns: The device's Internetwork Operating System (IOS) version, model number, and serial number.
+    :rtype: tuple
     :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
       expected result (raised from the pexpect module).
     """
     print("Getting device information...")
     __reset_prompt(child)
-    """
-    try:
-        child.expect(r'.*', timeout=.1)
-    except pexpect.TIMEOUT:
-        pass
-    """
-    child.sendline("enable\r")
+    # Reset pexpect cursor to multiple prompts in a row
+    child.sendline("enable\r\r\r")
+    child.expect_exact("enable\r\nR1#\r\nR1#\r\nR1#")
+
+    child.send("show version | include [IOSios] [Ss]oftware\r\n")
     child.expect_exact("R1#")
-    child.sendline("\r")
-    child.expect_exact("R1#")
-    child.sendline("show version | include [IOSios] [Ss]oftware\r")
-    child.expect_exact("R1#")
+    __software_ver = str(child.before).splitlines()[1]
+    if not re.compile(r"[IOSios] [Ss]oftware").search(__software_ver):
+        raise RuntimeError("Cannot get the device's software version.")
+    print("- Software version: {0}".format(__software_ver))
+
     child.sendline("show inventory | include [Cc]hassis\r")
     child.expect_exact("R1#")
-    print(child.before)
+    __device_name = str(child.before).splitlines()[1]
+    if not re.compile(r"[Cc]hassis").search(__device_name):
+        raise RuntimeError("Cannot get the device's name.")
+    print("- Device name: {0}".format(__device_name))
+
     child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
     child.expect_exact("R1#")
-    print(child.before)
+    __serial_num = str(child.before).splitlines()[1]
+    if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(__serial_num):
+        raise RuntimeError("Cannot get the device's serial number.")
+    print("- Serial number: {0}".format(__serial_num))
+    return __software_ver, __device_name, __serial_num
 
 
 def format_device_memory(child):
     """Format the device's flash memory.
+
     :param pexpect.spawn child: The connection in a child application object.
     :return: None
     :rtype: None
@@ -168,6 +182,7 @@ def format_device_memory(child):
 
 def assign_device_ip_addr(child, new_device_ip, subnet_mask):
     """Configure a device for Ethernet (Layer 3) connections.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str new_device_ip: The desired IPv4 address of the device.
     :param str subnet_mask: The subnet mask for the network.
@@ -200,6 +215,7 @@ def assign_device_ip_addr(child, new_device_ip, subnet_mask):
 
 def check_l3_connectivity(child, host_ip, device_ip):
     """Check connectivity between devices using ping.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str host_ip: The IPv4 address of the host.
     :param str device_ip: The IPv4 address of the device.
@@ -231,7 +247,9 @@ def check_l3_connectivity(child, host_ip, device_ip):
 
 def download_file_tftp(child, file_path, download_path="~/Downloads"):
     """Download a file from a device using TFTP.
+
     Developer Note: TFTP must be installed: i.e., sudo yum -y install tftp tftp-server
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to download.
     :param str download_path: The location to save the file; default is ~/Downloads.
@@ -241,13 +259,31 @@ def download_file_tftp(child, file_path, download_path="~/Downloads"):
     """
     print("Downloading {0} over TFTP...".format(file_path))
     __reset_prompt(child)
-
+    # Open TFTP connection port
+    tftp_child = pexpect.spawn("sudo firewall-cmd --zone=public --add-service=tftp")
+    index = tftp_child.expect_exact(["success", "password", ])
+    if index == 1:
+        tftp_child.sendline(__prompt_for_password())
+        tftp_child.expect_exact("success")
+    # Use subprocess for all other calls to catch errors and return codes
+    __run_commands(["sudo systemctl start tftp", ])
+    print("Here!")
+    __run_commands(["sudo systemctl stop tftp", ])
+    # Close this child
+    tftp_child = pexpect.spawn("sudo firewall-cmd --zone=public --remove-service=tftp")
+    index = tftp_child.expect_exact(["success", "password", ])
+    if index == 1:
+        tftp_child.sendline(__prompt_for_password())
+        tftp_child.expect_exact("success")
+    tftp_child.close()
     print("{0} downloaded.".format(file_path))
 
 
 def upload_file_tftp(child, file_path, upload_path="flash:/"):
     """Upload a file to a device using TFTP.
+
     Developer Note: TFTP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to upload.
     :param str upload_path: The location to save the file; default is flash:/.
@@ -263,7 +299,9 @@ def upload_file_tftp(child, file_path, upload_path="flash:/"):
 
 def download_file_ftp(child, file_path, download_path="~/Downloads"):
     """Download a file from a device using FTP.
+
     Developer Note: FTP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to download.
     :param str download_path: The location to save the file; default is ~/Downloads.
@@ -279,7 +317,9 @@ def download_file_ftp(child, file_path, download_path="~/Downloads"):
 
 def upload_file_ftp(child, file_path, upload_path="flash:/"):
     """Upload a file to a device using FTP.
+
     Developer Note: FTP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to upload.
     :param str upload_path: The location to save the file; default is flash:/.
@@ -295,7 +335,9 @@ def upload_file_ftp(child, file_path, upload_path="flash:/"):
 
 def download_file_scp(child, file_path, download_path="~/Downloads"):
     """Download a file from a device using SCP.
+
     Developer Note: SCP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to download.
     :param str download_path: The location to save the file; default is ~/Downloads.
@@ -311,7 +353,9 @@ def download_file_scp(child, file_path, download_path="~/Downloads"):
 
 def upload_file_scp(child, file_path, upload_path="flash:/"):
     """Upload a file to a device using SCP.
+
     Developer Note: SCP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to upload.
     :param str upload_path: The location to save the file; default is flash:/.
@@ -327,7 +371,9 @@ def upload_file_scp(child, file_path, upload_path="flash:/"):
 
 def download_file_sftp(child, file_path, download_path="~/Downloads"):
     """Download a file from a device using SFTP.
+
     Developer Note: SFTP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to download.
     :param str download_path: The location to save the file; default is ~/Downloads.
@@ -343,7 +389,9 @@ def download_file_sftp(child, file_path, download_path="~/Downloads"):
 
 def upload_file_sftp(child, file_path, upload_path="flash:/"):
     """Upload a file to a device using SFTP.
+
     Developer Note: SFTP must be installed.
+
     :param pexpect.spawn child: The connection in a child application object.
     :param str file_path: The file to upload.
     :param str upload_path: The location to save the file; default is flash:/.
@@ -399,11 +447,13 @@ def __prompt_for_password():
 
 def __reset_prompt(child):
     """Resets the prompt to Privileged EXEC mode on Cisco devices.
+
     Check for a prompt:
          * "R1>" (User EXEC mode)
          * "R1#" (Privileged EXEC Mode)
          * "R1(" (Any Global Configuration mode: R1(config)#, R1(vlan)#, etc.)
     Then set to Privileged EXEC Mode using the "enable" or "end" commands.
+
     :param pexpect.spawn child: The connection in a child application object.
     :return: None
     :rtype: None
@@ -420,6 +470,22 @@ def __reset_prompt(child):
         child.sendline("end\r")
         child.expect_exact("R1#")
 
+
+def __run_commands(commands):
+    """Run commands with error detection.
+
+    :param list commands: The commands to execute.
+    :return: None
+    :rtype: None
+    :raise RuntimeError: If unable to run a command.
+    """
+    for c in commands:
+        p = subprocess.Popen(shlex.split(c), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        _, err = p.communicate()
+        rc = p.returncode
+        if rc != 0:
+            raise RuntimeError("Unable to {0}: {1}".format(c, err.strip()))
 
 if __name__ == "__main__":
     print("Welcome to Lab 000!")
