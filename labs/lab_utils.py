@@ -100,14 +100,19 @@ def error_message(exc_info, **options):
         # https://pexpect.readthedocs.io/en/stable/api/pexpect.html#spawn-class
         # https://pexpect.readthedocs.io/en/stable/_modules/pexpect/exceptions.html#TIMEOUT
 
-        # Log what was actually found during the pexpect call
-        pattern = r"\nsearcher:(.*):\n\s+0: "
-        _, _, tail = re.split(pattern, str(pex))
-        e_value = "Expected {0}, found \"{1}\"".format(
-            tail.split("\n")[0].strip("\r\n"),
-            str(pex).split("before (last 100 chars): ")[1].split("\n")[0].strip("\r\n")
-        )
-        # Remove any unwanted escape characters here, like backspaces, etc.
+        # For pexpect.run calls...
+        if "searcher" not in str(pex):
+            e_value = str(pex).strip("\r\n")
+        # For pexpect.expect-type calls...
+        else:
+            # Log what was actually found during the pexpect call
+            pattern = r"\nsearcher:(.*):\n\s+0: "
+            _, _, tail = re.split(pattern, str(pex))
+            e_value = "Expected {0}, found \"{1}\"".format(
+                tail.split("\n")[0].strip("\r\n"),
+                str(pex).split("before (last 100 chars): ")[1].split("\n")[0].strip("\r\n")
+            )
+            # Remove any unwanted escape characters here, like backspaces, etc.
         e_value = re.sub("[\b]", "", e_value)
     elif cpe.output:
         # This code is for subprocess.CalledProcessError. In Python 2.7, subprocess only

@@ -246,3 +246,76 @@ Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/lab
 2021-09-30 00:46:14,726UTC: CRITICAL:root:
 Type RuntimeError: "Unable to sudo systemctl start tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/lab000-combo.py at line 269.
 
+2021-09-30 15:11:18,524UTC: CRITICAL:root:
+Type TypeError: "__prompt_for_password() takes no arguments (1 given)" in /home/gns3user/Automation/labs/test.py at line 240.
+
+2021-09-30 15:15:52,713UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl stop tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/test.py at line 64.
+
+2021-09-30 15:51:59,425UTC: CRITICAL:root:
+Type ExceptionPexpect: "The command was not found or was not executable: booga." in /home/gns3user/Automation/labs/test.py at line 219.
+
+2021-09-30 15:57:28,943UTC: CRITICAL:root:
+Type RuntimeError: "Unable to systemctl stop tftp: Failed to stop tftp.service: Access denied
+See system logs and 'systemctl status tftp.service' for details.
+Warning: Stopping tftp.service, but it can still be activated by:
+  tftp.socket" in /home/gns3user/Automation/labs/test.py at line 64.
+
+2021-09-30 18:05:55,481UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
+
+2021-09-30 18:13:31,761UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
+
+2021-09-30 18:20:40,877UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
+
+2021-09-30 18:47:07,856UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl stop tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/test.py at line 71.
+
+2021-09-30 18:51:43,028UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl stop tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/test.py at line 71.
+
+2021-09-30 18:54:25,965UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl stop tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/test.py at line 73.
+
+2021-09-30 18:59:27,858UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo firewall-cmd --zone=public --add-service=tftp: sudo: no tty present and no askpass program specified" in /home/gns3user/Automation/labs/test.py at line 58.
+
+2021-09-30 18:59:45,297UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo -S firewall-cmd --zone=public --add-service=tftp: [sudo] password for gns3user: 
+sudo: no password was provided" in /home/gns3user/Automation/labs/test.py at line 58.
+
+2021-09-30 19:15:06,151UTC: CRITICAL:root:
+Type KeyboardInterrupt: "" in /home/gns3user/Automation/labs/test.py at line 31.
+
+2021-09-30 19:20:42,954UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
+
+2021-09-30 19:30:41,254UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 285.
+
+2021-09-30 19:32:01,989UTC: CRITICAL:root:
+Type KeyboardInterrupt: "" in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-30 19:33:26,882UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 286.
+
+2021-09-30 20:05:58,496UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect to console port." in /home/gns3user/Automation/labs/lab000-combo.py at line 113.
+
+2021-09-30 20:11:44,848UTC: CRITICAL:root:
+Type KeyboardInterrupt: "" in /home/gns3user/Automation/labs/lab000-combo.py at line 90.
+
+2021-09-30 20:15:29,326UTC: CRITICAL:root:
+Type IndexError: "tuple index out of range" in /home/gns3user/Automation/labs/lab000-combo.py at line 270.
+
+2021-09-30 20:25:07,496UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 284.
+
+2021-09-30 20:29:22,751UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "Destination filename", found "ads""" in /home/gns3user/Automation/labs/lab000-combo.py at line 279.
+
+2021-09-30 20:34:03,383UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
+
