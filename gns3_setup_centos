@@ -4,7 +4,6 @@ echo -e "Using:"
 cat /etc/centos-release
 echo -e "Updating CentOS"
 sudo yum -y update
-sudo yum -y upgrade
 # Install Python 3 and pip
 sudo yum -y install python3 # Also installs python3-setuptools
 sudo python3 -m pip install --upgrade pip
@@ -19,7 +18,6 @@ sudo yum -y install elfutils-libelf-devel # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
 sudo yum -y install glibc-static # For VCPS
-sudo yum -y install telnet # Yes, we will use Telnet
 # Install Qt GUI library
 sudo yum -y install qt5-qtbase
 sudo yum -y install qt5-qtbase-devel
@@ -76,6 +74,11 @@ wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_run
 sudo mv ~/gns3_run /usr/bin/
+# Lab dependencies
+sudo yum -y install telnet
+sudo yum -y install tftp tftp-server*
+sudo mkdir -p /var/lib/tftpboot
+sudo chmod 777 /var/lib/tftpboot
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."

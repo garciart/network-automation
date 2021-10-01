@@ -72,7 +72,6 @@ In Virtual Machine Manager, you can make all the above changes to your VM in **V
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
 ```
-sudo yum -y update
 sudo yum -y upgrade
 ```
 
@@ -80,8 +79,7 @@ sudo yum -y upgrade
 >
 >```
 >sudo yum -y install epel-release
->sudo yum -y update
->sudo yum install make gcc kernel-headers kernel-devel perl dkms bzip2
+>sudo yum -y install make gcc kernel-headers kernel-devel perl dkms bzip2
 >sudo reboot now
 >```
 >
