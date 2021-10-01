@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 """Lab 000: Combo Lab
 
-Tasks:
-* Telnet into a device
-* Format the flash memory.
-* Save configuration
-
 To run this lab:
 * Start GNS3 by executing "gns3_run" in a Terminal window.
 * Setup the lab environment according to lab001-telnet.md.

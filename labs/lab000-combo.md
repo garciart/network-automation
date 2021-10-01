@@ -12,7 +12,7 @@ Before transferring files between the CentOS host and Cisco devices, you must in
 
 ```
 sudo yum -y install tftp tftp-server* 
-sudo mkdir -p -m777 /var/lib/tftpboot
+sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
 ```
 
