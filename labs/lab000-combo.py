@@ -25,6 +25,7 @@ import subprocess
 import sys
 import time
 from getpass import getpass
+from datetime import datetime
 
 import pexpect
 
@@ -54,7 +55,8 @@ def main():
         format_device_memory(child)
         assign_device_ip_addr(child, DEVICE_IP_ADDRESS, SUBNET_MASK)
         check_l3_connectivity(child, HOST_IP_ADDRESS, DEVICE_IP_ADDRESS)
-        download_file_tftp(child, "startup-config")
+        download_file_tftp(
+            child, "startup-config", "startup-config-{0}".format(datetime.utcnow().strftime("%y%m%d%H%M%SZ")))
         close_telnet_conn(child)
         print("Finished lab.")
     # Let the user know something went wrong and put the details in the log file.
@@ -69,7 +71,7 @@ def main():
     finally:
         if child:
             child.close()
-        print("\n***Restart the device before running this script again.***\n")
+        print("\n*** Restart the device before running this script again. ***\n")
         print("Script complete. Have a nice day.")
 
 

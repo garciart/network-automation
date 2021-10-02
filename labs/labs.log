@@ -319,3 +319,6 @@ Type TIMEOUT: "Expected "Destination filename", found "ads""" in /home/gns3user/
 2021-09-30 20:34:03,383UTC: CRITICAL:root:
 Type RuntimeError: "Cannot download startup-config from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 283.
 
+2021-10-02 04:26:51,427UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect to console port." in /home/gns3user/Automation/labs/lab000-combo.py at line 110.
+

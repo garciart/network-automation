@@ -1,4 +1,4 @@
-GNS3 Desktop Shortcut
+Modify GNS3 Desktop Shortcut
 
 cd /usr/local/share/applications
 sudo vim gns3.desktop
@@ -21,16 +21,25 @@ Categories=Education;Network;
 MimeType=application/x-gns3;application/x-gns3appliance;application/x-gns3project;
 Keywords=simulator;network;netsim;
 
+- - - - - - - - - - - - - - -
+
+Install PyCharm
+
+sudo tar xzf pycharm-*.tar.gz -C /opt/
+cd /opt/pycharm-*/bin
+sh pycharm.sh
+
+Tools -> Create Desktop Entry...
+File -> Open ... -> /home/gns3user/Automation
+File -> Settings... -> Project:Automation -> Python Interpreter -> [Gear Icon] -> Add... -> System Interpreter -> Interpreter: /usr/bin/python2.7
+
+- - - - - - - - - - - - - - -
 
 Need to research:
-http://www.gns3.xyz/files/Downloads/
 https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/
-
-
 Add the router to the templates (need to explain: https://docs.gns3.com/docs/using-gns3/beginners/switching-and-gns3/#using-a-c3725-as-an-etherswitch-router)
 
-Use FastEthernet0/0 or FastEthernet0/1 (they are routed ports, not switchports)
-
+Remember, "The first two FastEthernet ports (fa0/0 and fa0/1) provided by that GT96100-FE are routed ports only! This is by design, and they cannot be used as switchports. If you left the default NM-16ESW adapter installed in slot 1, the switchports will be interfaces fa1/0 and go through fa1/15".
 
 Configure the router:
 Method 1 (auto)

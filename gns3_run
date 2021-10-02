@@ -20,7 +20,7 @@ done
 # Get sudo password
 read -r -s -p "[sudo] sudo password for $(whoami): " s_pass
 echo
-echo "Configuring network..."
+echo "Configuring the network..."
 # Configure the bridge
 echo "$s_pass" | sudo -S ip link add br0 type bridge &> /dev/null # Create the bridge
 sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
