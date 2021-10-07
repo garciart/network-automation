@@ -322,3 +322,9 @@ Type RuntimeError: "Cannot download startup-config from device using TFTP." in /
 2021-10-02 04:26:51,427UTC: CRITICAL:root:
 Type RuntimeError: "Cannot connect to console port." in /home/gns3user/Automation/labs/lab000-combo.py at line 110.
 
+2021-10-06 14:45:14,015UTC: CRITICAL:root:
+Type RuntimeError: "The filepath must start with /var/lib/tftpboot and the file to upload must be in that directory." in /home/gns3user/Automation/labs/lab000-combo.py at line 307.
+
+2021-10-06 21:21:46,012UTC: CRITICAL:root:
+Type RuntimeError: "Cannot download test.txt from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 284.
+
