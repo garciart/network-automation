@@ -328,3 +328,36 @@ Type RuntimeError: "The filepath must start with /var/lib/tftpboot and the file 
 2021-10-06 21:21:46,012UTC: CRITICAL:root:
 Type RuntimeError: "Cannot download test.txt from device using TFTP." in /home/gns3user/Automation/labs/lab000-combo.py at line 284.
 
+2021-10-24 19:24:25,262UTC: CRITICAL:root:
+Type RuntimeError: "Unable to ping -c 4 255.255.255.0: PING 255.255.255.0 (255.255.255.0) 56(84) bytes of data.
+
+--- 255.255.255.0 ping statistics ---
+4 packets transmitted, 0 received, 100% packet loss, time 3011ms" in /home/gns3user/Automation/labs/cisco_test.py at line 199.
+
+2021-10-24 19:42:44,113UTC: CRITICAL:root:
+Type RuntimeError: "Invalid port number." in /home/gns3user/Automation/labs/cisco_test.py at line 51.
+
+2021-10-24 19:43:14,428UTC: CRITICAL:root:
+Type RuntimeError: "Invalid port number." in /home/gns3user/Automation/labs/cisco_test.py at line 51.
+
+2021-10-24 19:43:57,656UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco_test.py at line 58.
+
+2021-10-24 20:03:04,553UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-24 20:31:51,405UTC: CRITICAL:root:
+Type ValueError: "Argument contains an invalid IP address: None" in /home/gns3user/Automation/labs/cisco.py at line 35.
+
+2021-10-24 20:39:56,636UTC: CRITICAL:root:
+Type AttributeError: "'bool' object has no attribute 'strip'" in /home/gns3user/Automation/labs/cisco.py at line 53.
+
+2021-10-24 20:51:29,765UTC: CRITICAL:root:
+Type TypeError: "assign_device_ip_addr() takes exactly 4 arguments (3 given)" in /home/gns3user/Automation/labs/cisco_test.py at line 32.
+
+2021-10-24 21:01:03,098UTC: CRITICAL:root:
+Type TypeError: "download_file_tftp() takes at least 3 arguments (2 given)" in /home/gns3user/Automation/labs/cisco_test.py at line 34.
+
+2021-10-24 21:01:58,733UTC: CRITICAL:root:
+Type ValueError: "Valid device file system (flash:, slot0:, etc.) not specified." in /home/gns3user/Automation/labs/cisco.py at line 236.
+

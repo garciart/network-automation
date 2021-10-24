@@ -120,25 +120,24 @@ def error_message(exc_info, **options):
         # CalledProcessError object unless the shell option is set to True, which is unsafe due
         # to potential shell injections.
         # https://docs.python.org/2/library/subprocess.html#subprocess.check_output
-
         e_value = "'{0}' failed: {1}".format(cpe.cmd, cpe.output)
 
+    # Move up the error stack to retrieve the function or method where the error or exception actually occurred,
+    # instead of the line number where the function or method was called.
+    if e_traceback.tb_next is not None:
+        e_traceback = e_traceback.tb_next
     # Return the formatted message for logging
     # Start with a linefeed to avoid tailing device OS messages
     # Error message format:
     # - e_type: Type of error.
     # - e_value: Error message.
     # - e_traceback.tb_frame.f_code.co_filename: The name of the file that caused the error.
-    # - e_traceback.tb_lineno: The line number where the error occurred. The ternary operator
-    #     checks if tb_next exists; if so, it moves up the error stack to retrieve the line
-    #     number where the error or exception actually occurred in a function or method,
-    #     instead of the line number where the function or method was called.
+    # - e_traceback.tb_lineno: The line number where the error occurred.
     msg = ("\nType {0}: \"{1}\" in {2} at line {3}.\n".format(
         e_type.__name__,
         e_value,
         e_traceback.tb_frame.f_code.co_filename,
-        e_traceback.tb_lineno if e_traceback.tb_next is None
-        else e_traceback.tb_next.tb_lineno))
+        e_traceback.tb_lineno))
     log_message(msg, level=logging.ERROR)
     return msg
 
