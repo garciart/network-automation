@@ -22,26 +22,15 @@ class Cisco:
     _PROMPT_LIST = ["R1>", "R1#", "R1(config)", "R1(config-if)", "R1(config-router)", "R1(config-line)", ]
     _FILE_SYSTEM_PREFIX = ["startup-config", "running-config", "nvram", "flash", "slot", ]
 
-    def __init__(self, device_ip_addr=None, host_ip_addr=None, gateway_ip_addr=None, subnet_mask=None):
+    def __init__(self):
         """Class instantiation.
 
-        :param str device_ip_addr: The device's IP address.
-        :param str host_ip_addr: The host's IP address.
-        :param str gateway_ip_addr: The network gateway IP address.
-        :param str subnet_mask: The subnet mask for the network.
         :return: None
         :rtype: None
         """
-        self._device_ip_addr = device_ip_addr if device_ip_addr is not None and validate_ip_address(
-            device_ip_addr) else None
-        self._host_ip_addr = host_ip_addr if host_ip_addr is not None and validate_ip_address(
-            host_ip_addr) else None
-        self._gateway_ip_addr = gateway_ip_addr if gateway_ip_addr is not None and validate_ip_address(
-            gateway_ip_addr) else None
-        self._subnet_mask = subnet_mask if subnet_mask is not None and validate_subnet_mask(
-            subnet_mask) else None
+        pass
 
-    def connect_via_telnet(self, device_ip_addr=None, port_number=23):
+    def connect_via_telnet(self, device_ip_addr, port_number=23):
         """Connect to the device via Telnet.
 
         :param str device_ip_addr: The IP address that will be used to connect to the device.
@@ -53,8 +42,7 @@ class Cisco:
         """
         print("Connecting to device using Telnet...")
         # Validate arguments
-        device_ip_addr = device_ip_addr if device_ip_addr is not None and validate_ip_address(
-            device_ip_addr) else self._device_ip_addr
+        validate_ip_address(device_ip_addr)
         validate_port_number(port_number)
         # Open Telnet connection port
         run_cli_commands(["sudo firewall-cmd --zone=public --add-port=23/tcp", ])
@@ -149,7 +137,7 @@ class Cisco:
         child.expect_exact("(0 bytes used)")
         print("Flash memory formatted: {0}".format(str(child.before).splitlines()[-1]))
 
-    def assign_device_ip_addr(self, child, new_device_ip_addr, subnet_mask=None):
+    def assign_device_ip_addr(self, child, new_device_ip_addr, subnet_mask):
         """Configure a device for Ethernet (Layer 3) connections.
 
         :param pexpect.spawn child: The connection in a child application object.
@@ -162,7 +150,6 @@ class Cisco:
         print("Configuring device for Ethernet (Layer 3) connections...")
         # Validate arguments
         validate_ip_address(new_device_ip_addr)
-        subnet_mask = self._subnet_mask if subnet_mask is None else subnet_mask
         validate_subnet_mask(subnet_mask)
         self._reset_prompt(child)
         # Enter Global Configuration mode
@@ -180,10 +167,9 @@ class Cisco:
         child.expect_exact("R1(config-if)#")
         child.sendline("end\r")
         child.expect_exact("R1#")
-        self._device_ip_addr = new_device_ip_addr
         print("Device configured for Ethernet (Layer 3) connections.")
 
-    def check_l3_connectivity(self, child, host_ip_addr=None, device_ip_addr=None):
+    def check_l3_connectivity(self, child, host_ip_addr, device_ip_addr):
         """Check connectivity between devices using ping.
 
         :param pexpect.spawn child: The connection in a child application object.
@@ -195,8 +181,6 @@ class Cisco:
         """
         print("Checking connectivity...")
         # Validate arguments
-        host_ip_addr = self._host_ip_addr if host_ip_addr is None else host_ip_addr
-        device_ip_addr = self._device_ip_addr if device_ip_addr is None else device_ip_addr
         validate_ip_address(host_ip_addr)
         validate_ip_address(device_ip_addr)
         self._reset_prompt(child)
@@ -215,7 +199,7 @@ class Cisco:
             run_cli_commands([cmd, ])
         print("Connectivity check is good.")
 
-    def download_file_tftp(self, child, device_filepath, host_ip_addr=None, new_filename=None):
+    def download_file_tftp(self, child, device_filepath, host_ip_addr, new_filename=None):
         """Download a file from a device using TFTP.
 
         Developer Note: TFTP must be installed: i.e., sudo yum -y install tftp tftp-server
@@ -230,15 +214,14 @@ class Cisco:
         """
         print("Downloading {0} over TFTP...".format(device_filepath))
         # Validate arguments
-        host_ip_addr = self._host_ip_addr if host_ip_addr is None else host_ip_addr
-        validate_ip_address(host_ip_addr)
         if not device_filepath.startswith(tuple(self._FILE_SYSTEM_PREFIX)):
             raise ValueError("Valid device file system (flash:, slot0:, etc.) not specified.")
-        self._reset_prompt(child)
-        # Ensure parameters are valid. Do not use os.path.basename; you are downloading from the device,
+        validate_ip_address(host_ip_addr)
+        # Do not use os.path.basename; you are downloading from the device,
         # and it may use a different format from Linux
         new_filename = device_filepath.rsplit('/', 1)[-1] if new_filename is None else new_filename.lstrip(
             "/").replace("var/lib/tftpboot", "").lstrip("/")
+        self._reset_prompt(child)
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
             "sudo mkdir --parents --verbose /var/lib/tftpboot",
@@ -248,7 +231,6 @@ class Cisco:
             "sudo systemctl enable tftp",
             "sudo systemctl start tftp",
         ])
-        cmd = "copy {0} tftp://{1}/{2}\r".format(device_filepath, host_ip_addr, new_filename)
         child.sendline("copy {0} tftp://{1}/{2}\r".format(device_filepath, host_ip_addr, new_filename))
         child.expect_exact("Address or name of remote host")
         child.sendline("\r")
@@ -264,7 +246,7 @@ class Cisco:
         ])
         print("File downloaded to /var/lib/tftpboot/{0}.".format(new_filename))
 
-    def upload_file_tftp(self, child, upload_filepath, host_ip_addr=None, new_filename=None):
+    def upload_file_tftp(self, child, upload_filepath, host_ip_addr, new_filename=None):
         """Upload a file to a device using TFTP. The file will be saved in the flash file system (i.e., flash:/foo.txt),
         unless prefixed by another file system (i.e., slot0:/bar.txt)
 
@@ -280,13 +262,12 @@ class Cisco:
         """
         print("Uploading {0} over TFTP...".format(os.path.basename(upload_filepath)))
         # Validate arguments
-        host_ip_addr = self._host_ip_addr if host_ip_addr is None else host_ip_addr
-        validate_ip_address(host_ip_addr)
-        if new_filename and not new_filename.startswith(tuple(self._FILE_SYSTEM_PREFIX)):
-            raise ValueError("Valid device file system (flash:, slot0:, etc.) not specified.")
         if not upload_filepath.lstrip("/").startswith("var/lib/tftpboot"):
             raise RuntimeError(
                 "The filepath must start with /var/lib/tftpboot and the file to upload must be in that directory.")
+        validate_ip_address(host_ip_addr)
+        if new_filename and not new_filename.startswith(tuple(self._FILE_SYSTEM_PREFIX)):
+            raise ValueError("Valid device file system (flash:, slot0:, etc.) not specified.")
         self._reset_prompt(child)
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
@@ -301,14 +282,12 @@ class Cisco:
             print("No file system specified. Uploading to flash:/")
         new_filename = upload_filepath.rsplit('/', 1)[-1] if new_filename is None else new_filename
         # Remove /var/lib/tftpboot/ from upload_filepath; copy will automatically use /var/lib/tftpboot/
-        cmd = "copy tftp://{0}/{1} {2}\r".format(
-            host_ip_addr, upload_filepath.replace("/var/lib/tftpboot/", ""), new_filename)
         child.sendline("copy tftp://{0}/{1} {2}\r".format(
             host_ip_addr, upload_filepath.replace("/var/lib/tftpboot/", ""), new_filename))
         child.expect_exact("Destination filename")
         child.sendline("\r")
         index = child.expect_exact(["Error", "bytes copied in", "Do you want to over write", ])
-        # Check for over write message first
+        # Check for over write message first, but leave "Error" at index 0
         if index == 2:
             child.sendline("\r")
             index = child.expect_exact(["Error", "bytes copied in", ])
@@ -321,13 +300,58 @@ class Cisco:
         ])
         print("{0} uploaded.".format(os.path.basename(new_filename)))
 
+    def update_configuration(self, child):
+        """Save changes to the running configuration (e.g., IP address, etc.) to the device's default startup
+        configuration.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+          expected result (raised from the pexpect module).
+        """
+        print("Updating the device's startup configuration...")
+        self._reset_prompt(child)
+        child.sendline("copy running-config startup-config\r")
+        index = child.expect_exact(["Error", "[OK]", "Destination filename [startup-config]?", ])
+        # Check for destination filename message first, but leave "Error" at index 0
+        if index == 2:
+            child.sendline("\r")
+            time.sleep(1)
+            index = child.expect_exact(["Error", "[OK]", ])
+        if index == 0:
+            raise RuntimeError("Cannot update startup configuration.")
+        print("Startup configuration updated.")
+
+    def restore_configuration(self, child):
+        """Restore configuration from back-up. Backup must exist in the device's flash file system.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+          expected result (raised from the pexpect module).
+        """
+        print("Restoring the device's startup configuration...")
+        self._reset_prompt(child)
+        child.sendline("copy startup-config.bak startup-config\r")
+        index = child.expect_exact(["Error", "[OK]", "Destination filename [startup-config]?", ])
+        # Check for destination filename message first, but leave "Error" at index 0
+        if index == 2:
+            child.sendline("\r")
+            time.sleep(1)
+            index = child.expect_exact(["Error", "[OK]", ])
+        if index == 0:
+            raise RuntimeError("Cannot restore startup configuration.")
+        print("Startup configuration restored.")
+
     def _reset_prompt(self, child):
         """Resets the prompt to Privileged EXEC mode on Cisco devices.
 
         Check for a prompt:
              * "R1>" (User EXEC mode)
              * "R1#" (Privileged EXEC Mode)
-             * "R1(" (Any Global Configuration mode: R1(config)#, R1(vlan)#, etc.)
+             * "R1(*)" (Any Global Configuration mode: R1(config)#, R1(vlan)#, etc.)
         Then set to Privileged EXEC Mode using the "enable" or "end" commands.
 
         :param pexpect.spawn child: The connection in a child application object.

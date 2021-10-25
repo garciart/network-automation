@@ -361,3 +361,18 @@ Type TypeError: "download_file_tftp() takes at least 3 arguments (2 given)" in /
 2021-10-24 21:01:58,733UTC: CRITICAL:root:
 Type ValueError: "Valid device file system (flash:, slot0:, etc.) not specified." in /home/gns3user/Automation/labs/cisco.py at line 236.
 
+2021-10-25 01:01:12,531UTC: CRITICAL:root:
+Type ValueError: "Argument contains an invalid IPv4 address: flash:/startup-config.bak" in /home/gns3user/Automation/labs/cisco.py at line 268.
+
+2021-10-25 02:15:30,728UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "Error", found """ in /home/gns3user/Automation/labs/cisco.py at line 316.
+
+2021-10-25 02:18:31,708UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "Error", found "(520 bytes/sec)"" in /home/gns3user/Automation/labs/cisco.py at line 316.
+
+2021-10-25 02:20:25,935UTC: CRITICAL:root:
+Type RuntimeError: "Cannot update startup configuration." in /home/gns3user/Automation/labs/cisco.py at line 322.
+
+2021-10-25 02:22:14,759UTC: CRITICAL:root:
+Type RuntimeError: "Cannot update startup configuration." in /home/gns3user/Automation/labs/cisco.py at line 322.
+
