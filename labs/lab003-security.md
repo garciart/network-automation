@@ -101,7 +101,7 @@ will receive a ```Password required, but none set``` error.
 
 ```
 R1#configure terminal ; Or 'conf t'
-R1(config)#; Set cisco as the User EXEC mode password (do not add comments to passwords)
+R1(config)#; Set cisco as the Privileged EXEC mode password (do not add comments to passwords)
 R1(config)#enable password cisco
 R1(config)#line console 0 ; Enter configuration mode for the console port
 R1(config-line)#; Set cisco as the console terminal password (do not add comments to passwords)

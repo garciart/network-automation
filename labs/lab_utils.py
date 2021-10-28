@@ -106,14 +106,13 @@ def error_message(exc_info, **options):
         # For pexpect.expect-type calls...
         else:
             # Log what was actually found during the pexpect call
-            pattern = r"\nsearcher:(.*):\n\s+0: "
-            _, _, tail = re.split(pattern, str(pex))
-            e_value = "Expected {0}, found \"{1}\"".format(
-                tail.split("\n")[0].strip("\r\n"),
-                str(pex).split("before (last 100 chars): ")[1].split("\n")[0].strip("\r\n")
+            e_value = "Expected {0}, found \"{1}".format(
+                str(pex).split("searcher: ")[1].split("buffer (last 100 chars):")[0],
+                str(pex).split("before (last 100 chars): ")[1].split("after:")[0]
             )
             # Remove any unwanted escape characters here, like backspaces, etc.
-        e_value = re.sub("[\b]", "", e_value)
+        # e_value = re.sub("[\b\r\n]", " ", e_value).replace("  ", " ")
+        e_value = " ".join(e_value.replace("\b", "").split())
     elif cpe.output:
         # This code is for subprocess.CalledProcessError. In Python 2.7, subprocess only
         # returns the reason for a non-zero return code (i.e., the CLI's response) in a
