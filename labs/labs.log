@@ -376,3 +376,265 @@ Type RuntimeError: "Cannot update startup configuration." in /home/gns3user/Auto
 2021-10-25 02:22:14,759UTC: CRITICAL:root:
 Type RuntimeError: "Cannot update startup configuration." in /home/gns3user/Automation/labs/cisco.py at line 322.
 
+2021-10-26 02:30:17,563UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 53.
+
+2021-10-26 02:34:08,810UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 53.
+
+2021-10-26 02:59:26,883UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect to console port." in /home/gns3user/Automation/labs/cisco_test.py at line 36.
+
+2021-10-26 03:09:01,145UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 53.
+
+2021-10-26 03:12:17,061UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 53.
+
+2021-10-26 03:17:33,841UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:22:28,056UTC: CRITICAL:root:
+Type RuntimeError: "Cannot upload /var/lib/tftpboot/startup-config-211026032043Z to device using TFTP." in /home/gns3user/Automation/labs/cisco.py at line 296.
+
+2021-10-26 03:24:14,910UTC: CRITICAL:root:
+Type RuntimeError: "Cannot update startup configuration." in /home/gns3user/Automation/labs/cisco.py at line 324.
+
+2021-10-26 03:25:11,856UTC: CRITICAL:root:
+Type RuntimeError: "Cannot upload /var/lib/tftpboot/startup-config-211026032506Z to device using TFTP." in /home/gns3user/Automation/labs/cisco.py at line 296.
+
+2021-10-26 03:27:19,547UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect to console port." in /home/gns3user/Automation/labs/cisco_test.py at line 37.
+
+2021-10-26 03:32:15,096UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:38:32,116UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:38:52,770UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:39:07,723UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:42:32,378UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 03:43:16,609UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 50.
+
+2021-10-26 03:43:56,357UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 03:45:13,722UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 03:47:39,791UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 03:48:44,241UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 03:51:48,564UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 04:19:31,177UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 56.
+
+2021-10-26 04:23:07,901UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 56.
+
+2021-10-26 04:24:03,842UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 04:26:31,987UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 04:31:47,973UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 54.
+
+2021-10-26 04:33:15,811UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-26 04:36:43,656UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-26 04:42:39,621UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-26 04:49:40,866UTC: CRITICAL:root:
+Type TIMEOUT: "Expected EOF, found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 52.
+
+2021-10-26 04:54:16,519UTC: CRITICAL:root:
+Type AttributeError: "'NoneType' object has no attribute 'expect_exact'" in /home/gns3user/Automation/labs/cisco_test.py at line 33.
+
+2021-10-26 04:58:11,865UTC: CRITICAL:root:
+Type AttributeError: "'NoneType' object has no attribute 'expect_exact'" in /home/gns3user/Automation/labs/cisco_test.py at line 33.
+
+2021-10-26 05:04:01,104UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via console port." in /home/gns3user/Automation/labs/cisco_test.py at line 33.
+
+2021-10-26 05:06:24,133UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-26 05:17:27,968UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found """ in /home/gns3user/Automation/labs/cisco.py at line 58.
+
+2021-10-26 05:20:46,378UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 60.
+
+2021-10-27 20:07:05,684UTC: CRITICAL:root:
+Type EOF: "Expected "R1>", found "Trying 192.168.1.1..."" in /home/gns3user/Automation/labs/cisco.py at line 60.
+
+2021-10-27 20:09:42,173UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 20:11:16,160UTC: CRITICAL:root:
+Type OSError: "[Errno 9] Bad file descriptor" in /home/gns3user/Automation/labs/cisco.py at line 277.
+
+2021-10-27 20:22:32,653UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 20:30:58,715UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 20:48:27,516UTC: CRITICAL:root:
+Type RuntimeError: "Cannot upload /var/lib/tftpboot/startup-config-211027204822Z to device using TFTP." in /home/gns3user/Automation/labs/cisco.py at line 301.
+
+2021-10-27 20:51:19,518UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "Error", found "ation filename [startup-config.bak]? "" in /home/gns3user/Automation/labs/cisco.py at line 322.
+
+2021-10-27 20:55:38,558UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 21:02:26,605UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 21:04:11,978UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 57.
+
+2021-10-27 23:54:34,928UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via console port." in /home/gns3user/Automation/labs/cisco_test.py at line 31.
+
+2021-10-28 00:49:22,867UTC: CRITICAL:root:
+Type OSError: "[Errno 9] Bad file descriptor" in /home/gns3user/Automation/labs/cisco.py at line 77.
+
+2021-10-28 01:22:23,028UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "enable, found """ in /home/gns3user/Automation/labs/cisco.py at line 103.
+
+2021-10-28 01:26:07,936UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "otocol on Interface FastEthernet0/1, changed state to down"" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 01:29:05,085UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "ilable"" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 01:34:23,252UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "able"" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:17:52,252UTC: WARNING:root:Script /home/gns3user/Automation/labs/lab_utils.py cannot be run independently from this application.
+2021-10-28 02:24:21,156UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via console port." in /home/gns3user/Automation/labs/cisco_test.py at line 30.
+
+2021-10-28 02:39:30,234UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "vailable
+
+
+
+
+
+Press RETURN to get started.
+
+
+
+
+
+
+User Access Verification
+
+Password: "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:41:11,900UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found " now available
+
+
+
+
+
+Press RETURN to get started.
+
+
+
+User Access Verification
+
+Password: "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:46:21,421UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "ilable......Press RETURN to get started.........User Access Verification..Password: ."" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:48:51,457UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "    Press RETURN to get started.             User Access Verification  Password:  "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:55:26,256UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "Press RETURN to get started.User Access VerificationPassword: "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 02:59:30,984UTC: CRITICAL:root:
+Type TIMEOUT: "Expected "R1>", found "  Press RETURN to get started.                                User Access Verification    Password:  "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:02:30,793UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string:     0: "R1>"     1: "R1#"     2: "R1(config)"     3: "R1(config-if)"     4: "R1(config-router)"     5: "R1(config-line)" , found "otocol on Interface FastEthernet0/1, changed state to down    User Access Verification    Password:  "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:05:54,288UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string:     0: "R1>"     1: "R1#"     2: "R1(config)"     3: "R1(config-if)"     4: "R1(config-router)"     5: "R1(config-line)" , found "      Press RETURN to get started.                            User Access Verification    Password:  "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:07:55,103UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string:   0: "R1>"   1: "R1#"   2: "R1(config)"   3: "R1(config-if)"   4: "R1(config-router)"   5: "R1(config-line)" , found "ow available      Press RETURN to get started.     User Access Verification  Password: "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:20:19,540UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found "otocol on Interface FastEthernet0/1, changed state to down User Access Verification Password: "" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:26:06,113UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found " available Press RETURN to get started. User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 64.
+
+2021-10-28 03:30:38,678UTC: CRITICAL:root:
+Type EOF: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found "" in /home/gns3user/Automation/labs/cisco.py at line 101.
+
+2021-10-28 03:31:09,001UTC: CRITICAL:root:
+Type EOF: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found "" in /home/gns3user/Automation/labs/cisco.py at line 101.
+
+2021-10-28 03:37:18,084UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found "otocol on Interface FastEthernet0/1, changed state to down User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 101.
+
+2021-10-28 03:57:43,025UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: " R1# R1# R1#" , found " Press RETURN to get started. User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 106.
+
+2021-10-28 04:00:10,311UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: " R1# R1# R1#" , found " Press RETURN to get started. User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 106.
+
+2021-10-28 04:02:22,539UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: " R1# R1# R1#" , found " now available Press RETURN to get started. User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 106.
+
+2021-10-28 04:08:12,524UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1#" , found "" in /home/gns3user/Automation/labs/cisco.py at line 104.
+
+2021-10-28 04:13:20,531UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 04:18:03,458UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 04:20:12,495UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "Press RETURN to get started" 1: "Password:" 2: EOF 3: "R1>" 4: "R1#" 5: "R1(config)" 6: "R1(config-if)" 7: "R1(config-router)" 8: "R1(config-line)" , found "x HW Table --More-- R1#show q zz XDTUEMRBM pp" in /home/gns3user/Automation/labs/cisco.py at line 59.
+
+2021-10-28 04:24:44,003UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "Press RETURN to get started" 1: "Password:" 2: EOF 3: "R1>" 4: "R1#" 5: "R1(config)" 6: "R1(config-if)" 7: "R1(config-router)" 8: "R1(config-line)" , found "00:00:05.623: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down" in /home/gns3user/Automation/labs/cisco.py at line 59.
+
+2021-10-28 04:28:00,609UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 04:32:47,832UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 04:37:01,829UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
