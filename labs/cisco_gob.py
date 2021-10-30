@@ -78,12 +78,13 @@ def main():
     child.expect_exact(PROMPT_LIST[1])
 
     print("Getting device information...")
+
+    # Ask for the device info first, and then set the device's time to move the device info
+    # into the 'before' buffer (weird pexpect issue)
     child.sendline("show version | include [IOSios] [Ss]oftware\r")
     child.expect_exact(PROMPT_LIST[1])
 
-    timestamp = datetime.utcnow().strftime("%H:%M:%S %d %b %Y")
-    child.sendline("clock set {0}\r".format(timestamp))
-    child.expect_exact("{0}clock set {1}\r".format(PROMPT_LIST[1], timestamp))
+    child = set_clock(child)
 
     # Look for the text between the two carriage returns
     _software_ver = str(
@@ -95,9 +96,7 @@ def main():
     child.sendline("show inventory | include [Cc]hassis\r")
     child.expect_exact(PROMPT_LIST[1])
 
-    timestamp = datetime.utcnow().strftime("%H:%M:%S %d %b %Y")
-    child.sendline("clock set {0}\r".format(timestamp))
-    child.expect_exact("{0}clock set {1}\r".format(PROMPT_LIST[1], timestamp))
+    child = set_clock(child)
 
     _device_name = str(
         child.before).split("show inventory | include [Cc]hassis\r")[1].split("\r")[0].strip()
@@ -108,15 +107,14 @@ def main():
     child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
     child.expect_exact(PROMPT_LIST[1])
 
-    timestamp = datetime.utcnow().strftime("%H:%M:%S %d %b %Y")
-    child.sendline("clock set {0}\r".format(timestamp))
-    child.expect_exact("{0}clock set {1}\r".format(PROMPT_LIST[1], timestamp))
+    child = set_clock(child)
 
     _serial_num = str(
         child.before).split("show version | include [Pp]rocessor [Bb]oard [IDid]\r")[1].split("\r")[0].strip()
     if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(_serial_num):
         raise RuntimeError("Cannot get the device's serial number.")
     print("- Serial number: {0}".format(_serial_num))
+
     print("Closing telnet connection...")
     child.sendline("disable\r")
     # time.sleep(1)
@@ -130,6 +128,21 @@ def main():
     run_cli_commands(
         ["sudo firewall-cmd --zone=public --remove-port=23/tcp", ], "gns3user\r")
     print("Telnet connection closed.")
+
+
+def set_clock(child, timestamp=None):
+    """Set the device's clock.
+
+    :param pexpect.spawn child: The connection in a child application object.
+    :param datetime timestamp: A datetime tuple (year, month, day, hour, minute, second).
+    :returns: The updated connection in a child application object.
+    :rtype: pexpect.spawn
+    """
+    if not timestamp:
+        timestamp = datetime.utcnow()
+    child.sendline("clock set {0}\r".format(timestamp.strftime("%H:%M:%S %d %b %Y")))
+    child.expect_exact("{0}, configured from console by console".format(timestamp.strftime("%H:%M:%S UTC %a %b %d %Y")))
+    return child
 
 
 if __name__ == "__main__":

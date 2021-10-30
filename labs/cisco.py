@@ -100,7 +100,6 @@ class Cisco:
         """Close Telnet and disconnect from device.
 
         :param pexpect.spawn child: The connection in a child application object.
-
         :return: None
         :rtype: None
         """
@@ -115,6 +114,7 @@ class Cisco:
         # Close the Telnet child process
         child.close()
         # Close the firewall port
+        self._sudo_password = prompt_for_sudo_password()
         run_cli_commands(
             ["sudo firewall-cmd --zone=public --remove-port=23/tcp", ], self._sudo_password)
         print("Telnet connection closed.")
@@ -264,6 +264,7 @@ class Cisco:
         new_filename = device_filepath.rsplit('/', 1)[-1] if new_filename is None else new_filename.lstrip(
             "/").replace("var/lib/tftpboot", "").lstrip("/")
         self._reset_prompt(child)
+        self._sudo_password = prompt_for_sudo_password()
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
             "sudo mkdir --parents --verbose /var/lib/tftpboot",
@@ -281,6 +282,7 @@ class Cisco:
         index = child.expect_exact([self._COPIED_MSG, "Error", ], timeout=60)
         if index != 0:
             raise RuntimeError("Cannot download {0} from device using TFTP.".format(device_filepath))
+        self._sudo_password = prompt_for_sudo_password()
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
@@ -311,6 +313,7 @@ class Cisco:
         if new_filename and not new_filename.startswith(tuple(self._FILE_SYSTEM_PREFIX)):
             raise ValueError("Valid device file system (flash:, slot0:, etc.) not specified.")
         self._reset_prompt(child)
+        self._sudo_password = prompt_for_sudo_password()
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
             "sudo chmod 777 --verbose /var/lib/tftpboot/",
@@ -335,6 +338,7 @@ class Cisco:
             index = child.expect_exact(["Error", self._COPIED_MSG, ])
         if index == 0:
             raise RuntimeError("Cannot upload {0} to device using TFTP.".format(upload_filepath))
+        self._sudo_password = prompt_for_sudo_password()
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
