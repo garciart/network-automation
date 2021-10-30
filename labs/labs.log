@@ -638,3 +638,215 @@ Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cis
 2021-10-28 04:37:01,829UTC: CRITICAL:root:
 Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
 
+2021-10-28 14:52:28,229UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)" 3: "R1(config-if)" 4: "R1(config-router)" 5: "R1(config-line)" , found "# R1(config)#" in /home/gns3user/Automation/labs/cisco.py at line 379.
+
+2021-10-28 15:00:46,583UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 15:08:26,154UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 112.
+
+2021-10-28 15:13:15,462UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 112.
+
+2021-10-28 15:15:52,746UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 113.
+
+2021-10-28 15:20:36,512UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 113.
+
+2021-10-28 15:27:42,273UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 115.
+
+2021-10-28 15:29:06,239UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 15:34:07,790UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 15:39:34,944UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 113.
+
+2021-10-28 15:53:50,070UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 115.
+
+2021-10-28 15:57:15,999UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 115.
+
+2021-10-28 16:01:23,448UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-28 16:05:20,581UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-28 16:06:33,998UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-28 16:08:43,377UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 125.
+
+2021-10-28 16:12:47,158UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 127.
+
+2021-10-28 16:14:19,171UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 127.
+
+2021-10-28 16:17:09,518UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 127.
+
+2021-10-28 16:22:07,067UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-28 16:23:27,999UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 16:30:45,818UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 16:38:19,622UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 16:48:18,342UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 117.
+
+2021-10-28 16:53:10,788UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 117.
+
+2021-10-28 17:07:03,587UTC: CRITICAL:root:
+Type IOError: "[Errno 2] No such file or directory: '/home/gns3user/Automation/labs/c3745.log'" in /home/gns3user/Automation/labs/cisco_test.py at line 27.
+
+2021-10-28 17:09:05,337UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 117.
+
+2021-10-28 19:23:01,482UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: EOF 1: "Press RETURN to get started" 2: "Password:" 3: "R1>" 4: "R1#" 5: "R1(config)#" 6: "R1(config-if)#" 7: "R1(config-router)#" 8: "R1(config-line)#" , found "." in /home/gns3user/Automation/labs/cisco.py at line 59.
+
+2021-10-28 19:33:57,682UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 61.
+
+2021-10-28 19:35:01,618UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 61.
+
+2021-10-28 19:35:33,625UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 61.
+
+2021-10-28 19:48:00,094UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 110.
+
+2021-10-28 19:50:29,836UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 110.
+
+2021-10-28 19:58:28,961UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo firewall-cmd --zone=public --add-port=23/tcp: [sudo] password for gns3user:" in /home/gns3user/Automation/labs/cisco.py at line 50.
+
+2021-10-28 19:59:05,464UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 110.
+
+2021-10-28 20:15:01,833UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 110.
+
+2021-10-28 20:18:24,162UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 20:18:56,838UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 20:26:32,152UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 21:17:49,458UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 21:22:16,053UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: EOF , found "ftware, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1# R1#" in /home/gns3user/Automation/labs/cisco.py at line 111.
+
+2021-10-28 21:28:31,609UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-28 22:07:57,061UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-29 01:46:47,481UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: EOF 1: "Press RETURN to get started" 2: "Password:" 3: "R1>" 4: "R1#" 5: "R1(config)#" 6: "R1(config-if)#" 7: "R1(config-router)#" 8: "R1(config-line)#" , found "." in /home/gns3user/Automation/labs/cisco.py at line 63.
+
+2021-10-29 01:51:35,000UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-29 01:52:51,107UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 123.
+
+2021-10-29 02:09:59,267UTC: CRITICAL:root:
+Type TypeError: "object of type 'NoneType' has no len()" in /home/gns3user/Automation/labs/cisco.py at line 79.
+
+2021-10-29 02:20:26,201UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 02:32:57,388UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: ";START HERE (211029023150Z) " , found "wn command or computer name, or unable to find computer address R1#;START HERE (211029023150Z) R1#" in /home/gns3user/Automation/labs/cisco.py at line 114.
+
+2021-10-29 02:35:39,060UTC: CRITICAL:root:
+Type TypeError: "cannot concatenate 'str' and 'int' objects" in /home/gns3user/Automation/labs/cisco.py at line 114.
+
+2021-10-29 03:28:56,696UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 03:46:34,308UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's name." in /home/gns3user/Automation/labs/cisco.py at line 126.
+
+2021-10-29 03:59:54,664UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 04:00:16,509UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 04:01:30,343UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1>" 1: "R1#" 2: "R1(config)#" 3: "R1(config-if)#" 4: "R1(config-router)#" 5: "R1(config-line)#" , found ". User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 114.
+
+2021-10-29 04:09:10,476UTC: CRITICAL:root:
+Type TypeError: "bad operand type for unary +: 'list'" in /home/gns3user/Automation/labs/cisco.py at line 114.
+
+2021-10-29 04:11:18,096UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "R1#" , found " R1 con0 is now available Press RETURN to get started." in /home/gns3user/Automation/labs/cisco.py at line 116.
+
+2021-10-29 04:23:46,138UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 04:33:53,533UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 119.
+
+2021-10-29 18:33:41,985UTC: CRITICAL:root:
+Type RuntimeError: "Unable to sudo systemctl stop tftp: [sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+Sorry, try again.
+[sudo] password for gns3user: 
+sudo: 3 incorrect password attempts" in /home/gns3user/Automation/labs/cisco.py at line 328.
+
+2021-10-29 18:53:15,983UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "Error" 1: "[OK]" , found " R1 con0 is now available Press RETURN to get started." in /home/gns3user/Automation/labs/cisco.py at line 346.
+
+2021-10-29 18:55:56,887UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "Error" 1: "[OK]" , found " Press RETURN to get started. User Access Verification Password:" in /home/gns3user/Automation/labs/cisco.py at line 346.
+
+2021-10-29 19:01:34,233UTC: CRITICAL:root:
+Type RuntimeError: "Cannot connect via Telnet." in /home/gns3user/Automation/labs/cisco.py at line 71.
+
+2021-10-29 19:03:11,361UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "Address or name of remote host" , found "029190239 Z ^ % Invalid input detected at '^' marker. R1(config)#" in /home/gns3user/Automation/labs/cisco.py at line 264.
+
+2021-10-30 00:36:50,186UTC: CRITICAL:root:
+Type RuntimeError: "Cannot get the device's software version." in /home/gns3user/Automation/labs/cisco.py at line 136.
+
+2021-10-30 01:12:16,273UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: EOF , found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1#" in /home/gns3user/Automation/labs/cisco.py at line 135.
+
+2021-10-30 01:17:59,104UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 136.
+
+2021-10-30 01:24:59,349UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_re: 0: EOF , found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1#" in /home/gns3user/Automation/labs/cisco.py at line 135.
+
+2021-10-30 01:37:40,134UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_re: 0: EOF , found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1#" in /home/gns3user/Automation/labs/cisco.py at line 135.
+

@@ -15,14 +15,22 @@ import pexpect
 __author__ = "Rob Garcia"
 __license__ = "MIT"
 
-sudo_password = None
-enable_password = None
-vty_password = None
-
 
 class Cisco:
-    PROMPT_LIST = ["R1>", "R1#", "R1(config)", "R1(config-if)", "R1(config-router)", "R1(config-line)", ]
+    PROMPT_LIST = ["R1>", "R1#", "R1(config)#", "R1(config-if)#", "R1(config-router)#", "R1(config-line)#", ]
+
+    _ACCESS_CONFIG_CMD = "configure terminal\r"
+    _COPIED_MSG = "bytes copied in"
+    _ENCRYPT_CONFIG_CMD = "service password-encryption\r"
+    _EXIT_CMD = "exit\r"
     _FILE_SYSTEM_PREFIX = ["startup-config", "running-config", "nvram", "flash", "slot", ]
+    _PASSWORD_PROMPT = "Password:"
+    _SET_PASSWORD_CMD = "password {0}\r"
+    _REQUIRE_LOGIN_CMD = "login\r"
+
+    _sudo_password = None
+    _enable_password = None
+    _vty_password = None
 
     def __init__(self):
         """Class instantiation.
@@ -47,24 +55,43 @@ class Cisco:
         validate_ip_address(device_ip_addr)
         validate_port_number(port_number)
         # Open Telnet connection port
-        run_cli_commands(["sudo firewall-cmd --zone=public --add-port=23/tcp", ])
+        self._sudo_password = prompt_for_sudo_password()
+        run_cli_commands(
+            ["sudo firewall-cmd --zone=public --add-port=23/tcp", ], self._sudo_password)
         child = pexpect.spawn("telnet {0} {1}".format(device_ip_addr, port_number))
-        # Allow time for the startup messages to clear
-        time.sleep(5)
+        child.delaybeforesend = 1
         if not child:
             raise RuntimeError("Cannot connect via Telnet.")
-        prompts = ["Press RETURN to get started", "Password:", pexpect.EOF, ] + self.PROMPT_LIST
+        prompts = [pexpect.EOF, "Press RETURN to get started", self._PASSWORD_PROMPT, ] + self.PROMPT_LIST
         connected = False
+        already_configured = False
+        possible_active_session = True
         while not connected:
             index = child.expect_exact(prompts)
+            # If EOF with no prompts found
             if index == 0:
-                child.sendline("\r")
-            elif index == 1:
-                password = prompt_for_vty_password()
-                child.sendline(password)
-            elif index == 2:
                 raise RuntimeError("Cannot connect via Telnet.")
+            elif index == 1:
+                # "Press RETURN to get started" appears if the device was properly restarted or reloaded,
+                # clearing any artifacts from previous terminal sessions
+                possible_active_session = False
+                child.sendline("\r")
+                time.sleep(5)
+            elif index == 2:
+                # "Password" appears if the device has already been configured
+                self._vty_password = prompt_for_vty_password(self._vty_password)
+                already_configured = True
+                child.sendline(self._vty_password + "\r")
             else:
+                # You may be accessing an active VTY line if a prompt appears immediately
+                if possible_active_session:
+                    print("You may be accessing an open or uncleared virtual teletype session. \n" +
+                          "Output from previous commands may cause pexpect expect calls to fail. \n" +
+                          "We recommend you restart or reload this device to clear any artifacts. \n")
+                if already_configured:
+                    print("This device has already been configured and secured. Changes may be \n" +
+                          "incompatible with the current configuration. We recommend you reset \n" +
+                          "the device to the default configuration or upload a complete new configuration. \n")
                 connected = True
         print("Connected to device using Telnet.")
         return child
@@ -81,14 +108,15 @@ class Cisco:
         self._reset_prompt(child)
         child.sendline("disable\r")
         time.sleep(1)
-        child.expect_exact("R1>")
+        child.expect_exact(self.PROMPT_LIST[0])
         child.sendcontrol("]")
         child.sendline("q\r")
         child.expect_exact("Connection closed.")
         # Close the Telnet child process
         child.close()
         # Close the firewall port
-        run_cli_commands(["sudo firewall-cmd --zone=public --remove-port=23/tcp", ])
+        run_cli_commands(
+            ["sudo firewall-cmd --zone=public --remove-port=23/tcp", ], self._sudo_password)
         print("Telnet connection closed.")
 
     def get_device_info(self, child):
@@ -101,28 +129,27 @@ class Cisco:
           expected result (raised from the pexpect module).
         """
         print("Getting device information...")
-        self._reset_prompt(child)
-        # Reset pexpect cursor to multiple prompts in a row
-        child.sendline("\r\r\r")
-        child.expect_exact("\r\nR1#\r\nR1#\r\nR1#")
-
-        child.send("show version | include [IOSios] [Ss]oftware\r\n")
-        child.expect_exact("R1#", searchwindowsize=40)
-        _software_ver = str(child.before).splitlines()[1]
+        child = self._reset_prompt(child)
+        i = child.sendline("show version | include [IOSios] [Ss]oftware\r")
+        print(i)
+        t = child.read()
+        print(t)
+        child.expect_exact(self.PROMPT_LIST[1])
+        _software_ver = str(child.before).splitlines()[-1]
         if not re.compile(r"[IOSios] [Ss]oftware").search(_software_ver):
             raise RuntimeError("Cannot get the device's software version.")
         print("- Software version: {0}".format(_software_ver))
 
         child.sendline("show inventory | include [Cc]hassis\r")
-        child.expect_exact("R1#")
-        _device_name = str(child.before).splitlines()[1]
+        child.expect_exact(self.PROMPT_LIST[1])
+        _device_name = str(child.before).splitlines()[-1]
         if not re.compile(r"[Cc]hassis").search(_device_name):
             raise RuntimeError("Cannot get the device's name.")
         print("- Device name: {0}".format(_device_name))
 
         child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
-        child.expect_exact("R1#")
-        _serial_num = str(child.before).splitlines()[1]
+        child.expect_exact(self.PROMPT_LIST[1])
+        _serial_num = str(child.before).splitlines()[-1]
         if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(_serial_num):
             raise RuntimeError("Cannot get the device's serial number.")
         print("- Serial number: {0}".format(_serial_num))
@@ -168,20 +195,20 @@ class Cisco:
         validate_subnet_mask(subnet_mask)
         self._reset_prompt(child)
         # Enter Global Configuration mode
-        child.sendline("configure terminal\r")
-        child.expect_exact("R1(config)#")
+        child.sendline(self._ACCESS_CONFIG_CMD)
+        child.expect_exact(self.PROMPT_LIST[2])
         # Access Ethernet port
         child.sendline("interface FastEthernet0/0\r")
-        child.expect_exact("R1(config-if)#")
+        child.expect_exact(self.PROMPT_LIST[3])
         # Assign an IPv4 address and subnet mask
         child.sendline("ip address {0} {1}\r".format(new_device_ip_addr, subnet_mask))
-        child.expect_exact("R1(config-if)#")
+        child.expect_exact(self.PROMPT_LIST[3])
         # Bring the Ethernet port up
         child.sendline("no shutdown\r")
         time.sleep(1)
-        child.expect_exact("R1(config-if)#")
+        child.expect_exact(self.PROMPT_LIST[3])
         child.sendline("end\r")
-        child.expect_exact("R1#")
+        child.expect_exact(self.PROMPT_LIST[1])
         print("Device configured for Ethernet (Layer 3) connections.")
 
     def check_l3_connectivity(self, child, host_ip_addr, device_ip_addr):
@@ -202,7 +229,7 @@ class Cisco:
         # Ping the host from the device
         child.sendline("ping {0}\r".format(host_ip_addr))
         # Check for the fail condition first, since the child will always return a prompt
-        index = child.expect_exact(["Success rate is 0 percent", "R1#", ], timeout=60)
+        index = child.expect_exact(["Success rate is 0 percent", self.PROMPT_LIST[1], ], timeout=60)
         if index == 0:
             raise RuntimeError("Unable to ping the host from the device.")
         else:
@@ -245,20 +272,20 @@ class Cisco:
             "sudo chmod 777 --verbose /var/lib/tftpboot/{0}".format(new_filename),
             "sudo systemctl enable tftp",
             "sudo systemctl start tftp",
-        ])
+        ], self._sudo_password)
         child.sendline("copy {0} tftp://{1}/{2}\r".format(device_filepath, host_ip_addr, new_filename))
         child.expect_exact("Address or name of remote host")
         child.sendline("\r")
         child.expect_exact("Destination filename")
         child.sendline("\r")
-        index = child.expect_exact(["bytes copied in", "Error", ], timeout=60)
+        index = child.expect_exact([self._COPIED_MSG, "Error", ], timeout=60)
         if index != 0:
             raise RuntimeError("Cannot download {0} from device using TFTP.".format(device_filepath))
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
             "sudo firewall-cmd --zone=public --remove-service=tftp",
-        ])
+        ], self._sudo_password)
         print("File downloaded to /var/lib/tftpboot/{0}.".format(new_filename))
 
     def upload_to_device_tftp(self, child, upload_filepath, host_ip_addr, new_filename=None):
@@ -290,7 +317,7 @@ class Cisco:
             "sudo chmod 777 --verbose {0}".format(upload_filepath),
             "sudo systemctl enable tftp",
             "sudo systemctl start tftp",
-        ])
+        ], self._sudo_password)
         # Ensure parameters are valid. Do not use os.path.basename; you are uploading to the device, and it may use a
         # different format from Linux
         if new_filename is None:
@@ -301,18 +328,18 @@ class Cisco:
             host_ip_addr, upload_filepath.replace("/var/lib/tftpboot/", ""), new_filename))
         child.expect_exact("Destination filename")
         child.sendline("\r")
-        index = child.expect_exact(["Error", "bytes copied in", "Do you want to over write", ])
+        index = child.expect_exact(["Error", self._COPIED_MSG, "Do you want to over write", ])
         # Check for over write message first, but leave "Error" at index 0
         if index == 2:
             child.sendline("\r")
-            index = child.expect_exact(["Error", "bytes copied in", ])
+            index = child.expect_exact(["Error", self._COPIED_MSG, ])
         if index == 0:
             raise RuntimeError("Cannot upload {0} to device using TFTP.".format(upload_filepath))
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
             "sudo firewall-cmd --zone=public --remove-service=tftp",
-        ])
+        ], self._sudo_password)
         print("{0} uploaded.".format(os.path.basename(new_filename)))
 
     def update_startup_config(self, child):
@@ -369,7 +396,7 @@ class Cisco:
         """
         print("Securing Privileged EXEC mode...")
         self._reset_prompt(child)
-        child.sendline("configure terminal\r")
+        child.sendline(self._ACCESS_CONFIG_CMD)
         child.expect_exact(self.PROMPT_LIST[2])
         if encrypt:
             child.sendline("enable secret {0}\r".format(password))
@@ -394,21 +421,21 @@ class Cisco:
         print("Securing the console port...")
         self._reset_prompt(child)
         # Enter Global configuration mode
-        child.sendline("configure terminal\r")
+        child.sendline(self._ACCESS_CONFIG_CMD)
         child.expect_exact(self.PROMPT_LIST[2])
         # Enter configuration mode for the console port
         child.sendline("line console 0\r")
         child.expect_exact(self.PROMPT_LIST[5])
         # Set the console terminal password
-        child.sendline("password {0}\r".format(password))
+        child.sendline(self._SET_PASSWORD_CMD.format(password))
         child.expect_exact(self.PROMPT_LIST[5])
         # Require console terminal login
-        child.sendline("login\r")
+        child.sendline(self._REQUIRE_LOGIN_CMD)
         child.expect_exact(self.PROMPT_LIST[5])
         if encrypt:
-            child.sendline("exit\r")
+            child.sendline(self._EXIT_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
-            child.sendline("service password-encryption\r")
+            child.sendline(self._ENCRYPT_CONFIG_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
         self._reset_prompt(child)
         print("Console port secured.")
@@ -428,21 +455,21 @@ class Cisco:
         print("Securing the Auxiliary port...")
         self._reset_prompt(child)
         # Enter Global configuration mode
-        child.sendline("configure terminal\r")
+        child.sendline(self._ACCESS_CONFIG_CMD)
         child.expect_exact(self.PROMPT_LIST[2])
         # Enter configuration mode for the auxiliary port
         child.sendline("line aux 0\r")
         child.expect_exact(self.PROMPT_LIST[5])
         # Set the auxiliary terminal password
-        child.sendline("password {0}\r".format(password))
+        child.sendline(self._SET_PASSWORD_CMD.format(password))
         child.expect_exact(self.PROMPT_LIST[5])
         # Require auxiliary terminal login
-        child.sendline("login\r")
+        child.sendline(self._REQUIRE_LOGIN_CMD)
         child.expect_exact(self.PROMPT_LIST[5])
         if encrypt:
-            child.sendline("exit\r")
+            child.sendline(self._EXIT_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
-            child.sendline("service password-encryption\r")
+            child.sendline(self._ENCRYPT_CONFIG_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
         self._reset_prompt(child)
         print("Auxiliary port secured.")
@@ -463,21 +490,21 @@ class Cisco:
         print("Securing Virtual Teletype (vty) remote terminal access...")
         self._reset_prompt(child)
         # Enter Global configuration mode
-        child.sendline("configure terminal\r")
+        child.sendline(self._ACCESS_CONFIG_CMD)
         child.expect_exact(self.PROMPT_LIST[2])
         # Enter configuration mode for all 5 (0-4) VTY terminals
         child.sendline("line vty 0 4\r")
         child.expect_exact(self.PROMPT_LIST[5])
         # Set the VTY terminal password
-        child.sendline("password {0}\r".format(password))
+        child.sendline(self._SET_PASSWORD_CMD.format(password))
         child.expect_exact(self.PROMPT_LIST[5])
         # Require Telnet and SSH login
-        child.sendline("login\r")
+        child.sendline(self._REQUIRE_LOGIN_CMD)
         child.expect_exact(self.PROMPT_LIST[5])
         if encrypt:
-            child.sendline("exit\r")
+            child.sendline(self._EXIT_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
-            child.sendline("service password-encryption\r")
+            child.sendline(self._ENCRYPT_CONFIG_CMD)
             child.expect_exact(self.PROMPT_LIST[2])
         self._reset_prompt(child)
         print("Virtual Teletype (vty) remote terminal access secured.")
@@ -492,23 +519,33 @@ class Cisco:
         Then set to Privileged EXEC Mode using the "enable" or "end" commands.
 
         :param pexpect.spawn child: The connection in a child application object.
-        :return: None
-        :rtype: None
+        :return: The updated connection in a child application object.
+        :rtype: pexpect.spawn
         :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
           expected result (raised from the pexpect module).
         """
+        # child.sendline(self._EXIT_CMD)
+        # child.expect_exact(["Press RETURN to get started", ] + self.PROMPT_LIST)
         child.sendline("\r")
-        index = child.expect_exact(self.PROMPT_LIST, searchwindowsize=10)
+        index = child.expect_exact([self._PASSWORD_PROMPT, ] + self.PROMPT_LIST)
         if index == 0:
-            child.sendline("enable\r")
-            enable_index = child.expect_exact(["Password:", self.PROMPT_LIST[1]])
-            if enable_index == 0:
-                password = prompt_for_enable_password()
-                child.sendline(password)
-        elif index >= 1:
+            self._vty_password = prompt_for_vty_password(self._vty_password)
+            child.sendline(self._vty_password + "\r")
+            index = child.expect_exact(self.PROMPT_LIST)
+            if index == 0:
+                child.sendline("enable\r")
+                index = child.expect_exact([self._PASSWORD_PROMPT, ] + self.PROMPT_LIST)
+                if index == 0:
+                    self._enable_password = prompt_for_enable_password(self._enable_password)
+                    child.sendline(self._enable_password + "\r")
+                    child.expect_exact(self.PROMPT_LIST)
+        return child
+        """
+        elif index > 1:
             # "End" takes you back to Privileged EXEC Mode, while "exit" takes you back to the previous mode.
             child.sendline("end\r")
-        child.expect_exact(self.PROMPT_LIST[1])
+            child.expect_exact(self.PROMPT_LIST[1])
+        """
 
 
 def validate_ip_address(ip_address, ipv4_only=True):
@@ -589,9 +626,10 @@ def validate_port_number(port_number):
     return True
 
 
-def run_cli_commands(list_of_commands):
+def run_cli_commands(list_of_commands, sudo_password=None):
     """Use the command line interface with error detection.
 
+    :param str sudo_password: The sudo password, if it exists.
     :param list list_of_commands: The commands to execute.
     :return: None
     :rtype: None
@@ -599,45 +637,45 @@ def run_cli_commands(list_of_commands):
     """
     for c in list_of_commands:
         (command_output, exitstatus) = pexpect.run(c,
-                                                   events={"(?i)password": prompt_for_sudo_password()},
+                                                   events={"(?i)password": sudo_password},
                                                    withexitstatus=True)
         if exitstatus != 0:
             raise RuntimeError("Unable to {0}: {1}".format(c, command_output.strip()))
 
 
-def prompt_for_sudo_password():
-    """Allows running of sudo commands.
+def prompt_for_sudo_password(sudo_password=None):
+    """Prompts for a password to run sudo commands.
 
-    :return: The sudo password
+    :param str sudo_password: The sudo password, if it exists. If supplied, there will be no prompt.
+    :return: The sudo password received as an argument or from the prompt.
     :rtype: str
     """
-    global sudo_password
     if sudo_password is None:
-        sudo_password = getpass(prompt="SUDO password: ") + "\r\n"
+        sudo_password = getpass(prompt="SUDO password: ") + "\r"
     return sudo_password
 
 
-def prompt_for_enable_password():
-    """Allows access to Privileged EXEC mode.
+def prompt_for_enable_password(enable_password=None):
+    """Prompts for a password to access Privileged EXEC mode.
 
-    :return: The Privileged EXEC mode password
+    :param str enable_password: The enable password, if it exists. If supplied, there will be no prompt.
+    :return: The Privileged EXEC mode password received as an argument or from the prompt.
     :rtype: str
     """
-    global enable_password
     if enable_password is None:
-        enable_password = getpass(prompt="Privileged EXEC mode password: ") + "\r\n"
+        enable_password = getpass(prompt="Privileged EXEC mode password: ")
     return enable_password
 
 
-def prompt_for_vty_password():
-    """Allows access to the device's virtual teletype (VTY) remote terminal.
+def prompt_for_vty_password(vty_password=None):
+    """Prompts for a password to access the device's virtual teletype (VTY) remote terminal.
 
-    :return: The VTY terminal password
+    :param str vty_password: The virtual teletype (VTY) password, if it exists. If supplied, there will be no prompt.
+    :return: The VTY terminal password received as an argument or from the prompt.
     :rtype: str
     """
-    global vty_password
     if vty_password is None:
-        vty_password = getpass(prompt="VTY terminal password: ") + "\r\n"
+        vty_password = getpass(prompt="VTY terminal password: ")
     return vty_password
 
 

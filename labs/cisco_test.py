@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -18,16 +19,29 @@ def main():
     try:
         print("Beginning lab...")
         c3745 = Cisco()
+        """
         for console_port_number in range(5000, 5005 + 1):
             if child:
                 child.close()
             try:
                 child = c3745.connect_via_telnet("192.168.1.1", console_port_number)
+                child.logfile = open("{0}/c3745.log".format(os.getcwd()), "w+")
                 break
             except RuntimeError:
                 pass
         if not child:
             raise RuntimeError("Cannot connect via console port.")
+        """
+        child = c3745.connect_via_telnet("192.168.1.1", 5002)
+        child.logfile = open("{0}/c3745.log".format(os.getcwd()), "w")
+        """
+        # CODE TO RESET C3745
+        c3745.upload_to_device_tftp(
+            child, "/var/lib/tftpboot/startup-config", "192.168.1.10", "flash:/startup-config.bak")
+        c3745.restore_startup_config(child)
+        c3745.close_telnet_conn(child)
+
+        """
         c3745.get_device_info(child)
         c3745.format_flash_memory(child)
         c3745.set_device_ip_addr(child, "192.168.1.20", "255.255.255.0")
@@ -53,12 +67,6 @@ def main():
             new_filename)
         c3745.update_startup_config(child)
         c3745.close_telnet_conn(child)
-        # child = c3745.connect_via_telnet("192.168.1.20")
-        # REMOVE AFTER TESTING
-        # c3745.upload_to_device_tftp(
-        #     child, "/var/lib/tftpboot/startup-config", "192.168.1.10", "flash:/startup-config.bak")
-        # c3745.restore_startup_config(child)
-        # c3745.close_telnet_conn(child)
 
     # Let the user know something went wrong and put the details in the log file.
     # Catch pexpect and subprocess exceptions first, so other exceptions
@@ -71,8 +79,9 @@ def main():
         print(lab_utils.error_message(sys.exc_info()))
     finally:
         if child:
+            child.logfile.close()
             child.close()
-        print("\n*** Restart the device before running this script again. ***\n")
+        print("*** Restart the device before running this script again. ***\n")
         print("Script complete. Have a nice day.")
 
 
