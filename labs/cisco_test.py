@@ -34,7 +34,7 @@ def main():
         """
         child = c3745.connect_via_telnet("192.168.1.1", 5002)
         child.logfile = open("{0}/c3745.log".format(os.getcwd()), "w")
-        """
+
         # CODE TO RESET C3745
         c3745.upload_to_device_tftp(
             child, "/var/lib/tftpboot/startup-config", "192.168.1.10", "flash:/startup-config.bak")
@@ -67,7 +67,7 @@ def main():
             new_filename)
         c3745.update_startup_config(child)
         c3745.close_telnet_conn(child)
-
+        """
     # Let the user know something went wrong and put the details in the log file.
     # Catch pexpect and subprocess exceptions first, so other exceptions
     # (e.g., BaseException, etc) do not handle them by accident

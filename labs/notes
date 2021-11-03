@@ -1,0 +1,45 @@
+R1#
+R1#write erase
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+R1#
+*Mar  1 00:00:24.723: %SYS-7-NV_BLOCK_INIT: Initialized the geometry of nvram
+R1#show flash
+No files on device
+
+67104768 bytes available (67078144 bytes used)
+
+R1#
+*Mar  1 00:00:42.811: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+R1#
+
+
+lab1_telnet - Connect to the device using Telnet
+lab2_get_info - Get the device's information
+
+lab3_reset_device
+Reset the device to factory settings
+Format the device's flash memory
+Set the device's clock
+
+lab4_layer3
+Set up Layer 3 connectivity
+Verify connectivity
+
+lab5_tftp
+Download the device's configuration
+Upload a backup configuration
+
+lab6_configuration
+Update the startup configuration
+Restore the startup configuration
+
+lab6_security
+Secure the device
+
+
+
+show version | include [IOSios] [Ss]oftware
+show inventory | include [Cc]hassis
+show version | include [Pp]rocessor [Bb]oard [IDid]
