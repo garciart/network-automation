@@ -7,6 +7,7 @@ import re
 import socket
 import sys
 import time
+from datetime import datetime
 from getpass import getpass
 
 import pexpect
@@ -55,13 +56,13 @@ class Cisco:
         validate_ip_address(device_ip_addr)
         validate_port_number(port_number)
         # Open Telnet connection port
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands(
             ["sudo firewall-cmd --zone=public --add-port=23/tcp", ], self._sudo_password)
-        child = pexpect.spawn("telnet {0} {1}".format(device_ip_addr, port_number))
-        child.delaybeforesend = 1
+        child = pexpect.spawn("telnet {0} {1}".format(device_ip_addr, port_number), maxread=360, searchwindowsize=360)
         if not child:
             raise RuntimeError("Cannot connect via Telnet.")
+        child.delaybeforesend = 0.5
         prompts = [pexpect.EOF, "Press RETURN to get started", self._PASSWORD_PROMPT, ] + self.PROMPT_LIST
         connected = False
         already_configured = False
@@ -93,6 +94,7 @@ class Cisco:
                           "incompatible with the current configuration. We recommend you reset \n" +
                           "the device to the default configuration or upload a complete new configuration. \n")
                 connected = True
+        self._reset_prompt(child)
         print("Connected to device using Telnet.")
         return child
 
@@ -114,10 +116,26 @@ class Cisco:
         # Close the Telnet child process
         child.close()
         # Close the firewall port
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands(
             ["sudo firewall-cmd --zone=public --remove-port=23/tcp", ], self._sudo_password)
         print("Telnet connection closed.")
+
+    def set_clock(self, child, timestamp=None):
+        """Set the device's clock.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :param datetime timestamp: A datetime tuple (year, month, day, hour, minute, second).
+        :returns: The updated connection in a child application object.
+        :rtype: pexpect.spawn
+        """
+        self._reset_prompt(child)
+        if not timestamp:
+            timestamp = datetime.utcnow()
+        child.sendline("clock set {0}\r".format(timestamp.strftime("%H:%M:%S %d %b %Y")))
+        child.expect_exact(
+            "{0}, configured from console by console".format(timestamp.strftime("%H:%M:%S UTC %a %b %d %Y")))
+        return child
 
     def get_device_info(self, child):
         """Get the device's flash memory. This will only work after a reload.
@@ -130,26 +148,39 @@ class Cisco:
         """
         print("Getting device information...")
         child = self._reset_prompt(child)
-        i = child.sendline("show version | include [IOSios] [Ss]oftware\r")
-        print(i)
-        t = child.read()
-        print(t)
+
+        # Ask for the device info first, and then set the device's time to move the device info
+        # into the 'before' buffer (weird pexpect issue)
+        child.sendline("show version | include [IOSios] [Ss]oftware\r")
         child.expect_exact(self.PROMPT_LIST[1])
-        _software_ver = str(child.before).splitlines()[-1]
+
+        child = self.set_clock(child)
+
+        # Look for the text between the two carriage returns
+        _software_ver = str(
+            child.before).split("show version | include [IOSios] [Ss]oftware\r")[1].split("\r")[0].strip()
         if not re.compile(r"[IOSios] [Ss]oftware").search(_software_ver):
             raise RuntimeError("Cannot get the device's software version.")
         print("- Software version: {0}".format(_software_ver))
 
         child.sendline("show inventory | include [Cc]hassis\r")
         child.expect_exact(self.PROMPT_LIST[1])
-        _device_name = str(child.before).splitlines()[-1]
+
+        child = self.set_clock(child)
+
+        _device_name = str(
+            child.before).split("show inventory | include [Cc]hassis\r")[1].split("\r")[0].strip()
         if not re.compile(r"[Cc]hassis").search(_device_name):
             raise RuntimeError("Cannot get the device's name.")
         print("- Device name: {0}".format(_device_name))
 
         child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
         child.expect_exact(self.PROMPT_LIST[1])
-        _serial_num = str(child.before).splitlines()[-1]
+
+        child = self.set_clock(child)
+
+        _serial_num = str(
+            child.before).split("show version | include [Pp]rocessor [Bb]oard [IDid]\r")[1].split("\r")[0].strip()
         if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(_serial_num):
             raise RuntimeError("Cannot get the device's serial number.")
         print("- Serial number: {0}".format(_serial_num))
@@ -264,7 +295,7 @@ class Cisco:
         new_filename = device_filepath.rsplit('/', 1)[-1] if new_filename is None else new_filename.lstrip(
             "/").replace("var/lib/tftpboot", "").lstrip("/")
         self._reset_prompt(child)
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
             "sudo mkdir --parents --verbose /var/lib/tftpboot",
@@ -282,7 +313,7 @@ class Cisco:
         index = child.expect_exact([self._COPIED_MSG, "Error", ], timeout=60)
         if index != 0:
             raise RuntimeError("Cannot download {0} from device using TFTP.".format(device_filepath))
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
@@ -313,7 +344,7 @@ class Cisco:
         if new_filename and not new_filename.startswith(tuple(self._FILE_SYSTEM_PREFIX)):
             raise ValueError("Valid device file system (flash:, slot0:, etc.) not specified.")
         self._reset_prompt(child)
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands([
             "sudo firewall-cmd --zone=public --add-service=tftp",
             "sudo chmod 777 --verbose /var/lib/tftpboot/",
@@ -338,7 +369,7 @@ class Cisco:
             index = child.expect_exact(["Error", self._COPIED_MSG, ])
         if index == 0:
             raise RuntimeError("Cannot upload {0} to device using TFTP.".format(upload_filepath))
-        self._sudo_password = prompt_for_sudo_password()
+        self._sudo_password = prompt_for_sudo_password(self._sudo_password)
         run_cli_commands([
             "sudo systemctl stop tftp",
             "sudo systemctl disable tftp",
@@ -528,28 +559,17 @@ class Cisco:
         :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
           expected result (raised from the pexpect module).
         """
-        # child.sendline(self._EXIT_CMD)
-        # child.expect_exact(["Press RETURN to get started", ] + self.PROMPT_LIST)
-        child.sendline("\r")
-        index = child.expect_exact([self._PASSWORD_PROMPT, ] + self.PROMPT_LIST)
+        child.sendline("\renable\r")
+        index = child.expect_exact([self._PASSWORD_PROMPT, pexpect.EOF, self.PROMPT_LIST[1], ])
         if index == 0:
-            self._vty_password = prompt_for_vty_password(self._vty_password)
-            child.sendline(self._vty_password + "\r")
-            index = child.expect_exact(self.PROMPT_LIST)
-            if index == 0:
-                child.sendline("enable\r")
-                index = child.expect_exact([self._PASSWORD_PROMPT, ] + self.PROMPT_LIST)
-                if index == 0:
-                    self._enable_password = prompt_for_enable_password(self._enable_password)
-                    child.sendline(self._enable_password + "\r")
-                    child.expect_exact(self.PROMPT_LIST)
-        return child
-        """
-        elif index > 1:
+            self._enable_password = prompt_for_enable_password(self._enable_password)
+            child.sendline(self._enable_password + "\r")
+            child.expect_exact(self.PROMPT_LIST[1])
+        elif index == 1:
             # "End" takes you back to Privileged EXEC Mode, while "exit" takes you back to the previous mode.
             child.sendline("end\r")
             child.expect_exact(self.PROMPT_LIST[1])
-        """
+        return child
 
 
 def validate_ip_address(ip_address, ipv4_only=True):

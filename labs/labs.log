@@ -850,3 +850,21 @@ Type TIMEOUT: "Expected searcher_re: 0: EOF , found "OS Software, 3700 Software 
 2021-10-30 01:37:40,134UTC: CRITICAL:root:
 Type TIMEOUT: "Expected searcher_re: 0: EOF , found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1#" in /home/gns3user/Automation/labs/cisco.py at line 135.
 
+2021-10-31 04:06:40,718UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_re: 0: EOF , found "OS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1) R1#" in /home/gns3user/Automation/labs/cisco.py at line 152.
+
+2021-10-31 04:17:36,916UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "04:17:05 UTC Sun Oct 31 2021, configured from console by console" , found "ARE (fc1) R1>clock set 04:17:05 31 Oct 2021 ^ % Invalid input detected at '^' marker. R1>" in /home/gns3user/Automation/labs/cisco.py at line 155.
+
+2021-10-31 04:20:14,941UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "04:19:43 UTC Sun Oct 31 2021, configured from console by console" , found "fc1) R1> R1>clock set 04:19:43 31 Oct 2021 ^ % Invalid input detected at '^' marker. R1>" in /home/gns3user/Automation/labs/cisco.py at line 157.
+
+2021-10-31 04:29:26,675UTC: CRITICAL:root:
+Type AttributeError: "Cisco instance has no attribute 'pexpect'" in /home/gns3user/Automation/labs/cisco.py at line 97.
+
+2021-10-31 04:31:46,892UTC: CRITICAL:root:
+Type TIMEOUT: "Expected searcher_string: 0: "04:31:15 UTC Sun Oct 31 2021, configured from console by console" , found "> R1>enable Password: Password: Password: % Bad secrets R1>enable Password: Password:" in /home/gns3user/Automation/labs/cisco.py at line 157.
+
+2021-10-31 04:33:43,610UTC: CRITICAL:root:
+Type IndexError: "list index out of range" in /home/gns3user/Automation/labs/cisco.py at line 172.
+
