@@ -1,0 +1,483 @@
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
+Press ENTER to get the prompt.
+ROMMON emulation microcode.
+
+                           Launching IOS image at 0x80008000...
+
+                                                               Smart Init is disabled. IOMEM set to: 5
+
+                        Using iomem percentage: 5
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+
+
+ BIST FAILED...
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco 3745 (R7000) processor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+SETUP: new interface FastEthernet0/0 placed in "shutdown" state
+SETUP: new interface FastEthernet0/1 placed in "shutdown" state
+
+
+Press RETURN to get started!
+
+sslinit fn
+
+*Mar  1 00:00:03.791: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up
+*Mar  1 00:00:03.859: %SYS-5-CONFIG_I: Configured from memory by console
+*Mar  1 00:00:03.999: %SYS-5-RESTART: System restarted --
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+*Mar  1 00:00:04.007: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start
+*Mar  1 00:00:04.079: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up
+*Mar  1 00:00:04.515: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
+*Mar  1 00:00:04.611: %LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down
+*Mar  1 00:00:05.515: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down
+*Mar  1 00:00:05.611: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
+R1#enable
+R1#show flash:
+No files on device
+
+67104768 bytes available (67078144 bytes used)
+
+R1#
+*Mar  1 00:04:13.903: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+R1#show startup-config
+Using 402 out of 155640 bytes!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+ip cef
+no ip domain-lookup
+no ip icmp rate-limit unreachable
+ip tcp synwait 5
+no cdp log mismatch duplex
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+line aux 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+!
+!
+end
+
+R1#
+format flash:
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+R1#show flash:
+No files on device
+
+66875392 bytes available (0 bytes used)
+
+R1#clock set 13:52:00 Nov 3 2021
+R1#
+*Nov  3 13:52:00.000: %SYS-6-CLOCKUPDATE: System clock has been updated from 00:04:46 UTC Fri Mar 1 2002 to 13:52:00 UTC Wed Nov 3 2021, configured from console by console.
+R1#show version | include [IOSios] [Ss]oftware
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+R1#show inventory | include [Cc]hassis
+NAME: "3745 chassis", DESCR: "3745 chassis"
+R1#show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID FTX0945W0MY
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#enable secret cisco
+R1(config)#line console 0
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#line aux 0
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#line vty 0 4
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#interface FastEthernet0/0
+R1(config-if)#ip address 192.168.1.20 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#
+Nov  3 13:54:29.355: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
+Nov  3 13:54:30.355: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+R1(config-if)#exit
+R1(config)#service password-encryption
+R1(config)#end
+R1#
+Nov  3 13:54:56.027: %SYS-5-CONFIG_I: Configured from console by console
+R1#write memory
+Building configuration...
+[OK]
+R1#ping 192.168.1.10
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.10, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 32/35/40 ms
+R1#copy startup-config tftp://192.168.1.10/startup-config.bak
+Address or name of remote host [192.168.1.10]?
+Destination filename [startup-config.bak]?
+!!
+1149 bytes copied in 0.124 secs (9266 bytes/sec)
+R1#copy tftp://192.168.1.10/startup-config.bak startup-config.bak
+Destination filename [startup-config.bak]?
+Accessing tftp://192.168.1.10/startup-config.bak...
+Loading startup-config.bak from 192.168.1.10 (via FastEthernet0/0): !
+[OK - 1149 bytes]
+
+1149 bytes copied in 0.888 secs (1294 bytes/sec)
+R1#copy startup-config startup-config.alt
+Destination filename [startup-config.alt]?
+
+1149 bytes copied in 0.956 secs (1202 bytes/sec)
+R1#copy startup-config.bak startup-config
+Destination filename [startup-config]?
+[OK]
+1149 bytes copied in 1.748 secs (657 bytes/sec)
+R1#show flash
+-#- --length-- -----date/time------ path
+1         1149 Nov 3 2021 13:55:56 +00:00 startup-config.bak
+2         1149 Nov 3 2021 13:56:10 +00:00 startup-config.alt
+
+66867200 bytes available (8192 bytes used)
+
+R1#show running-config
+Building configuration...
+
+Current configuration : 1149 bytes
+!
+! Last configuration change at 13:54:56 UTC Wed Nov 3 2021
+! NVRAM config last updated at 13:55:05 UTC Wed Nov 3 2021
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$Zd/2$1ntpgxI73xFkXzaZg0.Wo1
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 1511021F0725
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 045802150C2E
+ logging synchronous
+ login
+line vty 0 4
+ password 7 045802150C2E
+ login
+!
+!
+end
+
+R1#show startup-config
+Using 1149 out of 155640 bytes
+!
+! Last configuration change at 13:54:56 UTC Wed Nov 3 2021
+! NVRAM config last updated at 13:55:05 UTC Wed Nov 3 2021
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$Zd/2$1ntpgxI73xFkXzaZg0.Wo1
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 1511021F0725
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 045802150C2E
+ logging synchronous
+ login
+line vty 0 4
+ password 7 045802150C2E
+ login
+!
+!
+end
+
+R1#reload
+Proceed with reload? [confirm]
+!!! WARNING - VM is not running, will be unresponsive (status=1) !!!
+
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
+Press ENTER to get the prompt.
+5-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+
+
+ BIST FAILED...
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco 3745 (R7000) processor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+
+
+Press RETURN to get started!
+
+sslinit fn
+
+*Mar  1 00:00:03.807: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up
+*Mar  1 00:00:03.987: %SYS-5-CONFIG_I: Configured from memory by console
+*Mar  1 00:00:04.143: %SYS-5-RESTART: System restarted --
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+*Mar  1 00:00:04.147: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start
+*Mar  1 00:00:04.159: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up
+*Mar  1 00:00:04.523: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
+*Mar  1 00:00:04.619: %LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down
+*Mar  1 00:00:05.523: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+*Mar  1 00:00:05.619: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
+
+User Access Verification
+
+Password:
+R1#

@@ -1,0 +1,57 @@
+Opening Linux Commands:
+sudo firewall-cmd --zone=public --add-port=23/tcp
+sudo firewall-cmd --zone=public --add-service=tftp
+sudo mkdir --parents --verbose /var/lib/tftpboot
+sudo chmod 777 --verbose /var/lib/tftpboot
+sudo touch /var/lib/tftpboot/startup-config.bak
+sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
+sudo systemctl enable tftp
+sudo systemctl start tftp
+
+
+Cisco Commands:
+enable
+write erase
+format flash:
+show flash:
+clock set 12:00:00 Jan 1 2021
+show version | include [IOSios] [Ss]oftware
+show inventory | include [Cc]hassis
+show version | include [Pp]rocessor [Bb]oard [IDid]
+configure terminal
+enable secret cisco
+line console 0
+password cisco
+login
+exit
+line aux 0
+password cisco
+login
+exit
+line vty 0 4
+password cisco
+login
+exit
+interface FastEthernet0/0
+ip address 192.168.1.20 255.255.255.0
+no shutdown
+exit
+service password-encryption
+end
+write memory
+ping 192.168.1.10
+copy startup-config tftp://192.168.1.10/startup-config.bak
+copy tftp://192.168.1.10/startup-config.bak startup-config.bak
+copy startup-config startup-config.alt
+copy startup-config.bak startup-config
+reload
+
+Telnet Command:
+[CTRL]+[]] [q]
+
+
+Closing Linux Commands:
+sudo firewall-cmd --zone=public --remove-port=23/tcp
+sudo systemctl stop tftp
+sudo systemctl disable tftp
+sudo firewall-cmd --zone=public --remove-service=tftp

@@ -43,3 +43,5 @@ Secure the device
 show version | include [IOSios] [Ss]oftware
 show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
+
+c7200-adventerprisek9-mz.152-4.M8.bin
