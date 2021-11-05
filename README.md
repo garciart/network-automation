@@ -185,7 +185,7 @@ Now for the setup: There are a few good posts and articles on how to install GNS
 >echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."
 >```
 
-Using elevated privileges, make the shell script executable and run it, piping any errors and the output into a text file. This will take a while:
+Now, you have a choice: you can open a Linux Terminal and enter each of the above lines, one at a time, or you can use the [executable script](gns3_setup_centos "CentOS Setup Script"). If you choose to run the script (as we recommend), make the shell script executable and run it, piping any errors and the output into a text file. It will take a while to finish, so be patient:
 
 ```
 sudo chmod +x gns3_setup_centos
