@@ -11,8 +11,8 @@ sudo systemctl start tftp
 
 Cisco Commands:
 enable
-write erase
 format flash:
+
 show flash:
 clock set 12:00:00 Jan 1 2021
 show version | include [IOSios] [Ss]oftware
