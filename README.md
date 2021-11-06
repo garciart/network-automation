@@ -467,7 +467,7 @@ Click on **Edit** to increase the device's flash memory from 0 to 64 MiB:
 
 ![Preferences](img/a23.png)
 
-In the **Dynamips IOS router template configuration** pop-up dialog, select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB and click **OK**:
+In the **Dynamips IOS router template configuration** pop-up dialog, select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB. While you are here, make sure **Automatically delete NVRAM and disk files** is unselected; otherwise, you will have to reformat the flash memory each time you reload the device. When you are done, click **OK** to continue:
 
 ![Dynamips IOS router template configuration](img/a24.png)
 
@@ -613,7 +613,7 @@ No files on device
 R1#
 ```
 
-Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, click the red **Stop** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to stop all devices?", click Yes::
+Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input <kbd>q</kbd> to exit Telnet. Go back to the GNS3 GUI, click the red **Stop** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to stop all devices?", click Yes::
 
 >Do not click on **Reload**! **Reload** will load the default settings, erasing any changes you have made. You will learn how to save configurations later.
 
