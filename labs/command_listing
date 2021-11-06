@@ -15,9 +15,9 @@ format flash:
 
 show flash:
 clock set 12:00:00 Jan 1 2021
-show version | include [IOSios] [Ss]oftware
 show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
+show version | include [IOSios] [Ss]oftware
 configure terminal
 enable secret cisco
 line console 0
