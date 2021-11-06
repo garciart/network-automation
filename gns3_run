@@ -23,7 +23,7 @@ echo
 echo "Configuring the network..."
 # Configure the bridge
 echo "$s_pass" | sudo -S ip link add br0 type bridge &> /dev/null # Create the bridge
-sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
+sudo ip address replace 192.168.1.1/24 dev br0 # Set the gateway IP address
 sudo ip link set br0 up # Enable the bridge
 
 # Configure the tap
@@ -36,7 +36,7 @@ sudo ip address flush dev "$host_interface" # Clear out any old adapter IP addre
 sudo ip link set "$host_interface" up # Enable the adapter
 sudo ip link set "$host_interface" master br0 # Connect the adapter to the bridge
 sleep 3
-sudo ip address add 192.168.1.10/24 dev "$host_interface" # Set the adapter IP address
+sudo ip address replace 192.168.1.10/24 dev "$host_interface" # Set the adapter IP address
 
 # Display configuration
 echo
