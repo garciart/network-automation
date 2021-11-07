@@ -77,6 +77,7 @@ sudo mv ~/gns3_run /usr/bin/
 # Lab dependencies
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
+sudo yum -y install ntp
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
 # Optional - Modify vimrc file
