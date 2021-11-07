@@ -19,27 +19,34 @@ show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
 show version | include [IOSios] [Ss]oftware
 configure terminal
-enable secret cisco
-line console 0
-password cisco
-login
-exit
-line aux 0
-password cisco
-login
-exit
-line vty 0 4
-password cisco
-login
-exit
 interface FastEthernet0/0
 ip address 192.168.1.20 255.255.255.0
 no shutdown
+end
+
+ping 192.168.1.10
+
+configure terminal
+line vty 0 4
+username admin password cisco
+line console 0
+password ciscon
+login
 exit
+line aux 0
+password cisaux
+login
+exit
+enable password cisen
+end
+write memory
+
+show startup-config
+
+
 service password-encryption
 end
 write memory
-ping 192.168.1.10
 copy startup-config tftp://192.168.1.10/startup-config.bak
 copy tftp://192.168.1.10/startup-config.bak startup-config.bak
 copy startup-config startup-config.alt
