@@ -4,34 +4,37 @@
 
 These labs will show you how to automate simple network tasks using Python:
 
-- Accessing a network device's Privileged EXEC Mode
-- Formatting a network device's flash memory
-- Setting a network device's clock
-- Getting information about a network device
-- Enabling Layer 3 communications to and from a network device
-- Securing a network device
-- Transferring files to and from a network device
-- Securely connecting to a network device
-- Securely transferring files to and from a network device
+- Access a network device's Privileged EXEC Mode
+- Format a network device's flash memory
+- Get information about a network device
+- Enable Layer 3 communications to and from a network device
+- Secure a network device
+- Set a network device's clock
+- Transfer files to and from a network device
+- Securely connect to a network device
+- Securely transfer files to and from a network device
 
 However, before starting the labs, run these commands through the Cisco command-line interface (CLI), as you would do with a real network device. This will give you an idea of what to look for and what to expect from each lab.
 
->**NOTE** - This tutorial is primarily for Python programmers who are learning about network engineering. If you are a network engineer or know basic Cisco CLI commands, you can skip to the first lab.
+>**NOTE - This tutorial is primarily for Python programmers who are learning about network engineering. If you are a network engineer or know basic Cisco CLI commands, you can skip this and go the first lab.**
 
-First, ensure you have installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial (this repo's main README.md file) and start it up. As we stated in the post script of that tutorial, we recommend you enter ```gns3_run``` from a Terminal to use GNS3.
+---
+## Set up the Host's Linux Environment 
+
+First, ensure you have installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. As we stated in the post script of that tutorial, enter ```gns3_run``` in a Linux Terminal to start GNS3.
 
 >**NOTE** - By the way, you will continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
 Second, make sure services required for the labs exist on the host. The services include:
 
-1. Network Time Protocol (NTP) - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. By enabling an NTP service, the device can update its clock using the host's clock.
-2. Trivial File Transfer Protocol (TFTP) - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port. 
+1. **Network Time Protocol (NTP)** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. By enabling an NTP service, the device can update its clock using the host's clock.
+2. **Trivial File Transfer Protocol (TFTP)** - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port. 
 
 Check their statuses by entering the following commands:
 
 ```
 systemctl status tftp
-systemctl status ntp
+systemctl status ntpd
 ```
 
 After a few seconds, you will see the following output:
@@ -104,8 +107,11 @@ echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
 Finally, start the NTP service:
 
 ```
-sudo systemctl start ntp
+sudo systemctl start ntpd
 ```
+
+---
+##Access a network device's Privileged EXEC Mode
 
 Now that you have set up the host system, you can run the commands in a Console port session. First, get the gateway IP address and Console port's number from the **Topology Summary** in the top left-hand corner.:
 
@@ -152,21 +158,23 @@ If the device was reloaded correctly, this line will appear near the end of the 
 >
 >![Reload the Device](../img/b01.png)
 
-If you do not see a prompt, press <kbd>Enter</kbd> now. If the following text appears...
+If you do not see a prompt, press <kbd>Enter</kbd> now. 
 
-```
-User Access Verification
-
-Password: 
-```
-
-...it means that the device has already been configured by someone else. There is nothing wrong with that, and, as long as you have permission and the proper credentials, you can automate tasks for the device. However, for your labs, you need to use an unconfigured device.
-
+>**NOTE** - If the following text appears after you press <kbd>Enter</kbd>...
+>
+>```
+>User Access Verification
+>
+>Password: 
+>```
+>
+>...it means that the device has already been configured by someone else. There is nothing wrong with that, and, as long as you have permission and the proper credentials, you can automate tasks for the device. However, for your labs, you need to use an unconfigured device.
+>
 >Unfortunately, there is no easy way to reset the device to its factory settings in GNS3; you will have to delete the device in the GNS3 workspace, and replace it with a new device.
-
+>
 >***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open virtual teletype session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life, when configuring an actual device for Layer 3 communications.***
 
-Otherwise, if you press <kbd>Enter</kbd>, and you are greeted with a simple ```R1#```, you are good to go. You are in **Privileged EXEC Mode**, the default startup mode for most Cisco devices:
+If you are greeted with a simple ```R1#```, you are good to go. You are in **Privileged EXEC Mode**, the default startup mode for most Cisco devices:
 
 ```
 R1#
@@ -177,6 +185,9 @@ Some devices may display an ```R1>``` prompt instead. This means you are in **Us
 ```
 enable
 ```
+
+---
+##Format a network device's flash memory
 
 If you are prompted for a password, this means that the device has already been configured. Unfortunately, as we stated earlier, to run the labs, you will have to delete the device in the GNS3 workspace, and replace it with a new device.
 
@@ -217,44 +228,8 @@ Format of flash complete
 R1#
 ```
 
-Next, you will set the device's clock. As we stated earlier, this is a simple, but very important, task, since tasks, such as logging or synchronization, depend on an up-to-date clock. To this manually, enter the following command:
-
-```
-clock set 12:00:00 Jan 1 2021
-```
-
-After a few seconds, you will see the following output:
-
-```
-*Jan  1 12:00:00.000: %SYS-6-CLOCKUPDATE: System clock has been updated from 00:24:57 UTC Fri Mar 1 2002 to 12:00:00 UTC Fri Jan 1 2021, configured from console by console.
-R1#
-```
-
-Unfortunately, our device will not retain manual clock settings after reload. Luckily, you activated an NTP service on the host; the device can use it to update its clock. Do this by entering the following command:
-
-```
-configure terminal
-ntp server 192.168.1.10
-end
-show ntp status
-show clock
-
-```
-
-After a few seconds, you will see the following output:
-
-```
-R1#show ntp status
-Clock is unsynchronized, stratum 16, no reference clock
-nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**18
-reference time is E532E1B1.AA29D0D3 (23:37:21.664 UTC Sun Nov 7 2021)
-clock offset is 4891.1245 msec, root delay is 98.69 msec
-root dispersion is 20805.36 msec, peer dispersion is 16000.00 msec
-R1#show clock
-23:37:39.071 UTC Sun Nov 7 2021
-```
-
-Your devices clock should match your system clock, offset for Coordinated Universal Time (UTC).
+---
+##Get information about a network device
 
 Now, there are times you will need to get the device's Internetwork Operating System (IOS) version, the device's serial number, etc. Enter the following commands to get that information:
 
@@ -279,6 +254,9 @@ R1#
 ```
 
 You are using a 3745 Router, serial number FTX0945W0MY, running Cisco's Advanced Enterprise Services IOS version 12.4(25d).
+
+---
+##Enable Layer 3 communications to and from a network device
 
 Next, you will enable Layer 3 connectivity by assigning an IP address to the device. Right now, in GNS3, you are simulating a direct connection from the host to the device through the Console port. However, the Console port is not designed to be accessed remotely. Our goal is to automate tasks, such as IOS updates and reconfigurations, and perform them remotely. The best option is to use a secure shell (SSH) to connect to the device over the network, and, to use SSH, the device must have an IP address. Follow these steps:
 
@@ -347,6 +325,9 @@ R1#
 > 1. **running-configuration** - This file keeps track of all changes to the device's configuration for the current session. It is held in the device's volatile RAM, and the file, along with any changes, are discarded when the device is turned off or reloaded, unless saved to the startup-configuration file. 
 > 2. **startup-configuration** - This file is stored in the device's nonvolatile random-access memory (NVRAM) and is read by the device upon startup. Any changes to the device's configuration must be saved to this file to become permanent. 
 
+---
+##Secure a network device
+
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
 ![Reload the Device](../img/b01.png)
@@ -370,7 +351,7 @@ Connection closed by foreign host.
 
 ![What???](../img/whaat-huh.gif "What???")
 
-When you made your changes permanent, the current running configuration added this line to the end of the device's startup configuration, stored in the device's nonvolatile random-access memory (NVRAM):
+What happened? Well, when you made your changes permanent, the current running configuration added this line to the end of the device's startup configuration, stored in the device's nonvolatile random-access memory (NVRAM):
 
 ```
 line vty 0 4
@@ -394,9 +375,11 @@ telnet 192.168.1.1 5001
 Now you will secure the VTY line. Set the username to ```admin```, the privilege level to "15", and the password to ```cisco```:
 
 >**NOTE** - Cisco devices have 16 privilege levels (0 through 15). 13 are customizable, while three are set by the IOS:
+> 
 > - 0 - No privileges
 > - 1 - Read-only and access to the ping command
 > - 15 - Full access, including reading and writing configuration files
+> 
 >To see your privilege level, enter ```show privilege``` at the prompt.
 
 ```
@@ -450,7 +433,7 @@ Attempt to re-enter **Privileged EXEC Mode**:
 enable
 ```
 
-When prompted for a password, enter the **Privileged EXEC Mode** (i.e., ```cisen```). You should see the **Privileged EXEC Mode** prompt:
+When prompted for a password, enter the password for **Privileged EXEC Mode** (i.e., ```cisen```). You should see the **Privileged EXEC Mode** prompt:
 
 ```
 R1#
@@ -532,8 +515,6 @@ line aux 0
 line vty 0 4
  login local
 !
-ntp server 192.168.1.10
-!
 end
 ```
 
@@ -555,7 +536,9 @@ line aux 0
  password cisaux
 ```
 
-Fix the **Privileged EXEC Mode** password first by removing the plain text and replacing it with a hashed password. FYI, Cisco uses its own MD5 hash algorithm with a salt, resulting in a 30-character string:
+Fix the **Privileged EXEC Mode** password first by removing the plain text and replacing it with a hashed password:
+
+>**NOTE** - Cisco uses its own MD5 hash algorithm with a salt, resulting in a 30-character string.
 
 ```
 configure terminal
@@ -575,7 +558,9 @@ end
 write memory
 ```
 
-Finally, obscure the Console port and Auxiliary port passwords by enabling the password encryption service. FYI, these passwords are encrypted using a reversible Vigenère cipher, not a hashing algorithm, resulting in a 14-character alphanumeric string:
+Finally, obscure the Console port and Auxiliary port passwords by enabling the password encryption service:
+
+>**NOTE** - Cisco uses a reversible Vigenère cipher, not a hashing algorithm, for its password encryption service, resulting in a 14-character alphanumeric string.
 
 ```
 configure terminal
@@ -587,7 +572,7 @@ write memory
 Take another look at the startup configuration file:
 
 ```
-show statup-config
+show startup-config
 ```
 
 You should see changes similar to the following:
@@ -630,5 +615,314 @@ Password:
 R1#
 ```
 
-If you made it this far, congratulations! Our next step is to back up and save the startup configuration.
+---
+##Set a network device's clock
 
+Next, you will set the device's clock. As we stated earlier, this is a simple, but very important, task, since tasks, such as logging or synchronization, depend on an up-to-date clock. To this manually, enter the following command:
+
+```
+clock set 12:00:00 Jan 1 2021
+```
+
+After a few seconds, you will see the following output:
+
+```
+*Jan  1 12:00:00.000: %SYS-6-CLOCKUPDATE: System clock has been updated from 00:24:57 UTC Fri Mar 1 2002 to 12:00:00 UTC Fri Jan 1 2021, configured from console by console.
+R1#
+```
+
+Unfortunately, our device may not retain manual clock settings after it is powered down. Luckily, you activated an NTP service on the host; now that you have Layer 3 connectivity, the device can use the host to update its clock. Do this by entering the following command:
+
+```
+configure terminal
+ntp server 192.168.1.10
+end
+show ntp status
+show clock
+```
+
+After a few seconds, you will see the following output:
+
+```
+R1#show ntp status
+Clock is unsynchronized, stratum 16, no reference clock
+nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**18
+reference time is E532E1B1.AA29D0D3 (23:37:21.664 UTC Sun Nov 7 2021)
+clock offset is 4891.1245 msec, root delay is 98.69 msec
+root dispersion is 20805.36 msec, peer dispersion is 16000.00 msec
+R1#show clock
+23:37:39.071 UTC Sun Nov 7 2021
+```
+
+Your devices clock should match your system clock, offset for Coordinated Universal Time (UTC). If you update the startup-configuration, the device will always check the host's IP address for an NTP server:
+
+```
+write memory
+```
+
+---
+##Transfer files to and from a network device
+
+>**NOTE** - You are now using Layer 3 communications, not a direct console line. As in real life, your connection may time out more often. Before sending commands in the blind, as you will do automating tasks using Python, always check you are connected first. 
+
+If you made it this far, congratulations!
+
+At the beginning of this tutorial, you started a TFTP service on the host. Now that you have Layer 3 connectivity, you will use it to back up and save the startup configuration.  
+
+Enter the following commands:
+
+```
+configure terminal
+ip tftp source-interface FastEthernet0/0
+end
+write memory
+```
+
+This tells the device to use the FastEthernet port 0/0 for all TFTP transfers.
+
+Next, transfer the file from the device to the host:
+
+```
+copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak
+```
+
+You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
+
+```
+Address or name of remote host [192.168.1.10]? 
+Destination filename [startup-config.bak]? 
+!!
+1244 bytes copied in 0.116 secs (10724 bytes/sec)
+R1#
+```
+
+If you open another Linux Terminal and enter the following command, you will see the backup file and its contents:
+
+```
+ll /var/lib/tftpboot
+cat /var/lib/tftpboot/startup-config.bak
+```
+
+Go back to the Telnet terminal. Just in case you lose access to the host, back up the backup file to the device's flash memory:
+
+```
+copy tftp://192.168.1.10/startup-config.bak flash:/startup-config.bak
+```
+
+You will be prompted to confirm the destination filename. You've already provided that information; press <kbd>Enter</kbd>:
+
+```
+Destination filename [startup-config.bak]? 
+Accessing tftp://192.168.1.10/startup-config.bak...
+Loading startup-config.bak from 192.168.1.10 (via FastEthernet0/0): !
+[OK - 1244 bytes]
+
+1244 bytes copied in 0.216 secs (5759 bytes/sec)
+R1#
+```
+
+Use the following commands to see the backup of the backup file and its contents:
+
+```
+show flash:
+more flash:/startup-config.bak
+```
+
+After a few seconds, you will see the following output. By the way, press <kbd>Space</kbd> to continue at the ```--More--``` prompt:
+
+```
+R1#show flash:
+-#- --length-- -----date/time------ path
+1         1244 Nov 8 2021 03:30:32 +00:00 startup-config.bak
+
+66871296 bytes available (4096 bytes used)
+
+R1#more flash:/startup-config.bak
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+
+...
+
+line vty 0 4
+ login local
+!
+ntp server 192.168.1.10
+!
+end
+```
+
+Of course, you can copy a file from the NVRAM to flash memory directly and vice versa:
+
+```
+copy nvram:/startup-config flash:/startup-config.alt
+copy flash:/startup-config.bak nvram:/startup-config
+```
+
+However, do not copy a file into NVRAM that is not supposed to be there! NVRAM has a limited amount of memory, and it is for the IOS image and configuration files.
+
+>**NOTE** - TRUST ME! You do not want to play with the NVRAM, unless you have 2+ hours to spare to transfer the IOS image over xmodem (if everything goes well :rage:)
+
+---
+##Securely connect to a network device
+
+Until now, you have been using Telnet to interact with the device. As we stated before, Telnet is not secure. While it does use the reliable Transmission Control Protocol (TCP), for communications, neither credentials nor data transferred through Telnet is encrypted. A better option is to access the device using the Secure Shell (SSH) protocol.
+
+>**NOTE** - For a great story about SSH from its creator, Tatu Ylonen, check out [How SSH port became 22](https://www.ssh.com/academy/ssh/port "How SSH port became 22")
+
+SSH uses public key cryptography to authenticate users first, then encrypts the data transmitted using an industry-approved cipher. It is the preferred method of communicating with devices remotely.
+
+>**NOTE** - Knowing how public key cryptography and the secure sockets layer (SSL) handshake works is vital if you are planning on working with networks. However, both of these topics are outside the scope of this tutorial, but there are many resources on the Internet, such as [The SSL/TLS Handshake: an Overview](https://www.ssl.com/article/ssl-tls-handshake-overview/ "The SSL/TLS Handshake: an Overview") and others.
+
+However, SSH requires some setup before it can be used. The good news is that you have done much of this work already, such as enabling Layer 3 communications; updating the system clock using an NTP service; and securing the VTY lines with a username and password. Now, generate the Rivest, Shamir, and Adelman (RSA) key pairs the device will need for public key cryptography:
+
+```
+configure terminal
+crypto key generate rsa general-keys label ADVENTURES modulus 1024
+```
+
+After a few seconds, you will see the following output:
+
+```
+The name for the keys will be: ADVENTURES
+
+% The key modulus size is 1024 bits
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+R1(config)#
+```
+
+Before you continue, let's talk about the last command you typed in. As we said, the ```crypto key generate``` command is used to generate the key pairs your device will need to securely connect to the host. In this case, you used the RSA algorithm for the device's digital signature (the other option is the Digital Signature Algorithm (DSA)), and you wanted to generate a set of general-purpose keys, as opposed to key pairs for a specific task. The next option, ```label ADVENTURES``` is a unique identifier for the generated keys; you can maintain multiple sets of keys for different purposes.
+
+Regarding the final option, ```modulus 1024```, and without getting into how the RSA algorithm works, the larger the modulus, the harder it will be to break the keys, but the longer it will take to generate the keys. The default modulus is 1024 bits, which can be used for the latest version, SSH-2. The recommended size is 2048 bits and the latest maximum size that Cisco allows is 4096 bits. However, SSH version 1 can only use keys up to 768 bits; remember this when generating keys to speak with older devices and hosts that can only use SSH-1. 
+
+To see the keys, enter the following command:
+
+```
+show crypto key mypubkey rsa
+```
+
+Since the modulus of the keys the device generated was greater than 768 bits, you can use SSH-2. Enter the following commands to set the SSH version:
+
+```
+ip ssh version 2
+end
+write memory
+show ip ssh
+```
+
+After a few seconds, you will see the following output:
+
+```
+SSH Enabled - version 2.0
+Authentication timeout: 120 secs; Authentication retries: 3
+R1#
+```
+
+>**NOTE** - If you see ```SSH Enabled - version 1.99```, reset the SSH version to 2. SSH 1.99 is not an SSH version; it just means that the device supports SSH-1 and SSH-2. You want to use SSH-2.
+
+Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
+
+![Reload the Device](../img/b01.png)
+
+Now, at the Linux prompt, attempt to SSH into the device using the username and the IP address:
+
+```
+ssh admin@192.168.1.20
+```
+
+After a few seconds, you will see the following output:
+
+```
+The authenticity of host '192.168.1.20 (192.168.1.20)' can't be established.
+RSA key fingerprint is SHA256:cpoYeqhnSJxDE/Qv1X1LRJH9hrh8fPB8sfD8ELfvTr8.
+RSA key fingerprint is MD5:26:ac:35:27:98:0e:82:11:b0:e8:b6:2a:3d:5f:cf:ea.
+Are you sure you want to continue connecting (yes/no)?
+```
+
+Most computers keep "known" IP addresses in a known_hosts file in the user's hidden .ssh directory. Since this IP address is not in that file, the host wants to know if it can be trusted. It also provides you with hashes of the RSA key fingerprint, so you can verify the device using the ssh-keygen utility.
+
+Enter ```yes``` to continue connecting and enter the VTY password when prompted:
+
+```
+Warning: Permanently added '192.168.1.20' (RSA) to the list of known hosts.
+Password: 
+
+R1#
+```
+
+---
+#Securely transfer files to and from a network device
+
+There are several ways to securely copy files to and from a device, such as using the Secure Copy Protocol (SCP) or the SSH File Transfer Protocol (SFTP). You will be using SCP for the lab.
+
+Like SSH, SCP requires some setup before it can be used. The good news is that you have done all the work already! You have enabled Layer 3 communications; updated the system clock using an NTP service; secured the VTY lines with a username and password; and generated the RSA key pairs required for authentication. So, without further ado, enter the following command:
+
+>**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. Since we are still using the /var/lib/tftpboot/ directory, use two backslashes after the IP address, or SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg):
+
+```
+copy startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/scp_start.cfg
+```
+
+You will be prompted to confirm the remote host's IP address, the remote host's username, and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
+
+```
+Address or name of remote host [192.168.1.10]? 
+Destination username [gns3user]? 
+Destination filename [/var/lib/tftpboot/scp_start.cfg]?
+```
+
+After a few seconds, you will see the following output:
+
+```
+Writing /var/lib/tftpboot/scp_start.cfg
+Password: 
+! Sink: C0644 1330 scp_start.cfg
+
+1330 bytes copied in 3.596 secs (370 bytes/sec)
+R1#
+```
+
+If you open another Linux Terminal and enter the following command, you will see the backup file and its contents:
+
+```
+ll /var/lib/tftpboot
+cat /var/lib/tftpboot/scp_start.cfg
+```
+
+Go back to the SSH session and exit by entering ```exit``` st the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
+
+---
+##Congratulations!
+
+Nicely done! Now that you have walked through common tasks and their commands through the Cisco command-line interface (CLI), you can begin to automate them using Python and Pexpect. Go to Lab 1 when you are ready and good luck!
+
+---
+FTP NOTES
+
+```
+sudo yum install vsftpd
+sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-service=ftp
+systemctl start vsftpd
+```
+
+```
+R1#configure terminal
+R1(config)#ip ftp source-interface FastEthernet0/0
+R1(config)#end
+R1#copy startup-config ftp://gns3user:gns3user@192.168.1.10/test2.cfg                  
+Address or name of remote host [192.168.1.10]? 
+Destination filename [test2.cfg]? 
+Writing test2.cfg !
+1330 bytes copied in 0.240 secs (5542 bytes/sec)
+R1#
+```
+
+```
+ll /home/gns3user/test2.cfg
+-rw-r--r--. 1 gns3user gns3user 1330 Nov  8 02:10 /home/gns3user/test2.cfg
+```
+
+Ran into SELinux problem when I attempt to transfer into the /var/lib/tftpboot directory (Permission denied)
