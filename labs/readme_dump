@@ -1,0 +1,946 @@
+[gns3user@localhost ~]$ systemctl status ntpd
+● ntpd.service - Network Time Service
+   Loaded: loaded (/usr/lib/systemd/system/ntpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+[gns3user@localhost ~]$ systemctl status tftp
+● tftp.service - Tftp Server
+   Loaded: loaded (/usr/lib/systemd/system/tftp.service; indirect; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:in.tftpd
+[gns3user@localhost ~]$ systemctl status vsftpd
+● vsftpd.service - Vsftpd ftp daemon
+   Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+
+Nov 08 12:27:17 localhost.localdomain systemd[1]: Starting Vsftpd ftp daemon...
+Nov 08 12:27:17 localhost.localdomain systemd[1]: Started Vsftpd ftp daemon.
+Nov 08 13:18:17 localhost.localdomain systemd[1]: Stopping Vsftpd ftp daemon...
+Nov 08 13:18:17 localhost.localdomain systemd[1]: Stopped Vsftpd ftp daemon.
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-port=21/tcp
+[sudo] password for gns3user:
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-service=ftp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-port=123/udp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-service=ntp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-port=23/tcp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-port=69/udp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --add-service=tftp
+success
+[gns3user@localhost ~]$ sudo systemctl start vsftpd
+[gns3user@localhost ~]$ grep "server 127.127.1.0" /etc/ntp.conf
+[gns3user@localhost ~]$ echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
+server 127.127.1.0
+[gns3user@localhost ~]$ sudo systemctl start ntpd
+[gns3user@localhost ~]$ sudo mkdir --parents --verbose /var/lib/tftpboot
+[gns3user@localhost ~]$ sudo chmod 777 --verbose /var/lib/tftpboot
+mode of ‘/var/lib/tftpboot’ retained as 0777 (rwxrwxrwx)
+[gns3user@localhost ~]$ sudo touch /var/lib/tftpboot/startup-config.bak
+[gns3user@localhost ~]$ sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
+mode of ‘/var/lib/tftpboot/startup-config.bak’ changed from 0644 (rw-r--r--) to 0777 (rwxrwxrwx)
+[gns3user@localhost ~]$ sudo systemctl start tftp
+[gns3user@localhost ~]$ telnet 192.168.1.1 5001
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
+Press ENTER to get the prompt.
+ROMMON emulation microcode.
+
+                           Launching IOS image at 0x80008000...
+
+                                                               Smart Init is disabled. IOMEM set to: 5
+
+                                                                                                        Using iomem percentage: 5
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+
+
+ BIST FAILED...
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco 3745 (R7000) processor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+SETUP: new interface FastEthernet0/0 placed in "shutdown" state
+SETUP: new interface FastEthernet0/1 placed in "shutdown" state
+
+
+Press RETURN to get started!
+
+sslinit fn
+
+*Mar  1 00:00:02.467: %SYS-5-CONFIG_I: Configured from memory by console
+*Mar  1 00:00:02.579: %SYS-5-RESTART: System restarted --
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+*Mar  1 00:00:02.579: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start
+*Mar  1 00:00:02.587: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+*Mar  1 00:00:02.687: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up
+*Mar  1 00:00:02.939: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up
+*Mar  1 00:00:03.743: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
+*Mar  1 00:00:03.775: %LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down
+*Mar  1 00:00:04.743: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down
+*Mar  1 00:00:04.775: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
+R1#enable
+R1#format flash:
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+R1#show inventory | include [Cc]hassis
+NAME: "3745 chassis", DESCR: "3745 chassis"
+R1#show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID FTX0945W0MY
+R1#show version | include [IOSios] [Ss]oftware
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            unassigned      YES unset  administratively down down
+FastEthernet0/1            unassigned      YES unset  administratively down down
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#interface FastEthernet0/0
+R1(config-if)#ip address 192.168.1.20 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#
+*Mar  1 00:06:02.111: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
+*Mar  1 00:06:03.111: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+R1(config-if)#end
+R1#
+*Mar  1 00:06:13.095: %SYS-5-CONFIG_I: Configured from console by console
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            192.168.1.20    YES manual up                    up
+FastEthernet0/1            unassigned      YES unset  administratively down down
+R1#ping 192.168.1.10
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.10, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 8/40/64 ms
+R1#write memory
+Building configuration...
+[OK]
+R1#
+telnet> q
+Connection closed.
+[gns3user@localhost ~]$ telnet 192.168.1.20
+Trying 192.168.1.20...
+Connected to 192.168.1.20.
+Escape character is '^]'.
+
+
+Password required, but none set
+Connection closed by foreign host.
+[gns3user@localhost ~]$ telnet 192.168.1.1 5001
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+Connected to Dynamips VM "R1" (ID 1, type c3745) - Console port
+Press ENTER to get the prompt.
+rocessor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+SETUP: new interface FastEthernet0/0 placed in "shutdown" state
+SETUP: new interface FastEthernet0/1 placed in "shutdown" state
+
+
+Press RETURN to get started!
+
+sslinit fn
+
+*Mar  1 00:00:02.467: %SYS-5-CONFIG_I: Configured from memory by console
+*Mar  1 00:00:02.579: %SYS-5-RESTART: System restarted --
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
+*Mar  1 00:00:02.579: %SNMP-5-COLDSTART: SNMP agent on host R1 is undergoing a cold start
+*Mar  1 00:00:02.587: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+*Mar  1 00:00:02.687: %LINEPROTO-5-UPDOWN: Line protocol on Interface VoIP-Null0, changed state to up
+*Mar  1 00:00:02.939: %LINEPROTO-5-UPDOWN: Line protocol on Interface IPv6-mpls, changed state to up
+*Mar  1 00:00:03.743: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to administratively down
+*Mar  1 00:00:03.775: %LINK-5-CHANGED: Interface FastEthernet0/1, changed state to administratively down
+*Mar  1 00:00:04.743: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to down
+*Mar  1 00:00:04.775: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
+R1#enable
+R1#format flash:
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+R1#show inventory | include [Cc]hassis
+NAME: "3745 chassis", DESCR: "3745 chassis"
+R1#show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID FTX0945W0MY
+R1#show version | include [IOSios] [Ss]oftware
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            unassigned      YES unset  administratively down down
+FastEthernet0/1            unassigned      YES unset  administratively down down
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#interface FastEthernet0/0
+R1(config-if)#ip address 192.168.1.20 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#
+*Mar  1 00:06:02.111: %LINK-3-UPDOWN: Interface FastEthernet0/0, changed state to up
+*Mar  1 00:06:03.111: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/0, changed state to up
+R1(config-if)#end
+R1#
+*Mar  1 00:06:13.095: %SYS-5-CONFIG_I: Configured from console by console
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+FastEthernet0/0            192.168.1.20    YES manual up                    up
+FastEthernet0/1            unassigned      YES unset  administratively down down
+R1#ping 192.168.1.10
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.10, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 8/40/64 ms
+R1#write memory
+Building configuration...
+[OK]
+R1#configure terminal ; Enter Global Configuration Mode
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#; Secure the VTY lines and return to Global Configuration Mode
+R1(config)#username admin privilege 15 password cisco
+R1(config)#line vty 0 4 ; Enter Line Configuration Mode for VTY
+R1(config-line)#login local ; See the note below
+R1(config-line)#exit
+R1(config)#$e 0 ; Enter Line Configuration Mode for the Console port
+R1(config-line)#password ciscon
+R1(config-line)#login  ; Secure the Console port
+R1(config-line)#exit ; Return to Global Configuration Mode
+R1(config)#line aux 0 ; Enter Line Configuration Mode for the Auxiliary port
+R1(config-line)#password cisaux
+R1(config-line)#login ; Secure the Auxiliary port
+R1(config-line)#exit ; Return to Global Configuration Mode
+R1(config)#enable password cisen
+R1(config)#end ; Secure and return to Privileged EXEC Mode
+R1#write memory ; Update the startup-configuration
+*Mar  1 00:09:20.855: %SYS-5-CONFIG_I: Configured from console by console
+R1#write memory ; Update the startup-configuration
+Building configuration...
+[OK]
+R1#disable
+R1>enable
+Password:
+R1#show startup-config
+Using 1017 out of 155640 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable password cisen
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin privilege 15 password 0 cisco
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password ciscon
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisaux
+ logging synchronous
+ login
+line vty 0 4
+ login local
+!
+!
+end
+
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#no enable password
+R1(config)#enable secret cisen
+R1(config)#end
+R1#write memory
+*Mar  1 00:13:02.771: %SYS-5-CONFIG_I: Configured from console by console
+R1#write memory
+Building configuration...
+[OK]
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#no username admin password cisco
+R1(config)#username admin privilege 15 secret cisco
+R1(config)#end
+R1#write memory
+Building configuration...
+[OK]
+R1#
+*Mar  1 00:13:18.755: %SYS-5-CONFIG_I: Configured from console by console
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#service password-encryption
+R1(config)#end
+R1#write memory
+Building configuration...
+
+*Mar  1 00:13:28.691: %SYS-5-CONFIG_I: Configured from console by console[OK]
+R1#show startup-config
+Using 1082 out of 155640 bytes
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$P9wG$zqkyObWeTnDYqfsDiHXXT0
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin privilege 15 secret 5 $1$BLGZ$XfLJwhwnpaoAjxXQwHEVm/
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04110402
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04131E14
+ logging synchronous
+ login
+line vty 0 4
+ login local
+!
+!
+end
+
+R1#
+telnet> q
+Connection closed.
+[gns3user@localhost ~]$ telnet 192.168.1.20
+Trying 192.168.1.20...
+Connected to 192.168.1.20.
+Escape character is '^]'.
+
+
+User Access Verification
+
+Username: admin
+Password:
+R1#clock set 12:00:00 Jan 1 2021
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ntp server 192.168.1.10
+R1(config)#end
+R1#show ntp status
+Clock is unsynchronized, stratum 16, no reference clock
+nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**18
+reference time is 00000000.00000000 (00:00:00.000 UTC Mon Jan 1 1900)
+clock offset is 0.0000 msec, root delay is 0.00 msec
+root dispersion is 0.00 msec, peer dispersion is 0.00 msec
+R1#show clock
+12:00:10.247 UTC Fri Jan 1 2021
+R1#show ntp status
+Clock is synchronized, stratum 4, reference is 192.168.1.10
+nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**18
+reference time is E533F0F5.2A9B4330 (18:54:45.166 UTC Mon Nov 8 2021)
+clock offset is -20.6188 msec, root delay is 33.42 msec
+root dispersion is 193.48 msec, peer dispersion is 132.17 msec
+R1#show clock
+18:54:50.577 UTC Mon Nov 8 2021
+R1#write memory
+Building configuration...
+[OK]
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip tftp source-interface FastEthernet0/0
+R1(config)#end
+R1#write memory
+Building configuration...
+[OK]
+R1#copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak
+Address or name of remote host [192.168.1.10]?
+Destination filename [startup-config.bak]?
+!!
+1311 bytes copied in 0.104 secs (12606 bytes/sec)
+R1#copy tftp://192.168.1.10/startup-config.bak flash:/startup-config.bak
+Destination filename [startup-config.bak]?
+Accessing tftp://192.168.1.10/startup-config.bak...
+Loading startup-config.bak from 192.168.1.10 (via FastEthernet0/0): !
+[OK - 1311 bytes]
+
+1311 bytes copied in 0.216 secs (6069 bytes/sec)
+R1#show flash:
+-#- --length-- -----date/time------ path
+1         1311 Nov 8 2021 18:58:00 +00:00 startup-config.bak
+
+66871296 bytes available (4096 bytes used)
+
+R1#more flash:/startup-config.bak
+!
+! Last configuration change at 18:57:10 UTC Mon Nov 8 2021 by admin
+! NVRAM config last updated at 18:57:12 UTC Mon Nov 8 2021 by admin
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$P9wG$zqkyObWeTnDYqfsDiHXXT0
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin privilege 15 secret 5 $1$BLGZ$XfLJwhwnpaoAjxXQwHEVm/
+!
+!
+ip tcp synwait-time 5
+ip tftp source-interface FastEthernet0/0
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04110402
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04131E14
+ logging synchronous
+ login
+line vty 0 4
+ login local
+!
+ntp clock-period 17179856
+ntp server 192.168.1.10
+!
+end
+
+R1#
+R1#
+R1#
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip ftp source-interface FastEthernet0/0
+R1(config)#end
+R1#write memory
+Building configuration...
+[OK]
+R1#copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp
+Address or name of remote host [192.168.1.10]?
+Destination filename [startup-config.ftp]?
+Writing startup-config.ftp !
+1351 bytes copied in 0.248 secs (5448 bytes/sec)
+R1#copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp
+Destination filename [startup-config.ftp]?
+Accessing ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp...
+Loading startup-config.ftp !
+[OK - 1351/4096 bytes]
+
+1351 bytes copied in 0.508 secs (2659 bytes/sec)
+R1#show flash:
+-#- --length-- -----date/time------ path
+1         1311 Nov 8 2021 18:58:00 +00:00 startup-config.bak
+2         1351 Nov 8 2021 19:08:26 +00:00 startup-config.ftp
+
+66867200 bytes available (8192 bytes used)
+
+R1#more flash:/startup-config.ftp
+!
+! Last configuration change at 19:07:06 UTC Mon Nov 8 2021 by admin
+! NVRAM config last updated at 19:07:13 UTC Mon Nov 8 2021 by admin
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$P9wG$zqkyObWeTnDYqfsDiHXXT0
+!
+no aaa new-model
+memory-size iomem 5
+no ip icmp rate-limit unreachable
+ip cef
+!
+!
+!
+!
+no ip domain lookup
+ip auth-proxy max-nodata-conns 3
+ip admission max-nodata-conns 3
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username admin privilege 15 secret 5 $1$BLGZ$XfLJwhwnpaoAjxXQwHEVm/
+!
+!
+ip tcp synwait-time 5
+ip ftp source-interface FastEthernet0/0
+ip tftp source-interface FastEthernet0/0
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.1.20 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04110402
+ logging synchronous
+ login
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ password 7 121A0C04131E14
+ logging synchronous
+ login
+line vty 0 4
+ login local
+!
+ntp clock-period 17179848
+ntp server 192.168.1.10
+!
+end
+
+R1#copy nvram:/startup-config flash:/startup-config.alt
+Destination filename [startup-config.alt]?
+
+1351 bytes copied in 0.080 secs (16888 bytes/sec)
+R1#copy flash:/startup-config.bak nvram:/startup-config
+Destination filename [startup-config]?
+[OK]
+1311 bytes copied in 0.064 secs (20484 bytes/sec)
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#do dir nvram:
+Directory of nvram:/
+
+  150  -rw-        1311                    <no date>  startup-config
+  151  ----          24                    <no date>  private-config
+    1  -rw-           0                    <no date>  ifIndex-table
+
+155640 bytes total (153229 bytes free)
+R1(config)#exit
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#crypto key generate rsa general-keys label ADVENTURES modulus 1024
+The name for the keys will be: ADVENTURES
+
+% The key modulus size is 1024 bits
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+R1(config)#show crypto key mypubkey rsa
+             ^
+% Invalid input detected at '^' marker.
+
+R1(config)#ip ssh version 2
+R1(config)#end
+R1#write memory
+Building configuration...
+[OK]
+R1#show ip ssh
+SSH Enabled - version 2.0
+Authentication timeout: 120 secs; Authentication retries: 3
+R1#show crypto key mypubkey rsa
+% Key pair was generated at: 19:13:45 UTC Nov 8 2021
+Key name: ADVENTURES
+ Usage: General Purpose Key
+ Key is not exportable.
+ Key Data:
+  30819F30 0D06092A 864886F7 0D010101 05000381 8D003081 89028181 00BA793C
+  5EE44392 82C55577 54162092 5AB59F8F A1737A5A 2FC1116B 3F58022A B6FF796E
+  0DE90CA0 677A163E 49F16BD8 7BFF4D4E 2F96B1FB B2351074 743E1A33 7688AE90
+  66541029 2FA1388D EEE966AF 6DEB7DB1 53C8B896 572281DA C6348415 7880E9F4
+  1D17A6D8 FB331D51 D57B41E6 79938F63 ACC4334C 9CA87553 E78A1722 03020301 0001
+% Key pair was generated at: 19:13:45 UTC Nov 8 2021
+Key name: ADVENTURES.server
+ Usage: Encryption Key
+ Key is not exportable.
+ Key Data:
+  307C300D 06092A86 4886F70D 01010105 00036B00 30680261 00C22B61 EAFE1478
+  923453E1 1B2F3C4F A415109F E82D06B9 7AEDFEF5 821EA303 3CD43880 BC87B5E3
+  23704AC4 8004ACED C56B7373 A17BE1C3 55FBBA43 3566212B 280FFAA1 63B61FC2
+  5D602734 22A4D481 F88D7D0A FC30F749 BDE65B41 EF99ECF9 49020301 0001
+R1#
+telnet> q
+Connection closed.
+[gns3user@localhost ~]$ ssh admin@192.168.1.20
+The authenticity of host '192.168.1.20 (192.168.1.20)' can't be established.
+RSA key fingerprint is SHA256:f34Jpubj7ijg2egiO4lU0zOb8aFiDvnc8dFl8UaraQU.
+RSA key fingerprint is MD5:b2:0f:f7:32:97:ef:4c:f4:d3:53:f1:26:5d:5b:ec:76.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.1.20' (RSA) to the list of known hosts.
+Password:
+
+R1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip scp source-interface FastEthernet0/0
+R1(config)#end
+R1#write memory
+Building configuration...
+[OK]
+R1#copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
+Address or name of remote host [192.168.1.10]?
+Destination username [gns3user]?
+Destination filename [/var/lib/tftpboot/startup-config.scp]?
+Writing /var/lib/tftpboot/startup-config.scp
+Password:
+! Sink: C0644 1408 startup-config.scp
+
+1408 bytes copied in 8.952 secs (157 bytes/sec)
+R1#exit
+Connection to 192.168.1.20 closed.
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-port=23/tcp
+[sudo] password for gns3user:
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-port=21/tcp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-service=ftp
+success
+[gns3user@localhost ~]$ sudo systemctl stop vsftpd
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-port=123/udp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-service=ntp
+success
+[gns3user@localhost ~]$ sudo systemctl stop ntpd
+[gns3user@localhost ~]$ sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-port=69/udp
+success
+[gns3user@localhost ~]$ sudo firewall-cmd --zone=public --remove-service=tftp
+success
+[gns3user@localhost ~]$ sudo systemctl stop tftp
+Warning: Stopping tftp.service, but it can still be activated by:
+  tftp.socket
+[gns3user@localhost ~]$
