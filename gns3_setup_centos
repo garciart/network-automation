@@ -78,6 +78,7 @@ sudo mv ~/gns3_run /usr/bin/
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
+sudo yum -y install vsftpd
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
 # Optional - Modify vimrc file

@@ -2,21 +2,19 @@
 
 ![All Devices Started](../img/adventures-automation.gif)
 
-These labs will show you how to automate simple network tasks using Python:
+The labs in this folder will show you how to automate simple network tasks using Python. However, before starting the labs, run these commands through the Cisco command-line interface (CLI), as you would do with a real network device. This will give you an idea of what to look for and what to expect from each lab.
 
-- Access a network device's Privileged EXEC Mode
-- Format a network device's flash memory
-- Get information about a network device
-- Enable Layer 3 communications to and from a network device
-- Secure a network device
-- Set a network device's clock
-- Transfer files to and from a network device
-- Securely connect to a network device
-- Securely transfer files to and from a network device
+>**NOTE - This tutorial is primarily for Python programmers who are learning about network engineering. If you are a network engineer or know basic Cisco CLI commands, you can skip this tutorial and go the first lab.**
 
-However, before starting the labs, run these commands through the Cisco command-line interface (CLI), as you would do with a real network device. This will give you an idea of what to look for and what to expect from each lab.
-
->**NOTE - This tutorial is primarily for Python programmers who are learning about network engineering. If you are a network engineer or know basic Cisco CLI commands, you can skip this and go the first lab.**
+- [Access a network device's Privileged EXEC Mode](#access-a-network-devices-privileged-exec-mode "Access a network device's Privileged EXEC Mode")
+- [Format a network device's flash memory](#format-a-network-devices-flash-memory "Format a network device's flash memory")
+- [Get information about a network device](#get-information-about-a-network-device "Get information about a network device")
+- [Enable Layer 3 communications to and from a network device](#enable-layer-3-communications-to-and-from-a-network-device "Enable Layer 3 communications to and from a network device")
+- [Secure a network device](#secure-a-network device "Secure a network device")
+- [Set a network device's clock](#set-a-network-devices-clock "Set a network device's clock")
+- [Transfer files to and from a network device](#transfer-files-to-and-from-a-network-device "Transfer files to and from a network device")
+- [Securely connect to a network device](#securely-connect-to-a-network-device "Securely connect to a network device")
+- [Securely transfer files to and from a network device](#securely-transfer-files-to-and-from-a-network-device "Securely transfer files to and from a network device") 
 
 ---
 ## Set up the Host's Linux Environment 
@@ -25,46 +23,54 @@ First, ensure you have installed GNS3 per the instructions in the [Adventures in
 
 >**NOTE** - By the way, you will continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
-Second, make sure services required for the labs exist on the host. The services include:
+Second, make sure services required for the labs exist on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial). The services include:
 
 1. **Network Time Protocol (NTP)** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. By enabling an NTP service, the device can update its clock using the host's clock.
-2. **Trivial File Transfer Protocol (TFTP)** - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port. 
+2. **Trivial File Transfer Protocol (TFTP)** - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port.
+3. **Very Secure FTP Daemon (vsftpd)** - vsftpd is an FTP server, used by many Linux systems. It uses the more reliable Transmission Control Protocol (TCP) to connect and communicate with other devices, and it authenticates using the destination's username and password. It does not encrypt data out-of-the-box, but it can be customized to use Secure Sockets Layer (SSL), Transport Layer Security (TLS), etc.
 
 Check their statuses by entering the following commands:
 
 ```
-systemctl status tftp
 systemctl status ntpd
+systemctl status tftp
+systemctl status vsftpd
 ```
 
 After a few seconds, you will see the following output:
 
 ```
+[gns3user@localhost ~]$ systemctl status ntpd
+● ntpd.service - Network Time Service
+   Loaded: loaded (/usr/lib/systemd/system/ntpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
 [gns3user@localhost ~]$ systemctl status tftp
 ● tftp.service - Tftp Server
    Loaded: loaded (/usr/lib/systemd/system/tftp.service; indirect; vendor preset: disabled)
    Active: inactive (dead)
      Docs: man:in.tftpd
-[gns3user@localhost ~]$ systemctl status ntpd
-● ntpd.service - Network Time Service
-   Loaded: loaded (/usr/lib/systemd/system/ntpd.service; disabled; vendor preset: disabled)
+[gns3user@localhost ~]$ systemctl status vsftpd
+● vsftpd.service - Vsftpd ftp daemon
+   Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
    Active: inactive (dead)
 [gns3user@localhost ~]$ 
 ```
 
->**NOTE** - If you see ```Unit tftp.service could not be found.``` or ```Unit ntpd.service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>**NOTE** - If you see ```Unit ntpd.service could not be found.```, ```Unit tftp.service could not be found.``` or ```Unit vsftpd.service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 
 Now that you know the services exist, change your firewall settings by opening a Linux Terminal window and entering the following commands. If prompted, enter your sudo password:
 
 ```
+sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-service=ftp
+sudo firewall-cmd --zone=public --add-port=123/udp
+sudo firewall-cmd --zone=public --add-service=ntp
 sudo firewall-cmd --zone=public --add-port=23/tcp
 sudo firewall-cmd --zone=public --add-port=69/udp
 sudo firewall-cmd --zone=public --add-service=tftp
-sudo firewall-cmd --zone=public --add-port=123/udp
-sudo firewall-cmd --zone=public --add-service=ntp
 ```
 
-The first command allows Telnet client communications through port 23, while the next two commands allow TFTP client and server communications through port 69. The final two commands permit NTP traffic, allowing the host to act as an NTP server.
+The first two commands allow FTP client and server communications through port 21. The next two commands permit NTP traffic, allowing the host to act as an NTP server. The following command allows Telnet client communications through port 23. The final two commands allow TFTP client and server communications through port 69.
 
 >**NOTE** - Both Telnet and TFTP are not secure, but you will use them in the labs to demonstrate simple host-to-device communications and file transfers, before implementing more secure protocols. 
 
@@ -72,24 +78,10 @@ The first command allows Telnet client communications through port 23, while the
 > - Do not reload the firewall daemon. For security purposes, these changes are temporary and the ports will close if the system crashes or reboots.
 > - Do not install a Telnet service. You will only need the Telnet client, which you installed during the GNS3 setup. 
 
-Next, create the TFTP default directory (if it does not exist) and give it the necessary permissions to accept and send files:
+Now, enable the FTP service:
 
 ```
-sudo mkdir --parents --verbose /var/lib/tftpboot 
-sudo chmod 777 --verbose /var/lib/tftpboot
-```
-
-For many reasons, TFTP is very limited. TFTP can only copy to an ***existing*** file; it cannot ***create*** a new copy. Therefore, create a shell file for TFTP to copy data into, and give the shell the necessary permissions to accept the data:
-
-```
-sudo touch /var/lib/tftpboot/startup-config.bak
-sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
-```
-
-Finally, start the TFTP service:
-
-```
-sudo systemctl start tftp
+sudo systemctl start vsftpd
 ```
 
 For the NTP service, you may need to make some modifications to the host system. First, check if the host is configured as an NTP server by looking for the reserved NTP server address:
@@ -110,8 +102,28 @@ Finally, start the NTP service:
 sudo systemctl start ntpd
 ```
 
+Before you enable the TFTP service, create the TFTP default directory (if it does not exist) and give it the necessary permissions to accept and send files:
+
+```
+sudo mkdir --parents --verbose /var/lib/tftpboot 
+sudo chmod 777 --verbose /var/lib/tftpboot
+```
+
+For many reasons, TFTP is very limited. TFTP can only copy to an ***existing*** file; it cannot ***create*** a new copy. Therefore, create a shell file for TFTP to copy data into, and give the shell the necessary permissions to accept the data:
+
+```
+sudo touch /var/lib/tftpboot/startup-config.bak
+sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
+```
+
+Finally, start the TFTP service:
+
+```
+sudo systemctl start tftp
+```
+
 ---
-##Access a network device's Privileged EXEC Mode
+## Access a network device's Privileged EXEC Mode
 
 Now that you have set up the host system, you can run the commands in a Console port session. First, get the gateway IP address and Console port's number from the **Topology Summary** in the top left-hand corner.:
 
@@ -187,7 +199,7 @@ enable
 ```
 
 ---
-##Format a network device's flash memory
+## Format a network device's flash memory
 
 If you are prompted for a password, this means that the device has already been configured. Unfortunately, as we stated earlier, to run the labs, you will have to delete the device in the GNS3 workspace, and replace it with a new device.
 
@@ -229,7 +241,7 @@ R1#
 ```
 
 ---
-##Get information about a network device
+## Get information about a network device
 
 Now, there are times you will need to get the device's Internetwork Operating System (IOS) version, the device's serial number, etc. Enter the following commands to get that information:
 
@@ -256,7 +268,7 @@ R1#
 You are using a 3745 Router, serial number FTX0945W0MY, running Cisco's Advanced Enterprise Services IOS version 12.4(25d).
 
 ---
-##Enable Layer 3 communications to and from a network device
+## Enable Layer 3 communications to and from a network device
 
 Next, you will enable Layer 3 connectivity by assigning an IP address to the device. Right now, in GNS3, you are simulating a direct connection from the host to the device through the Console port. However, the Console port is not designed to be accessed remotely. Our goal is to automate tasks, such as IOS updates and reconfigurations, and perform them remotely. The best option is to use a secure shell (SSH) to connect to the device over the network, and, to use SSH, the device must have an IP address. Follow these steps:
 
@@ -322,11 +334,11 @@ R1#
 ```
 
 >**NOTE** - Most Cisco devices have two configuration files:
-> 1. **running-configuration** - This file keeps track of all changes to the device's configuration for the current session. It is held in the device's volatile RAM, and the file, along with any changes, are discarded when the device is turned off or reloaded, unless saved to the startup-configuration file. 
-> 2. **startup-configuration** - This file is stored in the device's nonvolatile random-access memory (NVRAM) and is read by the device upon startup. Any changes to the device's configuration must be saved to this file to become permanent. 
+> 1. **running-configuration** - This file keeps track of all changes to the device's configuration for the current session. It is held in the device's RAM (```system:```), and the file, along with any changes, are discarded when the device is turned off or reloaded, unless saved to the startup-configuration file. 
+> 2. **startup-configuration** - This file is stored in the device's nonvolatile random-access memory (```nvram:```) and is read by the device upon startup. Any changes to the device's configuration must be saved to this file to become permanent. 
 
 ---
-##Secure a network device
+## Secure a network device
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
@@ -616,7 +628,7 @@ R1#
 ```
 
 ---
-##Set a network device's clock
+## Set a network device's clock
 
 Next, you will set the device's clock. As we stated earlier, this is a simple, but very important, task, since tasks, such as logging or synchronization, depend on an up-to-date clock. To this manually, enter the following command:
 
@@ -661,9 +673,9 @@ write memory
 ```
 
 ---
-##Transfer files to and from a network device
+## Transfer files to and from a network device
 
->**NOTE** - You are now using Layer 3 communications, not a direct console line. As in real life, your connection may time out more often. Before sending commands in the blind, as you will do automating tasks using Python, always check you are connected first. 
+>**NOTE** - You are now using Layer 3 communications, not a direct console line. As in real life, your connection may time out more often. Before sending commands in the blind, as you will do when automating tasks using Python, always check you are connected first. 
 
 If you made it this far, congratulations!
 
@@ -753,6 +765,59 @@ ntp server 192.168.1.10
 end
 ```
 
+Now, you will once again back up the startup-configuration, this time using the more secure and reliable FTP service. 
+
+When transferring a file using FTP, you must supply the recipient's username and password. In addition, FTP will save the file in the recipient's home folder, preventing you from overwriting a system file or other sensitive data.
+
+>**NOTE** - If you attempt to send the file to /var/lib/tftpboot on a Security-Enhanced Linux (SELinux) enabled host, SELinux will stop the transfer, stating "Permission denied", regardless if the directory has full read-write-execute (777) permissions. You will have to modify SELinux, which is out of the scope of this basic tutorial.
+
+Enter the following commands:
+
+```
+configure terminal
+ip ftp source-interface FastEthernet0/0
+end
+write memory
+```
+
+This tells the device to use the FastEthernet port 0/0 for all FTP transfers.
+
+Next, transfer the file from the device to the host:
+
+```
+copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp
+```
+
+You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press Enter each time:
+
+```
+Address or name of remote host [192.168.1.10]? 
+Destination filename [startup-config.ftp]? 
+Writing startup-config.ftp !
+1230 bytes copied in 0.248 secs (4960 bytes/sec)
+R1#
+```
+
+If you open another Linux Terminal and enter the following command, you will see the backup file and its contents:
+
+```
+ll /home/gns3user
+cat /home/gns3user/startup-config.ftp
+```
+
+Now transfer the file from the host back to the device:
+
+```
+copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp
+```
+
+Use the following commands to see the uploaded file and its contents:
+
+```
+show flash:
+more flash:/startup-config.ftp
+```
+
 Of course, you can copy a file from the NVRAM to flash memory directly and vice versa:
 
 ```
@@ -760,14 +825,29 @@ copy nvram:/startup-config flash:/startup-config.alt
 copy flash:/startup-config.bak nvram:/startup-config
 ```
 
-However, do not copy a file into NVRAM that is not supposed to be there! NVRAM has a limited amount of memory, and it is for the IOS image and configuration files.
+However, do not copy a file into NVRAM that is not supposed to be there! NVRAM has a limited amount of memory (sometimes less than 1 MB), and it is for configuration files, etc.
 
->**NOTE** - TRUST ME! You do not want to play with the NVRAM, unless you have 2+ hours to spare to transfer the IOS image over xmodem (if everything goes well :rage:)
+>**NOTE** - TRUST ME! You do not want to play with the NVRAM, unless you have half a day to spare to transfer the IOS image over xmodem (if everything goes well :rage:). But if you want to take a peek:
+> 
+>```
+>R1#configure terminal
+>Enter configuration commands, one per line.  End with CNTL/Z.
+>R1(config)#do dir nvram:
+>Directory of nvram:/
+>
+>  147  -rw-        1332                    <no date>  startup-config
+>  148  ----        1920                    <no date>  private-config
+>    1  -rw-           0                    <no date>  ifIndex-table
+>
+>155640 bytes total (151312 bytes free)
+>R1(config)#exit
+>R1#
+>```
 
 ---
-##Securely connect to a network device
+## Securely connect to a network device
 
-Until now, you have been using Telnet to interact with the device. As we stated before, Telnet is not secure. While it does use the reliable Transmission Control Protocol (TCP), for communications, neither credentials nor data transferred through Telnet is encrypted. A better option is to access the device using the Secure Shell (SSH) protocol.
+Until now, you have been using Telnet to interact with the device. As we stated before, Telnet is not secure. Neither credentials nor data transferred through Telnet is encrypted. A better option is to access the device using the Secure Shell (SSH) protocol.
 
 >**NOTE** - For a great story about SSH from its creator, Tatu Ylonen, check out [How SSH port became 22](https://www.ssh.com/academy/ssh/port "How SSH port became 22")
 
@@ -894,35 +974,42 @@ cat /var/lib/tftpboot/scp_start.cfg
 Go back to the SSH session and exit by entering ```exit``` st the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
 
 ---
-##Congratulations!
+## Cleanup
 
-Nicely done! Now that you have walked through common tasks and their commands through the Cisco command-line interface (CLI), you can begin to automate them using Python and Pexpect. Go to Lab 1 when you are ready and good luck!
+Before you finish, you will want to shut down all the services you started. Aside from the fact that they use resources, leaving unused services open and available gives threat actors more avenues to hack your system, which is not a good thing. Enter the following commands to shut things down:
+
+### Telnet Client
+
+```
+sudo firewall-cmd --zone=public --remove-port=23/tcp
+```
+
+### File Transfer Protocol (FTP) Service
+
+```
+sudo firewall-cmd --zone=public --remove-port=21/tcp
+sudo firewall-cmd --zone=public --remove-service=ftp
+sudo systemctl stop vsftpd
+```
+
+### Network Time Protocol (NTP) Service
+
+```
+sudo firewall-cmd --zone=public --remove-port=123/udp
+sudo firewall-cmd --zone=public --remove-service=ntp
+sudo systemctl stop ntpd
+sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf
+```
+
+### Trivial File Transfer Protocol (TFTP) Service
+
+```
+sudo firewall-cmd --zone=public --remove-port=69/udp
+sudo firewall-cmd --zone=public --remove-service=tftp
+sudo systemctl stop tftp
+```
 
 ---
-FTP NOTES
+## Congratulations!
 
-```
-sudo yum install vsftpd
-sudo firewall-cmd --zone=public --add-port=21/tcp
-sudo firewall-cmd --zone=public --add-service=ftp
-systemctl start vsftpd
-```
-
-```
-R1#configure terminal
-R1(config)#ip ftp source-interface FastEthernet0/0
-R1(config)#end
-R1#copy startup-config ftp://gns3user:gns3user@192.168.1.10/test2.cfg                  
-Address or name of remote host [192.168.1.10]? 
-Destination filename [test2.cfg]? 
-Writing test2.cfg !
-1330 bytes copied in 0.240 secs (5542 bytes/sec)
-R1#
-```
-
-```
-ll /home/gns3user/test2.cfg
--rw-r--r--. 1 gns3user gns3user 1330 Nov  8 02:10 /home/gns3user/test2.cfg
-```
-
-Ran into SELinux problem when I attempt to transfer into the /var/lib/tftpboot directory (Permission denied)
+Nicely done! Now that you have walked through common tasks and their commands through the Cisco command-line interface (CLI), you can begin to automate them using Python and Pexpect. Go to Lab 1 when you are ready and good luck!
