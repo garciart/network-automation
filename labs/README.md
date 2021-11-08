@@ -10,7 +10,7 @@ The labs in this folder will show you how to automate simple network tasks using
 - [Format a network device's flash memory](#format-a-network-devices-flash-memory "Format a network device's flash memory")
 - [Get information about a network device](#get-information-about-a-network-device "Get information about a network device")
 - [Enable Layer 3 communications to and from a network device](#enable-layer-3-communications-to-and-from-a-network-device "Enable Layer 3 communications to and from a network device")
-- [Secure a network device](#secure-a-network device "Secure a network device")
+- [Secure a network device](#secure-a-network-device "Secure a network device")
 - [Set a network device's clock](#set-a-network-devices-clock "Set a network device's clock")
 - [Transfer files to and from a network device](#transfer-files-to-and-from-a-network-device "Transfer files to and from a network device")
 - [Securely connect to a network device](#securely-connect-to-a-network-device "Securely connect to a network device")
@@ -19,11 +19,11 @@ The labs in this folder will show you how to automate simple network tasks using
 ---
 ## Set up the Host's Linux Environment 
 
-First, ensure you have installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. As we stated in the post script of that tutorial, enter ```gns3_run``` in a Linux Terminal to start GNS3.
+First, ensure you have installed and started GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. We recommend you follow our suggestion in the post-script to open a Linux Terminal and start GNS3 by entering ```gns3_run```. For this tutorial, we will continue to use "lab000-demo".
 
 >**NOTE** - By the way, you will continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
-Second, make sure services required for the labs exist on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial). The services include:
+Second, make sure the services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial). The services include:
 
 1. **Network Time Protocol (NTP)** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. By enabling an NTP service, the device can update its clock using the host's clock.
 2. **Trivial File Transfer Protocol (TFTP)** - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port.
@@ -462,10 +462,7 @@ show startup-config
 You should see something similar to the following output:
 
 ```
-Using 1118 out of 155640 bytes
-!
-! Last configuration change at 12:00:46 UTC Fri Jan 1 2021
-! NVRAM config last updated at 12:00:50 UTC Fri Jan 1 2021
+Using 1017 out of 155640 bytes
 !
 version 12.4
 service timestamps debug datetime msec
@@ -643,12 +640,17 @@ After a few seconds, you will see the following output:
 R1#
 ```
 
-Unfortunately, our device may not retain manual clock settings after it is powered down. Luckily, you activated an NTP service on the host; now that you have Layer 3 connectivity, the device can use the host to update its clock. Do this by entering the following command:
+Unfortunately, our device may not retain manual clock settings after it is powered down. Luckily, you activated an NTP service on the host; now that you have Layer 3 connectivity, the device can use the host to update its clock. Do this by entering the following commands:
 
 ```
 configure terminal
 ntp server 192.168.1.10
 end
+```
+
+Wait a few seconds for the NTP service to connect, and enter the following commands:
+
+```
 show ntp status
 show clock
 ```
@@ -657,13 +659,13 @@ After a few seconds, you will see the following output:
 
 ```
 R1#show ntp status
-Clock is unsynchronized, stratum 16, no reference clock
+Clock is synchronized, stratum 4, reference is 192.168.1.10
 nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**18
-reference time is E532E1B1.AA29D0D3 (23:37:21.664 UTC Sun Nov 7 2021)
-clock offset is 4891.1245 msec, root delay is 98.69 msec
-root dispersion is 20805.36 msec, peer dispersion is 16000.00 msec
-R1#show clock
-23:37:39.071 UTC Sun Nov 7 2021
+reference time is E533F0F5.2A9B4330 (18:54:45.166 UTC Mon Nov 8 2021)
+clock offset is -20.6188 msec, root delay is 33.42 msec
+root dispersion is 193.48 msec, peer dispersion is 132.17 msec
+R1#show clock     
+18:54:50.577 UTC Mon Nov 8 2021
 ```
 
 Your devices clock should match your system clock, offset for Coordinated Universal Time (UTC). If you update the startup-configuration, the device will always check the host's IP address for an NTP server:
@@ -698,13 +700,13 @@ Next, transfer the file from the device to the host:
 copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak
 ```
 
-You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
+You may be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
 ```
 Address or name of remote host [192.168.1.10]? 
 Destination filename [startup-config.bak]? 
 !!
-1244 bytes copied in 0.116 secs (10724 bytes/sec)
+1311 bytes copied in 0.104 secs (12606 bytes/sec)
 R1#
 ```
 
@@ -727,9 +729,9 @@ You will be prompted to confirm the destination filename. You've already provide
 Destination filename [startup-config.bak]? 
 Accessing tftp://192.168.1.10/startup-config.bak...
 Loading startup-config.bak from 192.168.1.10 (via FastEthernet0/0): !
-[OK - 1244 bytes]
+[OK - 1311 bytes]
 
-1244 bytes copied in 0.216 secs (5759 bytes/sec)
+1311 bytes copied in 0.216 secs (6069 bytes/sec)
 R1#
 ```
 
@@ -745,21 +747,18 @@ After a few seconds, you will see the following output. By the way, press <kbd>S
 ```
 R1#show flash:
 -#- --length-- -----date/time------ path
-1         1244 Nov 8 2021 03:30:32 +00:00 startup-config.bak
+1         1311 Nov 8 2021 18:58:00 +00:00 startup-config.bak
 
 66871296 bytes available (4096 bytes used)
 
 R1#more flash:/startup-config.bak
-version 12.4
-service timestamps debug datetime msec
-service timestamps log datetime msec
-service password-encryption
+!
+! Last configuration change at 18:57:10 UTC Mon Nov 8 2021 by admin
+! NVRAM config last updated at 18:57:12 UTC Mon Nov 8 2021 by admin
 
 ...
 
-line vty 0 4
- login local
-!
+ntp clock-period 17179856
 ntp server 192.168.1.10
 !
 end
@@ -788,13 +787,13 @@ Next, transfer the file from the device to the host:
 copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp
 ```
 
-You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press Enter each time:
+You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
 ```
 Address or name of remote host [192.168.1.10]? 
 Destination filename [startup-config.ftp]? 
 Writing startup-config.ftp !
-1230 bytes copied in 0.248 secs (4960 bytes/sec)
+1351 bytes copied in 0.248 secs (5448 bytes/sec)
 R1#
 ```
 
@@ -811,11 +810,47 @@ Now transfer the file from the host back to the device:
 copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp
 ```
 
+You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
+
+```
+Destination filename [startup-config.ftp]? 
+Accessing ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp...
+Loading startup-config.ftp !
+[OK - 1351/4096 bytes]
+
+1351 bytes copied in 0.508 secs (2659 bytes/sec)
+R1#
+```
+
 Use the following commands to see the uploaded file and its contents:
 
 ```
 show flash:
 more flash:/startup-config.ftp
+```
+
+After a few seconds, you will see the following output. By the way, press <kbd>Space</kbd> to continue at the ```--More--``` prompt:
+
+```
+R1#show flash:
+-#- --length-- -----date/time------ path
+1         1311 Nov 8 2021 18:58:00 +00:00 startup-config.bak
+2         1351 Nov 8 2021 19:08:26 +00:00 startup-config.ftp
+
+66867200 bytes available (8192 bytes used)
+
+R1#more flash:/startup-config.ftp
+!
+! Last configuration change at 19:07:06 UTC Mon Nov 8 2021 by admin
+! NVRAM config last updated at 19:07:13 UTC Mon Nov 8 2021 by admin
+
+...
+
+ntp clock-period 17179848
+ntp server 192.168.1.10
+!
+end
+R1#
 ```
 
 Of course, you can copy a file from the NVRAM to flash memory directly and vice versa:
@@ -875,13 +910,11 @@ R1(config)#
 
 Before you continue, let's talk about the last command you typed in. As we said, the ```crypto key generate``` command is used to generate the key pairs your device will need to securely connect to the host. In this case, you used the RSA algorithm for the device's digital signature (the other option is the Digital Signature Algorithm (DSA)), and you wanted to generate a set of general-purpose keys, as opposed to key pairs for a specific task. The next option, ```label ADVENTURES``` is a unique identifier for the generated keys; you can maintain multiple sets of keys for different purposes.
 
-Regarding the final option, ```modulus 1024```, and without getting into how the RSA algorithm works, the larger the modulus, the harder it will be to break the keys, but the longer it will take to generate the keys. The default modulus is 1024 bits, which can be used for the latest version, SSH-2. The recommended size is 2048 bits and the latest maximum size that Cisco allows is 4096 bits. However, SSH version 1 can only use keys up to 768 bits; remember this when generating keys to speak with older devices and hosts that can only use SSH-1. 
+Regarding the final option, ```modulus 1024```, and without getting into how the RSA algorithm works, the larger the modulus, the harder it will be to break the keys, but the longer it will take to generate the keys.
 
-To see the keys, enter the following command:
+>**NOTE** - When automating tasks, you need to keep these delays in mind, otherwise, you will be running commands on top of each other. For example, a Cisco 4700 switch may take four seconds to generate a key pair using a 1024-bit modulus, while it may take an older Cisco 2500 over four minutes! Sending a command before another command has finished processing will cause your scripts to fail.
 
-```
-show crypto key mypubkey rsa
-```
+The default modulus is 1024 bits, which can be used for the latest version, SSH-2. The recommended size is 2048 bits and the latest maximum size that Cisco allows is 4096 bits. However, SSH version 1 can only use keys up to 768 bits; remember this when generating keys to speak with older devices and hosts that can only use SSH-1. 
 
 Since the modulus of the keys the device generated was greater than 768 bits, you can use SSH-2. Enter the following commands to set the SSH version:
 
@@ -900,7 +933,13 @@ Authentication timeout: 120 secs; Authentication retries: 3
 R1#
 ```
 
->**NOTE** - If you see ```SSH Enabled - version 1.99```, reset the SSH version to 2. SSH 1.99 is not an SSH version; it just means that the device supports SSH-1 and SSH-2. You want to use SSH-2.
+>**NOTE** - If you see ```SSH Enabled - version 1.99```, reset the SSH version to 2 again. SSH 1.99 is not an SSH version; it just means that the device supports SSH-1 and SSH-2. You want to use SSH-2.
+
+To see the keys, enter the following command:
+
+```
+show crypto key mypubkey rsa
+```
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
@@ -933,16 +972,29 @@ R1#
 ```
 
 ---
-#Securely transfer files to and from a network device
+## Securely transfer files to and from a network device
 
 There are several ways to securely copy files to and from a device, such as using the Secure Copy Protocol (SCP) or the SSH File Transfer Protocol (SFTP). You will be using SCP for the lab.
 
-Like SSH, SCP requires some setup before it can be used. The good news is that you have done all the work already! You have enabled Layer 3 communications; updated the system clock using an NTP service; secured the VTY lines with a username and password; and generated the RSA key pairs required for authentication. So, without further ado, enter the following command:
+Like SSH, SCP requires some setup before it can be used. The good news is that you have done all the work already! You have enabled Layer 3 communications; updated the system clock using an NTP service; secured the VTY lines with a username and password; and generated the RSA key pairs required for authentication.
 
->**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. Since we are still using the /var/lib/tftpboot/ directory, use two backslashes after the IP address, or SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg):
+Enter the following commands:
 
 ```
-copy startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/scp_start.cfg
+configure terminal
+ip scp source-interface FastEthernet0/0
+end
+write memory
+```
+
+This tells the device to use the FastEthernet port 0/0 for all SCP transfers.
+
+Next, transfer the file from the device to the host:
+
+>**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. Since we are still using the /var/lib/tftpboot/ directory, use two backslashes after the IP address, or SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg).
+
+```
+copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
 ```
 
 You will be prompted to confirm the remote host's IP address, the remote host's username, and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
@@ -950,17 +1002,17 @@ You will be prompted to confirm the remote host's IP address, the remote host's 
 ```
 Address or name of remote host [192.168.1.10]? 
 Destination username [gns3user]? 
-Destination filename [/var/lib/tftpboot/scp_start.cfg]?
+Destination filename [/var/lib/tftpboot/startup-config.scp]? 
 ```
 
-After a few seconds, you will see the following output:
+After a few seconds, you will see the following output. Enter the ***remote host's password*** when prompted:
 
 ```
-Writing /var/lib/tftpboot/scp_start.cfg
+Writing /var/lib/tftpboot/startup-config.scp 
 Password: 
-! Sink: C0644 1330 scp_start.cfg
+! Sink: C0644 1408 startup-config.scp
 
-1330 bytes copied in 3.596 secs (370 bytes/sec)
+1408 bytes copied in 8.952 secs (157 bytes/sec)
 R1#
 ```
 
@@ -968,15 +1020,15 @@ If you open another Linux Terminal and enter the following command, you will see
 
 ```
 ll /var/lib/tftpboot
-cat /var/lib/tftpboot/scp_start.cfg
+cat /var/lib/tftpboot/startup-config.scp
 ```
 
-Go back to the SSH session and exit by entering ```exit``` st the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
+Go back to the SSH session and exit by entering ```exit``` at the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
 
 ---
 ## Cleanup
 
-Before you finish, you will want to shut down all the services you started. Aside from the fact that they use resources, leaving unused services open and available gives threat actors more avenues to hack your system, which is not a good thing. Enter the following commands to shut things down:
+Before you finish, you will want to shut down all the services you started. Aside from the fact that they use resources, leaving unused services open and available gives threat actors more avenues to hack your system, which is not a good thing. Enter the following commands to shut things down (enter the host's password if prompted):
 
 ### Telnet Client
 
