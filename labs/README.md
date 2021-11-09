@@ -912,7 +912,7 @@ Before you continue, let's talk about the last command you typed in. As we said,
 
 Regarding the final option, ```modulus 1024```, and without getting into how the RSA algorithm works, the larger the modulus, the harder it will be to break the keys, but the longer it will take to generate the keys.
 
->**NOTE** - When automating tasks, you need to keep these delays in mind, otherwise, you will be running commands on top of each other. For example, a Cisco 4700 switch may take four seconds to generate a key pair using a 1024-bit modulus, while it may take an older Cisco 2500 over four minutes! Sending a command before another command has finished processing will cause your scripts to fail.
+>**NOTE** - When automating tasks, you need to keep these delays in mind, otherwise, you will be running commands on top of each other. For example, a Cisco 4700 may take four seconds to generate a key pair using a 1024-bit modulus, while it may take an older Cisco 2500 over four minutes to do the same thing! Sending a command before another command has finished processing will cause your scripts to fail.
 
 The default modulus is 1024 bits, which can be used for the latest version, SSH-2. The recommended size is 2048 bits and the latest maximum size that Cisco allows is 4096 bits. However, SSH version 1 can only use keys up to 768 bits; remember this when generating keys to speak with older devices and hosts that can only use SSH-1. 
 
