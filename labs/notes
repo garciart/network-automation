@@ -1,3 +1,59 @@
+FOR FLASH FORMAT LAB!
+
+When you first configured the router, you gave it a default IOS image (c3745-adventerprisek9-mz.124-25d.bin). However, when the router first starts, it looks for an IOS image in flash memory. This is because the 3745 can store multiple IOS's in flash memory; you tell the router which one you want to use, by inputting ```boot system flash:<the IOS filename>.bin``` at a configuration prompt and saving it in the start-up configuration file. If the router does not find an IOS there, it will look in its Read-Only Memory (ROM) for a default IOS.
+
+Our router will do this because you have not formatted our flash memory, preventing us from uploading another IOS. As a matter of fact, you may see the following error:
+
+```
+PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+```
+
+In this lab, you will not need another IOS, but you do want to use our flash memory, so let us fix our memory issue, by inputting the following command:
+
+```
+format flash:
+```
+
+You will be asked to confirm the format operation twice. Press <kbd>Enter</kbd> both times:
+
+```
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+```
+
+You should see output similar to the following:
+
+```
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete
+..
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+
+R1#
+```
+
+Input ```show flash``` to see what is in the drive:
+
+```
+No files on device
+66875392 bytes available (0 bytes used)
+
+R1#
+```
+
+
+
+
+
+
 R1#
 R1#write erase
 Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
