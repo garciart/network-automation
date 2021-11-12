@@ -344,7 +344,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 ![Reload the Device](../img/b01.png)
 
-Now, at the Linux prompt, attempt to Telnet into the device using the IP address:
+Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
 ```
 telnet 192.168.1.20
@@ -604,7 +604,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 ![Reload the Device](../img/b01.png)
 
-Now, at the Linux prompt, attempt to Telnet into the device using the IP address:
+Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
 ```
 telnet 192.168.1.20
@@ -945,7 +945,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 ![Reload the Device](../img/b01.png)
 
-Now, at the Linux prompt, attempt to SSH into the device using the username and the IP address:
+Go back to the Linux Terminal and attempt to SSH into the device using the username and the IP address:
 
 ```
 ssh admin@192.168.1.20

@@ -2,25 +2,33 @@
 
 ![All Devices Started](img/adventures-automation.gif)
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since the devices that use those images are no longer supported by Cisco. They recommend using more up-to-date images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, we will use the freely available Dynamips images.***
+***Note - While I do not expect you to be an expert or certified in any of the technologies I cover in this tutorial, I expect that:***
 
-***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator, and not suitable for our purposes.***
+- ***You have used the Linux Terminal before***
+- ***You understand the basics of computer networking, especially the TCP/IP or OSI models***
+- ***You have programmed in Python before***
+
+---
+
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since Cisco no longer supports those devices or their Internetwork Operating Systems (IOS). They recommend using newer images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, you will use the freely available Dynamips images instead.***
+
+***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator. Its ability to interact with host devices is limited, and it is not suitable for our purposes.***
 
 ## Introduction
 
-Manually configuring a network device is not a difficult process. You simply access the device's command line interface (CLI) through its console or auxiliary port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL). Sometimes, though, you may accidentally skip a step or enter a wrong IP address, making the configuration process more difficult and time-consuming.
+Manually configuring a network device is not a difficult process. You simpy access the device's command line interface (CLI) through a console, auxiliary port or virtual teletype port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL).
 
-Now, imagine if you had to configure or update dozens or hundreds of devices. Chances are that you will make a few mistakes along the way. In addition, depending on the number of devices, by the time you were done, you would need to do another update!  
+However, imagine if you had to configure or update dozens or hundreds of devices. It could take a long time, and, by the time you were done, you could be sent another configuration change or update, requiring you to start the process all over again! In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
 
-Can we automate the process, using a scripting language such as Python? The answer is ***yes***, but the bad news is that each time you would like to test a script, you would need to "spin-up" a physical device. This may not always be practical; in some cases, you would have to take the device (and possibly the cabinet) offline.  
+Automating the process using a scripting language, such as Python, is a better option. The bad news is that each time you would like to test your code, whether your changes are big or small, you would need to "spin-up" a physical device, which may take time or require you to take the device (and possibly the cabinet) offline.  
 
-However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run Cisco Internetwork Operating System (IOS) images, and, with a little tweaking, allow you to test your code against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
+However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run Cisco Internetwork Operating System (IOS) images, and, with a little tweaking, allow you to test your code quickly against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
 
 This tutorial is broken down into three parts:
 
 - [Installing GNS3](#installing-gns3 "Installing GNS3")
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
-- [Running the Labs](#running-the-labs "Running the Labs")
+- [Your First Lab](#your-first-lab "Your First Lab")
 
 >**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
 
@@ -28,12 +36,9 @@ This tutorial is broken down into three parts:
 
 ## Installing GNS3
 
-Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, we will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
+Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, you will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
->**NOTE** - Why did I pick CentOS for this tutorial?
->- I use Fedora, RHEL, and CentOS, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS.
->- Many companies and government agencies, such as NASA and the DOD, use Red Hat Linux, the commercial version of CentOS, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
->- It was hard, but fun. Plus, I got to learn GNS3's dependencies, which will allow me to install it on other OS's.
+>**NOTE** - I picked CentOS for this tutorial because I use Red Hat Linux (RHEL) and CentOS quite a bit, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS. It was fun, and the process helped me learn GNS3's dependencies. In addition, many companies and government agencies, such as Northrup Grumman and NASA, use RHEL, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
 To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, I recommend you review the instructions on the following sites:
 
@@ -98,104 +103,104 @@ git clone https://github.com/garciart/Automation.git
 cd Automation
 ```
 
-Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into [one executable shell script](gns3_setup_centos "CentOS Setup Script"). Before you run the script, I highly recommend you look at its commands and comments, so you can become familiar with GNS3's dependencies:
+Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into the following list of commands:
 
->Contents of the **gns3_setup_centos** shell script:
->```
->#!/usr/bin/bash
->echo -e "Setting up GNS3..."
->echo -e "Using:"
->cat /etc/centos-release
->echo -e "Updating CentOS"
->sudo yum -y update
->sudo yum -y upgrade
-># Install Python 3 and pip
->sudo yum -y install python3 # Also installs python3-setuptools
->sudo python3 -m pip install --upgrade pip
->sudo python3 -m ensurepip
->sudo yum -y install python3-devel
->sudo yum -y install python3-tools
-># Install Git
->sudo yum -y install git
-># Install GNS3 dependencies
->sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but we will need the other tools later
->sudo yum -y install elfutils-libelf-devel # For Dynamips
->sudo yum -y install libpcap-devel # For Dynamips
->sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
->sudo yum -y install glibc-static # For VCPS
->sudo yum -y install telnet # Yes, we will use Telnet
-># Install Qt GUI library
->sudo yum -y install qt5-qtbase
->sudo yum -y install qt5-qtbase-devel
->sudo yum -y install qt5-qtsvg
->sudo yum -y install qt5-qtsvg-devel
-># Install xterm, one of the consoles used by GNS, and resize its output
->sudo yum -y install xterm
->echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
->sudo xrdb -merge ~/.Xresources
-># Install GNS3
->sudo python3 -m pip install gns3-server
->sudo python3 -m pip install gns3-gui
->sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
->sudo python3 -m pip install pyqt5
->sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
->sudo yum -y install putty # Get from epel
-># KVM: A Linux kernel module that interacts with the virtualization features of the processor.
-># QEMU: Virtualization software that emulates virtual processors and peripherals.
-># QEMU-KVM: Type 1 hypervisor that runs in kernel space and QEMU: type 2 hypervisor that runs in user space
->sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
-># Install the Dynamips Cisco Emulator
->cd /tmp || exit
->git clone https://github.com/GNS3/dynamips.git
->cd dynamips || exit
->mkdir build
->cd build/ || exit
->cmake .. -DDYNAMIPS_CODE=stable
->make
->sudo make install
-># Install the Virtual PC Simulator (vpcs)
->cd /tmp || exit
->sudo yum -y install svn
->svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
->cd vpcs/src || exit
->./mk.sh 64
->sudo install -m 755 vpcs /usr/local/bin
-># Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
->cd /tmp || exit
->git clone https://github.com/GNS3/ubridge.git
->cd ubridge || exit
->make
->sudo make install
->cd ~ || exit
-># Get router image and configuration file
->wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
->wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
-># Used to create interfaces to connect the host to GNS3
->sudo yum -y install bridge-utils
-># Install pexpect to control interactions with external devices
->sudo yum -y install pexpect # (For Python 2.7+)
->sudo python3 -m pip install pexpect # (For Python 3.6+)
-># Get the script that creates a tap/loopback interface in Linux and launches GNS3
->wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
-># Make the start-up script executable and place it in /usr/bin
->sudo chmod 755 ~/gns3_run
->sudo mv ~/gns3_run /usr/bin/
-># Optional - Modify vimrc file
->echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
->echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."
->```
+>**NOTE** - Do not run any commands as **root**! Otherwise, some files and executables will end up in the wrong place or have the wrong permissions, and GNS3 will not work.
+>
+>![GNS3 root error](img/ps-error1.png)
 
-Now, you have a choice: you can open a Linux Terminal and enter each of the above lines, one at a time, or you can use the [executable script](gns3_setup_centos "CentOS Setup Script"). If you choose to run the script (as we recommend), make the shell script executable and run it, piping any errors and the output into a text file. It will take a while to finish, so be patient:
+```
+sudo yum -y update
+# Install Python 3 and pip
+sudo yum -y install python3 # Also installs python3-setuptools
+sudo python3 -m pip install --upgrade pip
+sudo python3 -m ensurepip
+sudo yum -y install python3-devel
+sudo yum -y install python3-tools
+# Install GNS3 dependencies
+sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but we will need the other tools later
+sudo yum -y install elfutils-libelf-devel # For Dynamips
+sudo yum -y install libpcap-devel # For Dynamips
+sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
+sudo yum -y install glibc-static # For VCPS
+# Install Qt GUI library
+sudo yum -y install qt5-qtbase
+sudo yum -y install qt5-qtbase-devel
+sudo yum -y install qt5-qtsvg
+sudo yum -y install qt5-qtsvg-devel
+# Install xterm, one of the consoles used by GNS, and resize its output
+sudo yum -y install xterm
+echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
+sudo xrdb -merge ~/.Xresources
+# Install GNS3
+sudo python3 -m pip install gns3-server
+sudo python3 -m pip install gns3-gui
+sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
+sudo python3 -m pip install pyqt5
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
+sudo yum -y install putty # Get from epel
+# KVM: A Linux kernel module that interacts with the virtualization features of the processor.
+# QEMU: Virtualization software that emulates virtual processors and peripherals.
+# QEMU-KVM: Type 1 hypervisor that runs in kernel space and QEMU: type 2 hypervisor that runs in user space
+sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
+# Install the Dynamips Cisco Emulator
+cd /tmp || exit
+git clone https://github.com/GNS3/dynamips.git
+cd dynamips || exit
+mkdir build
+cd build/ || exit
+cmake .. -DDYNAMIPS_CODE=stable
+make
+sudo make install
+# Install the Virtual PC Simulator (vpcs)
+cd /tmp || exit
+sudo yum -y install svn
+svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
+cd vpcs/src || exit
+./mk.sh 64
+sudo install -m 755 vpcs /usr/local/bin
+# Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
+cd /tmp || exit
+git clone https://github.com/GNS3/ubridge.git
+cd ubridge || exit
+make
+sudo make install
+cd ~ || exit
+# Get router image and configuration file
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
+wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
+# Used to create interfaces to connect the host to GNS3
+sudo yum -y install bridge-utils
+# Install pexpect to control interactions with external devices
+sudo yum -y install pexpect # (For Python 2.7+)
+sudo python3 -m pip install pexpect # (For Python 3.6+)
+# Get the script that creates a tap/loopback interface in Linux and launches GNS3
+wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
+# Make the start-up script executable and place it in /usr/bin
+sudo chmod 755 ~/gns3_run
+sudo mv ~/gns3_run /usr/bin/
+# Required for the labs
+sudo yum -y install telnet
+sudo yum -y install tftp tftp-server*
+sudo yum -y install ntp
+sudo yum -y install vsftpd
+sudo mkdir -p /var/lib/tftpboot
+sudo chmod 777 /var/lib/tftpboot
+# Optional - Modify vimrc file
+echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
+```
+
+Now, the first time you install GNS3, I suggest you open a Linux Terminal and enter each of the above lines, one at a time. Look up any commands or programs you are unfamiliar with.
+
+>If you run into errors downloading IOS images from the [tfr.org](http://tfr.org "tfr.org") website, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes.
+
+If you need to reinstall GNS3, you can use the [executable script](gns3_setup_centos "CentOS Setup Script") I created and included in this repo. Make the shell script executable and run it, piping any errors and the output into a text file. It will take a while to finish, so be patient:
 
 ```
 sudo chmod +x gns3_setup_centos
 ./gns3_setup_centos 2>&1 | tee setup_output.txt # DO NOT RUN AS SUDO 
 grep -i -e "error" -e "warning" setup_output.txt
 ```
-
->**NOTE** - Do not run any commands as **root**! Otherwise, some files and executables will end up in the wrong place or have the wrong permissions, and GNS3 will not work.
->
->![GNS3 root error](img/ps-error1.png)
 
 Installation will take a few minutes, but once it is complete, check the text file for any errors. Correct any errors or, if necessary, delete the VM and start over again. Otherwise, if there are no errors, you can delete the output file and reboot the VM:
 
@@ -206,7 +211,7 @@ sudo reboot now
 
 >**NOTE** - For the labs, you will use images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
 >
->The [gns3_setup_centos](gns3_setup_centos "CentOS Setup Script") shell script attempts to download the files from the [tfr.org](http://tfr.org "tfr.org") website, but if that fails, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes. Here are the names of the files, their hashes, and some additional information:
+>Here are the names of the files, their hashes, and some additional information:
 >
 >- **Cisco 3745 Multi-Service Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -231,7 +236,7 @@ sudo reboot now
 
 ## Setting up the environment
 
-Before we start, here is the subnet information for the network:
+Before you start, here is the subnet information for the network:
 
 ```
 - Network Address: 192.168.1.0/24
@@ -245,7 +250,7 @@ Before we start, here is the subnet information for the network:
 - GNS3 Device Starting IP: 192.168.1.20
 ```
 
-As we stated before, we will create virtual network devices in GNS3, which will exist within our virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. We want to code on our host machine and test the code in GNS3. Therefore, we want to connect the GNS3 VLAN to our host machine. To do this, we will:
+As I stated before, you will create virtual network devices in GNS3, which will exist within our virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. You want to code on our host machine and test the code in GNS3. Therefore, you want to connect the GNS3 VLAN to our host machine. To do this, you will:
 
 - Create a virtual network bridge.
 - Create a Layer 2 TAP interface and connect the TAP to the bridge.
@@ -253,9 +258,7 @@ As we stated before, we will create virtual network devices in GNS3, which will 
 - Bind the GNS3 local server gateway to the bridge.
 - Connect the router to the bridge through the TAP.
 
->**NOTE** - All the following commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that you first set up and run GNS3 manually, so you can understand how GNS3 bridging works. Afterwards, you can use the script to start GNS3.
-
-First, we need to find out the name of our host machine's isolated Ethernet network adapter. We do not want to use the primary interface, since we will be overwriting the IP address and other information.
+First, you need to find out the name of our host machine's isolated Ethernet network adapter. You do not want to use the primary interface, since you will be overwriting the IP address and other information.
 
 Per RedHat's [Consistent Network Device Naming conventions](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming "Consistent Network Device Naming"), network interfaces for Ethernet will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.) in CentOS. Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
 
@@ -274,7 +277,7 @@ $ ip addr show label e*
 
 Look for the interface that does not have an IP address (i.e., no inet). In this case, the isolated interface is named ```enp0s8```. 
 
-We will now "bridge" the host machine and GNS3 together:
+You will now "bridge" the host machine and GNS3 together:
 
 ```
 # Configure the bridge
@@ -295,7 +298,7 @@ sleep 3 # Allow time to make the connection
 sudo ip address add 192.168.1.10/24 dev enp0s8 # Set the adapter IP address
 ```
 
->**NOTE** - Why do we need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, in other labs, we will create subnetworks in GNS3, separating their connections through Layer 2 TAP interfaces, so just get into the habit of connecting to a TAP instead of directly to the bridge.
+>**NOTE** - Why do you need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, in other labs, you will connect multiple devices to the host through Layer 2 TAP interfaces (e.g., tap1, tap2, etc.), so just get into the habit of connecting to a TAP instead of directly to the bridge.
 
 Check the configuration and the bridge by inputting ```ip addr show dev br0``` and ```brctl show br0```:
 
@@ -324,6 +327,10 @@ gns3
 
 >**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses.
 
+>***NOTE - All the above commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that from this point forward, you use the script to run GNS3.***
+
+---
+
 A Setup wizard will appear. Select **Run appliances on my local computer** and click **Next >**:
 
 ![Setup Wizard](img/a05.png)
@@ -348,7 +355,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-However, before we start on the lab, we need to make some adjustments. From the GNS3 Toolbar at the top of the GUI, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that:
+However, before you start on the lab, you need to make some adjustments. From the GNS3 Toolbar at the top of the GUI, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that:
 
 - **Enable local server** is checked.
 - **Host binding** is set to ```192.168.1.1```.
@@ -358,7 +365,7 @@ However, before we start on the lab, we need to make some adjustments. From the 
 
 ---
 
-Now we need to add a device. For our initial labs, we will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
+Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
 
 ![Cisco 3745 Rear View](img/a19.png)
 
@@ -423,7 +430,7 @@ Practice filling open slots with an adapter, but ***DO NOT CLICK ON NEXT!***:
 
 Did you notice that, aside from the built-in GT96100-FE adapter, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
 
-Aside from the built-in network adapter, we will not need any additional network adapters yet, so empty all the slots except for **slot 0** (GNS3 will not let you delete it anyway). When complete, click on **Next >**:
+Aside from the built-in network adapter, you will not need any additional network adapters yet, so empty all the slots except for **slot 0** (GNS3 will not let you delete it anyway). When complete, click on **Next >**:
 
 ![Network Adapters](img/a20a.png)
 
@@ -431,7 +438,7 @@ The **WIC modules** dialog appears:
 
 ![WIC Modules](img/a21a.png)
 
-For WAN Interface Cards (WICs), we have three slots, but only two options:
+For WAN Interface Cards (WICs), you have three slots, but only two options:
 
 - WIC-1T One port serial module (DB60, Cisco 60-pin "5-in-1" connector )
 
@@ -447,7 +454,7 @@ Go ahead and practice placing a WIC in open slots, but ***DO NOT CLICK ON NEXT!*
 
 This time, since the 3745 has three WIC slots, you can populate each of them with different modules, or even the same module.
 
-We will not need any WIC modules yet, so empty all the slots and click on **Next >**:
+You will not need any WIC modules yet, so empty all the slots and click on **Next >**:
 
 ![WIC Modules](img/a21a.png)
 
@@ -475,17 +482,17 @@ This brings you back to the template details window. Take a moment to look it ov
 
 ![Preferences](img/a25.png)
 
-## Running the Labs
+## Your First Lab
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, make sure that you have set up your network bridge, and start GNS3 by inputting ```gns3``` in a Terminal (the **Project** window should appear).
+Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal (the **Project** window should appear).
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```lab001-telnet``` in the ***Name*** textbox and click the **OK** button.
+A pop-up dialog will appear, asking you to create a new project. Enter ```Automation``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](img/a10.png)
 
-From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates**:
+From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates** (or **All devices**):
 
 ![All devices](img/a26.png)
 
@@ -535,6 +542,16 @@ The pop-up dialog has a lot of good information, including which port number the
 
 ![Node information](img/a36.png)
 
+Now, before we begin to code, you will do a dry run through a console.
+
+>**NOTE** - Normally, you cannot Telnet or Secure Shell (SSH) into a device until you assign the device an IP address. To do solve this chicken-or-egg problem, you would:
+>
+>- Connect an RS232 Port to RJ45 Ethernet cable from the host to the device's Console port.
+>- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (i.e., /dev/ttyS0) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
+>- Enter the necessary commands to set the IP address.
+> 
+>However, I do not know how to do this in GNS3, so you will be simulating that connection by Telnet-ing through the gateway and the port number the Console port is using.
+
 Open a new Terminal and Telnet into the device by inputting the following command:
 
 ```
@@ -562,72 +579,104 @@ Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a pro
 R1#
 ```
 
-You are now connected to the router through the Console port. Before we continue, let us take care of some housekeeping.
-
-When we first configured the router, we gave it a default IOS image (c3745-adventerprisek9-mz.124-25d.bin). However, when the router first starts, it looks for an IOS image in flash memory. This is because the 3745 can store multiple IOS's in flash memory; you tell the router which one you want to use, by inputting ```boot system flash:<the IOS filename>.bin``` at a configuration prompt and saving it in the start-up configuration file. If the router does not find an IOS there, it will look in its Read-Only Memory (ROM) for a default IOS.
-
-Our router will do this because we have not formatted our flash memory, preventing us from uploading another IOS. As a matter of fact, you may see the following error:
+You are now connected to the router through the Console port. Next, get the device's hardware and software information by inputting the following command:
 
 ```
-PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+show version
 ```
 
-In this lab, we will not need another IOS, but we do want to use our flash memory, so let us fix our memory issue, by inputting the following command:
+After a few seconds, you will see the following output:
 
 ```
-format flash:
-```
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
 
-You will be asked to confirm the format operation twice. Press <kbd>Enter</kbd> both times:
+...
 
-```
-Format operation may take a while. Continue? [confirm]
-Format operation will destroy all data in "flash:".  Continue? [confirm]
-```
-
-You should see output similar to the following:
-
-```
-Format: Drive communication & 1st Sector Write OK...
-Writing Monlib sectors.
-.........................................................................................................................
-Monlib write complete 
-..
-Format: All system sectors written. OK...
-
-Format: Total sectors in formatted partition: 130911
-Format: Total bytes in formatted partition: 67026432
-Format: Operation completed successfully.
-
-Format of flash complete
-
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+Configuration register is 0x2102
 R1#
 ```
 
-Input ```show flash``` to see what is in the drive:
+Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
+
+![Reload the Device](../img/b01.png)
+
+Go back to the Linux Terminal, and, at the prompt, enter the following command to start the Python interpreter:
 
 ```
-No files on device
-66875392 bytes available (0 bytes used)
-
-R1#
+python
 ```
 
-Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input <kbd>q</kbd> to exit Telnet. Go back to the GNS3 GUI, click the red **Stop** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to stop all devices?", click Yes::
+After a few seconds, you will see the following output:
 
->Do not click on **Reload**! **Reload** will load the default settings, erasing any changes you have made. You will learn how to save configurations later.
+```
+Python 2.7.5 (default, Nov 16 2020, 22:23:17) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 
+```
 
-![Stop the Router](img/a33.png)
+In Python, you will interact with the device using the pexpect module. Pexpect creates or "spawns" a session with another device, known as a "child". Using commands such as  ```sendline``` and ```expect```, you can interact with the device through the child.
 
-After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to start all devices?", click **Yes**:
+First, at the ```>>>``` prompt, import the module into the interpreter:
 
-![Confirm Start All](img/a31.png)
+```
+import pexpect
+```
 
-All the nodes should turn green.
+Second, create a Telnet child process:
+
+```
+>>> import pexpect
+>>> child = pexpect.spawn("telnet 192.168.1.1 5001")
+>>> child.expect("Press RETURN to get started")
+0
+>>> child.sendline("\r")
+2
+>>> child.expect("R1#")
+0
+>>> child.sendline("show version\r")
+14
+>>> index = child.expect(["R1#", "--More--", ])
+>>> print(index)
+1
+>>> if index == 1:
+...     child.sendline(" ")
+...     child.expect("R1#")
+... 
+2
+0
+>>> print(child.before)
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco 3745 (R7000) processor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+Configuration register is 0x2102
+
+
+>>> exit()
+```
+
 
 ## The Code:
 
-To recap, we:
+To recap, you:
 
 1. Accessed the device through Telnet.
 2. Entered Privileged EXEC Mode
@@ -636,7 +685,7 @@ To recap, we:
 
 Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
 
-This is a bare-bones script that automates everything we did earlier. The heart of the script is the ```child```. Once spawned, we will use it to send commands to the device, expecting a certain result:
+This is a bare-bones script that automates everything you did earlier. The heart of the script is the ```child```. Once spawned, you will use it to send commands to the device, expecting a certain result:
 
 ```
 #!/usr/bin/python

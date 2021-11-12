@@ -74,7 +74,7 @@ wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_run
 sudo mv ~/gns3_run /usr/bin/
-# Lab dependencies
+# Required for the labs
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
