@@ -180,12 +180,26 @@ sudo systemctl stop tftp
 systemctl status sshd
 ● sshd.service - OpenSSH server daemon
    Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
-   Active: inactive (dead) since Sat 2021-11-13 21:32:39 EST; 22s ago
+   Active: active (running) since Sun 2021-11-14 11:46:57 EST; 2h 4min ago
      Docs: man:sshd(8)
            man:sshd_config(5)
+ Main PID: 1253 (sshd)
+    Tasks: 1
+   CGroup: /system.slice/sshd.service
+           └─1253 /usr/sbin/sshd -D
+>**NOTE** - If you see ```Unit sshd.service could not be found.```, the service is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 sudo firewall-cmd --zone=public --add-port=22/tcp
 sudo firewall-cmd --zone=public --add-service=sshd
+sudo systemctl start sshd
 
 sudo firewall-cmd --zone=public --remove-service=sshd
 sudo firewall-cmd --zone=public --remove-port=22/tcp
+```
+
+### Secure Copy Protocol
+
+```
+which scp
+/usr/bin/scp
+>**NOTE** - If you see ```/usr/bin/which: no scp```, SCP is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 ```
