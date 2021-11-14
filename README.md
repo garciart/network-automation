@@ -484,6 +484,8 @@ This brings you back to the template details window. Take a moment to look it ov
 
 ## Your First Lab
 
+### Part 1: Create the Network
+
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
 Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal (the **Project** window should appear).
@@ -542,7 +544,11 @@ The pop-up dialog has a lot of good information, including which port number the
 
 ![Node information](img/a36.png)
 
-Now, before we begin to code, you will do a dry run through a console.
+---
+
+### Part 2: Dry Run through the Console Port
+
+Now, before we begin to code, you will perform a dry run by entering the commands directly in a console terminal, as you would do with a real device.
 
 >**NOTE** - Normally, you cannot Telnet or Secure Shell (SSH) into a device until you assign the device an IP address. To do solve this chicken-or-egg problem, you would:
 >
@@ -558,7 +564,7 @@ Open a new Terminal and Telnet into the device by inputting the following comman
 telnet 192.168.1.1 5001
 ```
 
-You will see boot up messages appear on the screen, similar to the following:
+You will see boot-up messages appear on the screen, similar to the following:
 
 ```
 Trying 192.168.1.1...
@@ -585,7 +591,7 @@ You are now connected to the router through the Console port. Next, get the devi
 show version
 ```
 
-After a few seconds, you will see the following output:
+After a few seconds, you will see the following output (press <kbd>Space</kbd> when the ```--More--``` prompt appears):
 
 ```
 Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
@@ -604,6 +610,10 @@ R1#
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
 ![Reload the Device](../img/b01.png)
+
+---
+
+### Part 3: Using Python and Pexpect
 
 Go back to the Linux Terminal, and, at the prompt, enter the following command to start the Python interpreter:
 
@@ -625,31 +635,85 @@ In Python, you will interact with the device using the pexpect module. Pexpect c
 First, at the ```>>>``` prompt, import the module into the interpreter:
 
 ```
-import pexpect
+>>> import pexpect
 ```
 
 Second, create a Telnet child process:
 
 ```
->>> import pexpect
 >>> child = pexpect.spawn("telnet 192.168.1.1 5001")
+```
+
+If you have looked at previous boot-up messages, you will notice that the string, "Press RETURN to get started", always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
+
+```
 >>> child.expect("Press RETURN to get started")
+```
+
+After a few seconds, you will see the following output:
+
+```
 0
+```
+
+0? What does that mean? The Pexpect expect class collects the output of the child during the spawn call. It takes your search string, converts it to a list, and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and since you only have one search string, the index will be 0. If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
+
+Pexpect will begin the next search right after the last match. This prevents Pexpect from continuing to use the same match, over and over again. 
+
+Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (\n)):
+
+```
 >>> child.sendline("\r")
+```
+
+After a few seconds, you will see the following output:
+
+```
 2
+```
+
+The return value states that two characters were successfully sent to the child: '\r' and'\n'. That is good, and when we look for our search string of ```R1#``` in the output, we should expect to find the default Privilege EXEC Mode prompt:
+
+```
 >>> child.expect("R1#")
 0
+```
+
+>**NOTE** - Always try to match each send with an expect. If you do not, Pexpect may look for the search string in the wrong place.
+
+Next, as you did earlier, get the device's hardware and software information. Send the command ```show version``` (14 characters, including the newline, will be sent):
+
+```
 >>> child.sendline("show version\r")
 14
+```
+
+The ```show version``` command produces too much output for one Telnet screen, so it pauses the output midway with a ```--More--``` prompt, so you can examine the first part before proceeding to the second. Therefore, this time, you will expect several responses and capture the index of the response:
+
+```
 >>> index = child.expect(["R1#", "--More--", ])
 >>> print(index)
 1
+```
+
+As expected, Pexpect expect found ```--More--``` (index == 1), instead of ```R1#``` (index == 0). To continue, send a <kbd>Space</kbd>:
+
+```
 >>> if index == 1:
 ...     child.sendline(" ")
-...     child.expect("R1#")
+...     child.expect("R1#") # Press Enter twice to execute
 ... 
 2
 0
+```
+
+The first return value is how many characters were sent (i.e., ' ' and '\n'). The second return value states that the ```R1#``` prompt was found, as expected.
+
+>**NOTE** - In real life, you would not use this code. It will work, because you know there will only be one ```--More--``` prompt, but you should use a **while** statement instead, in case there are more ```--More--``` prompts.
+
+Get the device's hardware and software information:
+
+```
 >>> print(child.before)
 to comply with U.S. and local laws, return this product immediately.
 
@@ -668,35 +732,117 @@ DRAM configuration is 64 bits wide with parity enabled.
 65536K bytes of ATA System CompactFlash (Read/Write)
 
 Configuration register is 0x2102
+```
 
+Now, cause an intentional error by looking for something that is not in the output:
 
+```
+>>> child.sendline("\r")
+2
+>>> child.expect("Automation is fun!")
+```
+
+After 30 seconds, you will see the following output (I added the line numbers):
+
+```
+01  Traceback (most recent call last):
+02    File "<stdin>", line 1, in <module>
+03    File "/usr/lib/python2.7/site-packages/pexpect.py", line 1311, in expect
+04      return self.expect_list(compiled_pattern_list, timeout, searchwindowsize)
+05    File "/usr/lib/python2.7/site-packages/pexpect.py", line 1325, in expect_list
+06      return self.expect_loop(searcher_re(pattern_list), timeout, searchwindowsize)
+07    File "/usr/lib/python2.7/site-packages/pexpect.py", line 1409, in expect_loop
+08      raise TIMEOUT (str(e) + '\n' + str(self))
+09  pexpect.TIMEOUT: Timeout exceeded in read_nonblocking().
+10  <pexpect.spawn object at 0x7f067d5d1f90>
+11  version: 2.3 ($Revision: 399 $)
+12  command: /usr/bin/telnet
+13  args: ['/usr/bin/telnet', '192.168.1.1', '5001']
+14  searcher: searcher_re:
+15      0: re.compile("Automation is fun!")
+16  buffer (last 100 chars):
+17  R1#
+18  before (last 100 chars):
+19  R1#
+20  after: <class 'pexpect.TIMEOUT'>
+21  match: None
+22  match_index: None
+23  exitstatus: None
+24  flag_eof: False
+25  pid: 24771
+26  child_fd: 3
+27  closed: False
+28  timeout: 30
+29  delimiter: <class 'pexpect.EOF'>
+30  logfile: None
+31  logfile_read: None
+32  logfile_send: None
+33  maxread: 2000
+34  ignorecase: False
+35  searchwindowsize: None
+36  delaybeforesend: 0.05
+37  delayafterclose: 0.1
+38  delayafterterminate: 0.1
+```
+
+The Pexpect error message has a lot of good info. Here is an explanation of some lines that will help you diagnose problems in your code:
+
+- **Line 01 - 08: Traceback (most recent call last):** If you were using a script, the filename; line number; and code snippet where the error occurred would appear here.
+- **Line 09: pexpect.TIMEOUT:** Pexpect returned a TIMEOUT, since it could not find the search string within the allotted time (the default is 30 seconds).
+- **Line 14 - 15: searcher:** The list of search items appears here. In this case, we only has one search item, ```"Automation is fun!"```.
+- **Line 16 - 17: before (last 100 chars):** All the output that was searched appears here; in this case it was ```R1#```.
+- **Line 21: match:** The search string that was matched; in this case it was ```None```.
+- **Line 22: match_index:** The index of the search item found; in this case it was ```None```.
+
+By the way, Pexpect generates this message for all expect calls, so you can look through it to make sure your code is working, even when there is not an error.
+
+Cause the error again, but this time, expect the timeout:
+
+```
+>>> child.sendline("\r")
+2
+>>> index = child.expect(["Automation is fun!", pexpect.TIMEOUT, ])
+>>> if index != 0:
+...     print("Search string not found.") # Press Enter twice to execute
+...
+```
+
+After a few seconds, you will see the following output:
+
+```
+Search string not found.
+```
+
+This time, you handled the error, displayed a custom message instead of the debug information. You can exit Telnet and the Python interpreter now, by entering the following commands:
+
+```
+>>> child.close()
 >>> exit()
 ```
 
+Once you have exited the Python interpreter, go to the GNS3 GUI and reload the device:
 
-## The Code:
+![Reload the Device](../img/b01.png)
 
-To recap, you:
+---
 
-1. Accessed the device through Telnet.
-2. Entered Privileged EXEC Mode
-3. Formatted the device's flash memory.
-4. Closed the connection.
+### Putting it all in a Script:
 
-Like I stated earlier, this is easy to do for one device, but not for one hundred. Let us put these steps into a simple python script.
-
-This is a bare-bones script that automates everything you did earlier. The heart of the script is the ```child```. Once spawned, you will use it to send commands to the device, expecting a certain result:
+Like I stated earlier, running this set of commands is easy to do for one device, but not for one hundred devices. Let us put these steps into a simple, bare-bones Python script, aptly named "automation.py", which automates everything you just did:
 
 ```
 #!/usr/bin/python
-"""Lab 001: Telnet into a device and format the flash memory.
+"""Automation Demo
+
+Project: Automation
+
 To run this lab:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Add a Cloud and a C3745 router
 * Connect the cloud's tap interface to the router's FastEthernet0/0 interface
 * Start all devices.
-* Run this script (i.e., "python lab001-telnet.py")
+* Run this script (i.e., "python automation.py")
 """
 from __future__ import print_function
 
@@ -704,12 +850,14 @@ import time
 
 import pexpect
 
-child = None
-print("Connecting to the device and formatting the flash memory...")
+print("Connecting to the device...")
 
-# Connect to the device and allow time for any boot messages to clear
+# Connect to the device and allow time for any boot-up messages to clear
 child = pexpect.spawn("telnet 192.168.1.1 5001")
 time.sleep(5)
+
+# Look for a welcome message to ensure the device was reloaded and you are not eavesdropping
+child.expect("Press RETURN to get started")
 child.sendline("\r")
 
 # Check for a prompt, either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
@@ -718,66 +866,97 @@ index = child.expect_exact(["R1>", "R1#", ])
 if index == 0:
     child.sendline("enable\r")
     child.expect_exact("R1#")
+print("Connected to the device.")
 
-# Format the flash memory. Look for the final characters of the following strings:
-# "Format operation may take a while. Continue? [confirm]"
-# "Format operation will destroy all data in "flash:".  Continue? [confirm]"
-# "66875392 bytes available (0 bytes used)"
-#
-child.sendline("format flash:\r")
-child.expect_exact("Continue? [confirm]")
+# Get the device's hardware and software information
+child.sendline("show version\r")
+
+# Create a variable to hold the information
+output = ""
+
+# Initialize the expect index
+index = -1
+
+# Use a loop to scroll through the output
+# You can also avoid the loop by sending the command, "terminal length 0"
+while index != 0:
+    index = child.expect(["R1#", "--More--", pexpect.TIMEOUT, ])
+    output = output + (child.before)
+    if index == 1:
+        child.sendline(" ")
+    elif index == 2:
+        print("Search string not found.")
+        break
+print("Getting device information:\n" + output.strip().replace("\n\n", ""))
+
+# Cause and handle an error
+print("Looking for a string...")
 child.sendline("\r")
-child.expect_exact("Continue? [confirm]")
-child.sendline("\r")
-child.expect_exact("Format of flash complete", timeout=120)
-child.sendline("show flash\r")
-child.expect_exact("(0 bytes used)")
+index = child.expect(["Automation is fun!", pexpect.TIMEOUT, ])
+if index == 0:
+    print("Search string found.")
+else:
+    print("Search string not found.")
 
 # Close Telnet and disconnect from device
+print("Disconnecting from the device...")
 child.sendcontrol("]")
 child.sendline('q\r')
+child.close()
 
-print("Successfully connected to the device and formatted the flash memory.")
+print("Script complete. Have a nice day.")
 ```
 
 Run the script, and you will get the following output:
 
 ```
-$ python lab001-telnet.py
+$ python automation.py
+Connecting to the device...
+Connected to the device.
+Getting device information:
+show version
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2010 by Cisco Systems, Inc.
+Compiled Wed 18-Aug-10 08:18 by prod_rel_team
 
-Hello, friend.
-Connecting to the device and formatting the flash memory...
-Successfully connected to the device and formatted the flash memory.
+ROM: ROMMON Emulation Microcode
+ROM: 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+
+R1 uptime is 0 minutes
+System returned to ROM by unknown reload cause - suspect boot_data[BOOT_COUNT] 0x0, BOOT_COUNT 0, BOOTDATA 19
+System image file is "tftp://255.255.255.255/unknown"
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco 3745 (R7000) processor (revision 2.0) with 249856K/12288K bytes of memory.
+Processor board ID FTX0945W0MY
+R7000 CPU at 350MHz, Implementation 39, Rev 2.1, 256KB L2, 512KB L3 Cache
+2 FastEthernet interfaces
+DRAM configuration is 64 bits wide with parity enabled.
+151K bytes of NVRAM.
+65536K bytes of ATA System CompactFlash (Read/Write)
+
+Configuration register is 0x2102
+Looking for a string...
+Search string not found.
+Disconnecting from the device...
 Script complete. Have a nice day.
 ```
-
-By the way, if you are still are connected to the device through Telnet in a Terminal window, you will see your program run:
-
-```
-R1#format flash:
-Format operation may take a while. Continue? [confirm]
-Format operation will destroy all data in "flash:".  Continue? [confirm]
-Format: Drive communication & 1st Sector Write OK...
-Writing Monlib sectors.
-.........................................................................................................................
-Monlib write complete 
-..
-Format: All system sectors written. OK...
-
-Format: Total sectors in formatted partition: 130911
-Format: Total bytes in formatted partition: 67026432
-Format: Operation completed successfully.
-
-Format of flash complete
-R1#show flash
-No files on device
-
-66875392 bytes available (0 bytes used)
-
-R1#
-```
-
-I have also included a script with error detection in the **labs** folder, named [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). If you want to experiment with debugging, stop the devices and run [lab001-telnet.py](labs/lab001-telnet.py "Telnet lab"). The script will fail, and provide you with detailed information on why.
 
 **Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 
@@ -827,21 +1006,6 @@ br0          8000.08002787ffe2  no           enp0s8
                                              tap0
 
 Starting GNS3...
-```
-
-Do not forget to return to the Terminal window when you exit GNS3 to finish execution of the script; enter your password if prompted:
-
-```
-Resetting the network...
-[sudo] password for gns3user: 
-
-Network interface configuration:
-3: enp0s8: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
-    link/ether 08:00:27:c7:b0:0f brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.10/24 scope global enp0s8
-       valid_lft forever preferred_lft forever
-
-Script complete. Have a nice day.
 ```
 
 By the way, do not run the script as ```sudo```, or GNS3 will incorrectly attempt to use the ```root``` directories, instead of the user directories, resulting in errors:
