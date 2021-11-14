@@ -23,18 +23,40 @@ First, ensure you have installed and started GNS3 per the instructions in the [A
 
 >**NOTE** - By the way, you will continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
-Second, make sure the services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial). The services include:
+Second, make sure the clients and services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial):
 
-1. **Network Time Protocol (NTP)** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. By enabling an NTP service, the device can update its clock using the host's clock.
-2. **Trivial File Transfer Protocol (TFTP)** - TFTP is a very simple file transfer protocol. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable nor secure for large file transfers. However, it is good for transferring small files, such as device configuration files, over direct connections, such as through a Console or Auxiliary port.
-3. **Very Secure FTP Daemon (vsftpd)** - vsftpd is an FTP server, used by many Linux systems. It uses the more reliable Transmission Control Protocol (TCP) to connect and communicate with other devices, and it authenticates using the destination's username and password. It does not encrypt data out-of-the-box, but it can be customized to use Secure Sockets Layer (SSL), Transport Layer Security (TLS), etc.
+1. **Teletype Network (Telnet) Client** - Telnet is a protocol that allows devices to communicate over a network. It uses the Transmission Control Protocol (TCP) to ensure a reliable session, but it neither authenticates users nor encrypts any data transmitted, so it is not secure. You will use Telnet to configure the device to switch to the Secure Shell Protocol (SSH).
+2. **Network Time Protocol (NTP) Service** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. You will use NTP to update the device's clock using the host's clock.
+3. **Trivial File Transfer Protocol (TFTP) Service** - TFTP is a very simple file transfer service. It uses User Datagram Protocol (UDP) and no encryption, so it is neither reliable for large file transfers nor secure. However, it is good for transferring small files over direct connections, such as through a Console or Auxiliary port. You will use TFTP to transfer configuration files between the device and the host.
+4. **Very Secure FTP Daemon (vsftpd) Service** - vsftpd is a version of the File Transfer Protocol (FTP) service, used by many Linux systems. It uses the Transmission Control Protocol (TCP) to ensure a reliable session, and it authenticates users before transferring files. However, FTP does not encrypt data out-of-the-box, but it can be customized to use Secure Sockets Layer (SSL), Transport Layer Security (TLS), etc. You will use FTP to transfer files between the device and the host, once you have secured the device.
+5. **Secure Shell Protocol (SSH) Service** - SSH allows secure communications between devices over an unsecure network. It uses the Transmission Control Protocol (TCP) to ensure a reliable session. SSH uses public key cryptography to authenticate users and an industry-approved cipher to encrypt any data transmitted. You will use SSH to run commands on the device, once you have generated the required cryptographic keys on the device.
+6. **Secure Copy Protocol (SCP) Program** - SCP is a file transfer program that uses the Secure Shell Protocol (SSH) to securely transfer files between devices. It uses the Transmission Control Protocol (TCP) to ensure a reliable session, and relies on SSH for authentication and encryption. SCP is deprecated, though, and its creators recommend you use the Secure File Transfer Protocol (SFTP) or rsync. However, older Cisco Internetwork Operating Systems (IOS) cannot use either alternative, so you will use SCP to transfer files when using SSH.
 
-Check their statuses by entering the following commands:
+Check the status of the Telnet and SCP programs by entering the following commands:
+
+```
+which telnet
+which scp
+```
+
+After a few seconds, you will see the following output:
+
+```
+[gns3user@localhost ~]$ which telnet
+/usr/bin/telnet
+[gns3user@localhost ~]$ which scp
+/usr/bin/scp
+```
+
+>**NOTE** - If you see ```/usr/bin/which: no telnet``` or ```/usr/bin/which: no scp```, the program is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+
+Check the status of the services by entering the following commands:
 
 ```
 systemctl status ntpd
 systemctl status tftp
 systemctl status vsftpd
+systemctl status sshd
 ```
 
 After a few seconds, you will see the following output:
@@ -53,39 +75,57 @@ After a few seconds, you will see the following output:
 ● vsftpd.service - Vsftpd ftp daemon
    Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
    Active: inactive (dead)
+[gns3user@localhost ~]$ systemctl status sshd
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Sun 2021-11-14 11:46:57 EST; 2h 4min ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+ Main PID: 1253 (sshd)
+    Tasks: 1
+   CGroup: /system.slice/sshd.service
+           └─1253 /usr/sbin/sshd -D
 [gns3user@localhost ~]$ 
 ```
 
->**NOTE** - If you see ```Unit ntpd.service could not be found.```, ```Unit tftp.service could not be found.``` or ```Unit vsftpd.service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+You see that ntpd, tftp, and vsftpd are present, but disabled, while the sshd service is running.
 
-Now that you know the services exist, change your firewall settings by opening a Linux Terminal window and entering the following commands. If prompted, enter your sudo password:
+>**NOTE** - If you see ```Unit (ntpd, tftp, vsftpd, or sshd).service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+
+Change your firewall settings by entering the following commands. If prompted, enter your sudo password:
 
 ```
 sudo firewall-cmd --zone=public --add-port=20/tcp
 sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-port=22/tcp
 sudo firewall-cmd --zone=public --add-service=ftp
+sudo firewall-cmd --zone=public --add-port=23/tcp
 sudo firewall-cmd --zone=public --add-port=123/udp
 sudo firewall-cmd --zone=public --add-service=ntp
-sudo firewall-cmd --zone=public --add-port=23/tcp
 sudo firewall-cmd --zone=public --add-port=69/udp
 sudo firewall-cmd --zone=public --add-service=tftp
 ```
 
-The first two commands allow FTP client and server communications through port 21. The next two commands permit NTP traffic, allowing the host to act as an NTP server. The following command allows Telnet client communications through port 23. The final two commands allow TFTP client and server communications through port 69.
+The first three commands allow FTP client and server communications through ports 20 and 21. The next command opens port 22 for secure communications. The following command allows Telnet client communications through port 23. The next two commands permit NTP traffic, allowing the host to act as an NTP server. The final two commands allow TFTP client and server communications through port 69.
 
->**NOTE** - Both Telnet and TFTP are not secure, but you will use them in the labs to demonstrate simple host-to-device communications and file transfers, before implementing more secure protocols. 
+>**NOTE** - SSH is already running, so if you run the following command...
+> 
+> ```sudo firewall-cmd --zone=public --add-service=sshd```
+> 
+>...you will get the following response:
+>
+> ```
+> Warning: ALREADY_ENABLED: 'ssh' already in 'public'
+> success
+> ```
+> 
+> However, you can run this command if you like; it will not affect the system.
 
 >**NOTE** - If you run into any errors, make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 > - Do not reload the firewall daemon. For security purposes, these changes are temporary and the ports will close if the system crashes or reboots.
 > - Do not install a Telnet service. You will only need the Telnet client, which you installed during the GNS3 setup. 
 
-Now, enable the FTP service:
-
-```
-sudo systemctl start vsftpd
-```
-
-For the NTP service, you may need to make some modifications to the host system. First, check if the host is configured as an NTP server by looking for the reserved NTP server address:
+To enable the NTP service, you may need to make some modifications to the host system. First, check if the host is configured as an NTP server by looking for the reserved NTP server address:
 
 ```
 grep "server 127.127.1.0" /etc/ntp.conf
@@ -122,6 +162,17 @@ Finally, start the TFTP service:
 ```
 sudo systemctl start tftp
 ```
+
+
+Now, enable the FTP service:
+
+```
+sudo systemctl start vsftpd
+```
+
+>**NOTE** - The SSH service is already running, but if you want to run the following command, it will not affect the system:
+> 
+> ```sudo systemctl start sshd```
 
 ---
 ## Access a network device's Privileged EXEC Mode
