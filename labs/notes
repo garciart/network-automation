@@ -101,3 +101,91 @@ show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
 
 c7200-adventerprisek9-mz.152-4.M8.bin
+
+
+
+### Telnet Client
+
+```
+which telnet
+/usr/bin/telnet
+>**NOTE** - If you see ```/usr/bin/which: no telnet```, the client is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+sudo firewall-cmd --zone=public --add-port=23/tcp
+
+sudo firewall-cmd --zone=public --remove-port=23/tcp
+```
+
+### File Transfer Protocol (FTP) Service
+
+```
+systemctl status vsftpd
+● vsftpd.service - Vsftpd ftp daemon
+   Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+>**NOTE** - If you see ```Unit vsftpd.service could not be found.```, the service is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+sudo firewall-cmd --zone=public --add-port=20/tcp
+sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-service=ftp
+sudo systemctl start vsftpd
+
+sudo systemctl stop vsftpd
+sudo firewall-cmd --zone=public --remove-service=ftp
+sudo firewall-cmd --zone=public --remove-port=21/tcp
+sudo firewall-cmd --zone=public --remove-port=20/tcp
+```
+
+### Network Time Protocol (NTP) Service
+
+```
+systemctl status ntpd
+● ntpd.service - Network Time Service
+   Loaded: loaded (/usr/lib/systemd/system/ntpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+>**NOTE** - If you see ```Unit ntpd.service could not be found.```, the service is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+grep "server 127.127.1.0" /etc/ntp.conf
+server 127.127.1.0 or echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
+sudo firewall-cmd --zone=public --add-port=123/udp
+sudo firewall-cmd --zone=public --add-service=ntp
+sudo systemctl start ntpd
+
+sudo systemctl stop ntpd
+sudo firewall-cmd --zone=public --remove-service=ntp
+sudo firewall-cmd --zone=public --remove-port=123/udp
+sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf
+```
+
+### Trivial File Transfer Protocol (TFTP) Service
+
+```
+systemctl status tftp
+● tftp.service - Tftp Server
+   Loaded: loaded (/usr/lib/systemd/system/tftp.service; indirect; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:in.tftpd
+>**NOTE** - If you see ```Unit tftp.service could not be found.```, the service is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+sudo mkdir --parents --verbose /var/lib/tftpboot
+sudo chmod 777 --verbose /var/lib/tftpboot
+sudo firewall-cmd --zone=public --add-port=69/udp
+sudo firewall-cmd --zone=public --add-service=tftp
+sudo systemctl start tftp
+
+sudo firewall-cmd --zone=public --remove-service=tftp
+sudo firewall-cmd --zone=public --remove-port=69/udp
+sudo systemctl stop tftp
+```
+
+### Secure Shell Protocol (SSH) Service
+
+```
+systemctl status sshd
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+   Active: inactive (dead) since Sat 2021-11-13 21:32:39 EST; 22s ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+sudo firewall-cmd --zone=public --add-port=22/tcp
+sudo firewall-cmd --zone=public --add-service=sshd
+
+sudo firewall-cmd --zone=public --remove-service=sshd
+sudo firewall-cmd --zone=public --remove-port=22/tcp
+```

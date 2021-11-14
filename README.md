@@ -822,11 +822,11 @@ This time, you handled the error, displayed a custom message instead of the debu
 
 Once you have exited the Python interpreter, go to the GNS3 GUI and reload the device:
 
-![Reload the Device](../img/b01.png)
+![Reload the Device](img/b01.png)
 
 ---
 
-### Putting it all in a Script:
+### Part 4: Putting it all in a Script
 
 Like I stated earlier, running this set of commands is easy to do for one device, but not for one hundred devices. Let us put these steps into a simple, bare-bones Python script, aptly named "automation.py", which automates everything you just did:
 
@@ -957,6 +957,8 @@ Search string not found.
 Disconnecting from the device...
 Script complete. Have a nice day.
 ```
+
+---
 
 **Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
 

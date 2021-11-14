@@ -61,6 +61,7 @@ After a few seconds, you will see the following output:
 Now that you know the services exist, change your firewall settings by opening a Linux Terminal window and entering the following commands. If prompted, enter your sudo password:
 
 ```
+sudo firewall-cmd --zone=public --add-port=20/tcp
 sudo firewall-cmd --zone=public --add-port=21/tcp
 sudo firewall-cmd --zone=public --add-service=ftp
 sudo firewall-cmd --zone=public --add-port=123/udp
