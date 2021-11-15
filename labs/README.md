@@ -66,15 +66,18 @@ After a few seconds, you will see the following output:
 ● ntpd.service - Network Time Service
    Loaded: loaded (/usr/lib/systemd/system/ntpd.service; disabled; vendor preset: disabled)
    Active: inactive (dead)
+
 [gns3user@localhost ~]$ systemctl status tftp
 ● tftp.service - Tftp Server
    Loaded: loaded (/usr/lib/systemd/system/tftp.service; indirect; vendor preset: disabled)
    Active: inactive (dead)
      Docs: man:in.tftpd
+
 [gns3user@localhost ~]$ systemctl status vsftpd
 ● vsftpd.service - Vsftpd ftp daemon
    Loaded: loaded (/usr/lib/systemd/system/vsftpd.service; disabled; vendor preset: disabled)
    Active: inactive (dead)
+
 [gns3user@localhost ~]$ systemctl status sshd
 ● sshd.service - OpenSSH server daemon
    Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
@@ -85,6 +88,7 @@ After a few seconds, you will see the following output:
     Tasks: 1
    CGroup: /system.slice/sshd.service
            └─1253 /usr/sbin/sshd -D
+
 [gns3user@localhost ~]$ 
 ```
 
@@ -110,38 +114,32 @@ The first three commands allow FTP client and server communications through port
 
 >**NOTE** - SSH is already running, so if you run the following command...
 > 
-> ```sudo firewall-cmd --zone=public --add-service=sshd```
+>```sudo firewall-cmd --zone=public --add-service=sshd```
 > 
 >...you will get the following response:
 >
-> ```
-> Warning: ALREADY_ENABLED: 'ssh' already in 'public'
-> success
-> ```
+>```
+>Warning: ALREADY_ENABLED: 'ssh' already in 'public'
+>success
+>```
 > 
-> However, you can run this command if you like; it will not affect the system.
+>However, you can run this command if you like; it will not affect the system.
 
 >**NOTE** - If you run into any errors, make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
-> - Do not reload the firewall daemon. For security purposes, these changes are temporary and the ports will close if the system crashes or reboots.
-> - Do not install a Telnet service. You will only need the Telnet client, which you installed during the GNS3 setup. 
+>- Do not reload the firewall daemon. For security purposes, these changes are temporary and the ports will close if the system crashes or reboots.
+>- Do not install a Telnet service. You will only need the Telnet client, which you installed during the GNS3 setup. 
 
 To enable the NTP service, you may need to make some modifications to the host system. First, check if the host is configured as an NTP server by looking for the reserved NTP server address:
 
-```
-grep "server 127.127.1.0" /etc/ntp.conf
-```
+```grep "server 127.127.1.0" /etc/ntp.conf```
 
 You should see the search string, ```server 127.127.1.0```, repeated back in red. If not, append the local server information to the NTP configuration file, using the following command:
 
-```
-echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
-```
+```echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf```
 
 Finally, start the NTP service:
 
-```
-sudo systemctl start ntpd
-```
+```sudo systemctl start ntpd```
 
 Before you enable the TFTP service, create the TFTP default directory (if it does not exist) and give it the necessary permissions to accept and send files:
 
@@ -159,20 +157,15 @@ sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
 
 Finally, start the TFTP service:
 
-```
-sudo systemctl start tftp
-```
-
+```sudo systemctl start tftp```
 
 Now, enable the FTP service:
 
-```
-sudo systemctl start vsftpd
-```
+```sudo systemctl start vsftpd```
 
 >**NOTE** - The SSH service is already running, but if you want to run the following command, it will not affect the system:
 > 
-> ```sudo systemctl start sshd```
+>```sudo systemctl start sshd```
 
 ---
 ## Access a network device's Privileged EXEC Mode
@@ -189,13 +182,11 @@ If the Console port number is difficult to see, you can get the information by e
 
 Connect to the device using Telnet. In your case, the Console port number is ```5001```:
 
-```
-telnet 192.168.1.1 5001
-```
+```telnet 192.168.1.1 5001```
 
 Not to be overly dramatic, but after you input that command, ***STOP!*** You may scroll, but do not press <kbd>Enter</kbd> or input any more commands yet.
 
-You will see messages from the boot sequence of the device appear on the screen:
+You will see messages from the startup sequence of the device appear on the screen:
 
 ```
 SETUP: new interface FastEthernet0/0 placed in "shutdown" state
@@ -212,13 +203,11 @@ sslinit fn
 
 For you, the most important message is:
 
-```
-Press RETURN to get started!
-```
+```Press RETURN to get started!```
 
-If the device was reloaded correctly, this line will appear near the end of the boot sequence. However, you should see no prompts (e.g., ```R1>```, ```R1#```, etc.). If you see any prompts, especially a prompt followed by a command (e.g., "```R1#configure terminal```", etc.), that means that the device was not properly reloaded, and you may be using someone else's virtual teletype (VTY) session. This is dangerous for many reasons, since you may be eavesdropping on another user's session or creating a race condition by simultaneously entering commands at the same time as another user.
+If the device reloaded correctly, this line will appear near the end of the boot sequence. However, you should see no prompts (e.g., ```R1>```, ```R1#```, etc.). If you see any prompts, especially a prompt followed by a command (e.g., "```R1#configure terminal```", etc.), that means that the device was not properly reloaded, and you may be using someone else's virtual teletype (VTY) session. This is dangerous for many reasons, since you may be eavesdropping on another user's session or creating a race condition by simultaneously entering commands at the same time as another user.
 
->Unfortunately, entering the ```reload``` command in GNS3 will cause the Console terminal to "hang", so if you do see a prompt, exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
+>**NOTE** - Unfortunately, entering the ```reload``` command in GNS3 will cause the Console terminal to "hang", so if you do see a prompt, exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 >
 >![Reload the Device](../img/b01.png)
 
@@ -238,34 +227,38 @@ If you do not see a prompt, press <kbd>Enter</kbd> now.
 >
 >***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open virtual teletype session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life, when configuring an actual device for Layer 3 communications.***
 
-If you are greeted with a simple ```R1#```, you are good to go. You are in **Privileged EXEC Mode**, the default startup mode for most Cisco devices:
+If you are greeted with a simple ```R1#```, you are good to go. You are in **Privileged EXEC Mode**, the default startup mode for Cisco devices in GNS3.
 
-```
-R1#
-```
-
-Some devices may display an ```R1>``` prompt instead. This means you are in **User EXEC Mode**, an interface that allows limited configuration and interaction with the device. Enter the following command to reach **Privileged EXEC Mode**:
-
-```
-enable
-```
+>**NOTE** - A real, brand-new device would not boot into **Privileged EXEC Mode**, but would prompt you for one of the following:
+> 
+>```Would you like to terminate autoinstall? [yes]:```
+>
+>or
+> 
+>```Would you like to enter the initial configuration dialog? [yes/no]:```
+> 
+>However, GNS3 devices are not real devices, so the first prompt you should see is the **Privileged EXEC Mode** prompt. Some devices may display a ```Router>``` prompt instead. This means you are in **User EXEC Mode**, an interface that allows limited configuration and interaction with the device. Enter the following commands to reach **Privileged EXEC Mode** and set the correct host name:
+>
+>```
+>enable ; Enter Privileged EXEC Mode
+>configure terminal ; Enter Global Configuration Mode
+>hostname R1 ; Change the device hostname
+>end ; Return to Privileged EXEC Mode
+>write memory ; Save the changes to the default configuration
+>```
+> 
+>I will go over these commands in more detail later on. 
 
 ---
 ## Format a network device's flash memory
 
-If you are prompted for a password, this means that the device has already been configured. Unfortunately, as we stated earlier, to run the labs, you will have to delete the device in the GNS3 workspace, and replace it with a new device.
+The first thing you want to do is to format the device's built-in CompactFlash (CF) memory card. If you scroll through the startup output, you may see the following status message:
 
-However, if all is well, the first thing you want to do is to format the device's built-in CompactFlash (CF) memory card. If you scroll through the startup output, you may see the following status message:
-
-```
-*Mar  1 00:00:04.135: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
-```
+```*Mar  1 00:00:04.135: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device```
 
 The Cisco 3745's PCMCIA disk 0, known as ```flash:```, is used to store the system image, configuration files, and more. While you can take a chance and hope the memory card works this device, it is better to format it before configuring the device. Therefore, enter the following command:
 
-```
-format flash:
-```
+```format flash:```
 
 You will be prompted twice to confirm. Press <kbd>Enter</kbd> each time:
 
@@ -352,9 +345,7 @@ R1#
 
 >If you see ```Success rate is 0 percent (0/5)```, go back to the GNS3 GUI and make sure you are connected. If so, but you are still at 0 percent, open another Linux Terminal and enter the following command:
 >
->```
->ip address show | grep '[0-9]: e[mnt]'
->```
+>```ip address show | grep '[0-9]: e[mnt]'```
 >
 >Note the name of the isolated interface from the [Adventures in Automation](../README.md "Adventures in Automation") tutorial (e.g., ```enp0s8```, etc.):
 >
@@ -365,17 +356,13 @@ R1#
 >
 >Reapply an IP address to the interface:
 >
->```
->sudo ip address replace 192.168.1.10/24 dev enp0s8
->```
+>```sudo ip address replace 192.168.1.10/24 dev enp0s8```
 >
 >Attempt to ping the host from the device once again. If the success rate is still zero, go back and review the steps in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 
 Before continuing, make that change to the interface permanent by updating the device's **startup configuration**; otherwise, the device will shutdown the interface after each reload or reboot:
 
-```
-write memory
-```
+```write memory```
 
 After a few seconds, you will see the following output:
 
@@ -386,8 +373,8 @@ R1#
 ```
 
 >**NOTE** - Most Cisco devices have two configuration files:
-> 1. **running-configuration** - This file keeps track of all changes to the device's configuration for the current session. It is held in the device's RAM (```system:```), and the file, along with any changes, are discarded when the device is turned off or reloaded, unless saved to the startup-configuration file. 
-> 2. **startup-configuration** - This file is stored in the device's nonvolatile random-access memory (```nvram:```) and is read by the device upon startup. Any changes to the device's configuration must be saved to this file to become permanent. 
+>1. **running-configuration** - This file keeps track of all changes to the device's configuration for the current session. It is held in the device's RAM (```system:```), and the file, along with any changes, are discarded when the device is turned off or reloaded, unless saved to the startup-configuration file. 
+>2. **startup-configuration** - This file is stored in the device's nonvolatile random-access memory (```nvram:```) and is read by the device upon startup. Any changes to the device's configuration must be saved to this file to become permanent. 
 
 ---
 ## Secure a network device
@@ -398,9 +385,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
-```
-telnet 192.168.1.20
-```
+```telnet 192.168.1.20```
 
 After a few seconds, you will see the following output:
 
@@ -432,17 +417,15 @@ You have several options.
 
 So, in the Linux Terminal, telnet back into the device through the Console port:
 
-```
-telnet 192.168.1.1 5001
-```
+```telnet 192.168.1.1 5001```
 
 Now you will secure the VTY line. Set the username to ```admin```, the privilege level to "15", and the password to ```cisco```:
 
 >**NOTE** - Cisco devices have 16 privilege levels (0 through 15). 13 are customizable, while three are set by the IOS:
 > 
-> - 0 - No privileges
-> - 1 - Read-only and access to the ping command
-> - 15 - Full access, including reading and writing configuration files
+>- 0 - No privileges
+>- 1 - Read-only and access to the ping command
+>- 15 - Full access, including reading and writing configuration files
 > 
 >To see your privilege level, enter ```show privilege``` at the prompt.
 
@@ -474,42 +457,32 @@ write memory ; Update the startup-configuration
 ```
 
 >**NOTE:** 
-> - In real life, make sure you use better passwords.
-> - The maximum length for a Cisco password is **64** characters and some special characters are allowed.
-> - Never add comments after a Cisco password; they will be included in the password.
-> - Check out [xkcd's take on passwords](https://xkcd.com/936/ "xkcd:Password Strength").
+>- In real life, make sure you use better passwords.
+>- The maximum length for a Cisco password is **64** characters and some special characters are allowed.
+>- Never add comments after a Cisco password; they will be included in the password.
+>- Check out [xkcd's take on passwords](https://xkcd.com/936/ "xkcd:Password Strength").
 
 To test your security, exit **Privileged EXEC Mode**:
 
-```
-disable
-```
+```disable```
 
 You are greeted with the **User EXEC Mode** prompt:
 
-```
-R1>
-```
+```R1>```
 
 Attempt to re-enter **Privileged EXEC Mode**:
 
-```
-enable
-```
+```enable```
 
 When prompted for a password, enter the password for **Privileged EXEC Mode** (i.e., ```cisen```). You should see the **Privileged EXEC Mode** prompt:
 
-```
-R1#
-```
+```R1#```
 
 >**NOTE** - If something went wrong, attempt to reconfigure the passwords again. However, if you are stuck in **User EXEC Mode**, you will have to delete the device in the GNS3 workspace, and replace it with a new device.
 
 Before you go on, take a look at the startup configuration file:
 
-```
-show startup-config
-```
+```show startup-config```
 
 You should see something similar to the following output:
 
@@ -585,14 +558,14 @@ There's a lot of good information in this file, but what is worrisome is the fac
 
 ```
 no service password-encryption
-...
+
 enable password cisen
-...
+
 username admin password 0 cisco
-...
+
 line con 0
  password ciscon
-...
+
 line aux 0
  password cisaux
 ```
@@ -632,22 +605,20 @@ write memory
 
 Take another look at the startup configuration file:
 
-```
-show startup-config
-```
+```show startup-config```
 
 You should see changes similar to the following:
 
 ```
 service password-encryption
-...
+
 enable secret 5 $1$GTon$HkSl2mJ3D8OB3lvCgNzK.0
-...
+
 username admin privilege 15 secret 5 $1$B2kV$6zQIQSPqM05TZzHh4NCPx1
-...
+
 line con 0
  password 7 05080F1C224340
-...
+
 line aux 0
  password 7 121A0C04131E14
 ```
@@ -658,9 +629,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
-```
-telnet 192.168.1.20
-```
+```telnet 192.168.1.20```
 
 After a few seconds, you will see the following output:
 
@@ -681,9 +650,7 @@ R1#
 
 Next, you will set the device's clock. As we stated earlier, this is a simple, but very important, task, since tasks, such as logging or synchronization, depend on an up-to-date clock. To this manually, enter the following command:
 
-```
-clock set 12:00:00 Jan 1 2021
-```
+```clock set 12:00:00 Jan 1 2021```
 
 After a few seconds, you will see the following output:
 
@@ -722,9 +689,7 @@ R1#show clock
 
 Your devices clock should match your system clock, offset for Coordinated Universal Time (UTC). If you update the startup-configuration, the device will always check the host's IP address for an NTP server:
 
-```
-write memory
-```
+```write memory```
 
 ---
 ## Transfer files to and from a network device
@@ -748,9 +713,7 @@ This tells the device to use the FastEthernet port 0/0 for all TFTP transfers.
 
 Next, transfer the file from the device to the host:
 
-```
-copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak
-```
+```copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak```
 
 You may be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
@@ -771,9 +734,7 @@ cat /var/lib/tftpboot/startup-config.bak
 
 Go back to the Telnet terminal. Just in case you lose access to the host, back up the backup file to the device's flash memory:
 
-```
-copy tftp://192.168.1.10/startup-config.bak flash:/startup-config.bak
-```
+```copy tftp://192.168.1.10/startup-config.bak flash:/startup-config.bak```
 
 You will be prompted to confirm the destination filename. You've already provided that information; press <kbd>Enter</kbd>:
 
@@ -835,9 +796,7 @@ This tells the device to use the FastEthernet port 0/0 for all FTP transfers.
 
 Next, transfer the file from the device to the host:
 
-```
-copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp
-```
+```copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp```
 
 You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
@@ -858,9 +817,7 @@ cat /home/gns3user/startup-config.ftp
 
 Now transfer the file from the host back to the device:
 
-```
-copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp
-```
+```copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp```
 
 You will be prompted to confirm the remote host's IP address and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
@@ -989,9 +946,7 @@ R1#
 
 To see the keys, enter the following command:
 
-```
-show crypto key mypubkey rsa
-```
+```show crypto key mypubkey rsa```
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
@@ -999,9 +954,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 Go back to the Linux Terminal and attempt to SSH into the device using the username and the IP address:
 
-```
-ssh admin@192.168.1.20
-```
+```ssh admin@192.168.1.20```
 
 After a few seconds, you will see the following output:
 
@@ -1045,9 +998,7 @@ Next, transfer the file from the device to the host:
 
 >**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. Since we are still using the /var/lib/tftpboot/ directory, use two backslashes after the IP address, or SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg).
 
-```
-copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
-```
+```copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp```
 
 You will be prompted to confirm the remote host's IP address, the remote host's username, and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
@@ -1084,9 +1035,7 @@ Before you finish, you will want to shut down all the services you started. Asid
 
 ### Telnet Client
 
-```
-sudo firewall-cmd --zone=public --remove-port=23/tcp
-```
+```sudo firewall-cmd --zone=public --remove-port=23/tcp```
 
 ### File Transfer Protocol (FTP) Service
 
