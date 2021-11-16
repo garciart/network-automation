@@ -2,7 +2,7 @@
 
 ![All Devices Started](img/adventures-automation.gif)
 
-***Note - While I do not expect you to be an expert or certified in any of the technologies I cover in this tutorial, I expect that:***
+***NOTE - While I do not expect you to be an expert in any of the technologies that I cover in this tutorial, I expect that:***
 
 - ***You have used the Linux Terminal before***
 - ***You understand the basics of computer networking, especially the TCP/IP or OSI models***
@@ -16,13 +16,13 @@
 
 ## Introduction
 
-Manually configuring a network device is not a difficult process. You simpy access the device's command line interface (CLI) through a console, auxiliary port or virtual teletype port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL).
+Manually configuring a network device is not a difficult process. You simpy access the device's command line interface (CLI) through a console, auxiliary, or virtual teletype port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL).
 
-However, imagine if you had to configure or update dozens or hundreds of devices. It could take a long time, and, by the time you were done, you could be sent another configuration change or update, requiring you to start the process all over again! In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
+However, imagine how long it would take to configure or update dozens, or even hundreds of devices. In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
 
-Automating the process using a scripting language, such as Python, is a better option. The bad news is that each time you would like to test your code, whether your changes are big or small, you would need to "spin-up" a physical device, which may take time or require you to take the device (and possibly the cabinet) offline.  
+Automating the process using a scripting language, such as Python, is a better option. The bad news is that each time you want to test your code, you would need to "spin-up" a physical device, which may take time or require you to take the device (and possibly the network) offline.  
 
-However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which can run Cisco Internetwork Operating System (IOS) images, and, with a little tweaking, allow you to test your code quickly against *multiple* virtual network devices, without having to take them offline, from a Terminal or an IDE.
+However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which, with a little tweaking, allow you to test your code quickly against *multiple* network devices, in a virtual environment.
 
 This tutorial is broken down into three parts:
 
@@ -76,9 +76,7 @@ In Virtual Machine Manager, you can make all the above changes to your VM in **V
 
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
-```
-sudo yum -y upgrade
-```
+```sudo yum -y upgrade```
 
 >**NOTE** - If you are using VirtualBox, I recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the software on the Guest Additions' ISO:
 >
@@ -92,9 +90,7 @@ sudo yum -y upgrade
 
 Next, open a Terminal and install git:
 
-```
-sudo yum -y install git
-```
+```sudo yum -y install git```
 
 Clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```), and then enter the repository:
 
@@ -190,7 +186,7 @@ sudo chmod 777 /var/lib/tftpboot
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 ```
 
-Now, the first time you install GNS3, I suggest you open a Linux Terminal and enter each of the above lines, one at a time. Look up any commands or programs you are unfamiliar with.
+Now, the first time you install GNS3, I suggest you open a Linux Terminal and enter each of the above lines, one at a time, and studying their output. Look up any commands or programs you are unfamiliar with.
 
 >If you run into errors downloading IOS images from the [tfr.org](http://tfr.org "tfr.org") website, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes.
 
@@ -321,9 +317,7 @@ br0          8000.08002787ffe2  no           enp0s8
 
 Start GNS3:
 
-```
-gns3
-```
+```gns3```
 
 >**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses.
 
@@ -349,7 +343,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
-:eyes: This will return to the main GNS3 Graphical User Interface (GUI):
+>>> :eyes: - This will return you to the main GNS3 Graphical User Interface (GUI):
 
 ![Main Screen](img/a09.png)
 
@@ -556,13 +550,11 @@ Now, before we begin to code, you will perform a dry run by entering the command
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (i.e., /dev/ttyS0) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IP address.
 > 
->However, I do not know how to do this in GNS3, so you will be simulating that connection by Telnet-ing through the gateway and the port number the Console port is using.
+>However, I do not know how to do this in GNS3, so you will be simulating that connection using the gateway and the Console port number.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
-```
-telnet 192.168.1.1 5001
-```
+```telnet 192.168.1.1 5001```
 
 You will see boot-up messages appear on the screen, similar to the following:
 
@@ -581,15 +573,11 @@ Press RETURN to get started!
 
 Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the Privileged EXEC mode prompt (```R1#```) will appear:
 
-```
-R1#
-```
+```R1#```
 
 You are now connected to the router through the Console port. Next, get the device's hardware and software information by inputting the following command:
 
-```
-show version
-```
+```show version```
 
 After a few seconds, you will see the following output (press <kbd>Space</kbd> when the ```--More--``` prompt appears):
 
@@ -609,7 +597,7 @@ R1#
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
-![Reload the Device](../img/b01.png)
+![Reload the Device](img/b01.png)
 
 ---
 
@@ -617,9 +605,7 @@ Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>
 
 Go back to the Linux Terminal, and, at the prompt, enter the following command to start the Python interpreter:
 
-```
-python
-```
+```python```
 
 After a few seconds, you will see the following output:
 
@@ -634,27 +620,19 @@ In Python, you will interact with the device using the pexpect module. Pexpect c
 
 First, at the ```>>>``` prompt, import the module into the interpreter:
 
-```
->>> import pexpect
-```
+```>>> import pexpect```
 
 Second, create a Telnet child process:
 
-```
->>> child = pexpect.spawn("telnet 192.168.1.1 5001")
-```
+```>>> child = pexpect.spawn("telnet 192.168.1.1 5001")```
 
 If you have looked at previous boot-up messages, you will notice that the string, "Press RETURN to get started", always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
 
-```
->>> child.expect("Press RETURN to get started")
-```
+```>>> child.expect("Press RETURN to get started")```
 
 After a few seconds, you will see the following output:
 
-```
-0
-```
+```0```
 
 0? What does that mean? The Pexpect expect class collects the output of the child during the spawn call. It takes your search string, converts it to a list, and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and since you only have one search string, the index will be 0. If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
 
@@ -662,30 +640,22 @@ Pexpect will begin the next search right after the last match. This prevents Pex
 
 Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (\n)):
 
-```
->>> child.sendline("\r")
-```
+```>>> child.sendline("\r")```
 
 After a few seconds, you will see the following output:
 
-```
-2
-```
+```2```
 
 The return value states that two characters were successfully sent to the child: '\r' and'\n'. That is good, and when we look for our search string of ```R1#``` in the output, we should expect to find the default Privilege EXEC Mode prompt:
 
-```
->>> child.expect("R1#")
-0
+```>>> child.expect("R1#")0
 ```
 
 >**NOTE** - Always try to match each send with an expect. If you do not, Pexpect may look for the search string in the wrong place.
 
 Next, as you did earlier, get the device's hardware and software information. Send the command ```show version``` (14 characters, including the newline, will be sent):
 
-```
->>> child.sendline("show version\r")
-14
+```>>> child.sendline("show version\r")14
 ```
 
 The ```show version``` command produces too much output for one Telnet screen, so it pauses the output midway with a ```--More--``` prompt, so you can examine the first part before proceeding to the second. Therefore, this time, you will expect several responses and capture the index of the response:
@@ -809,9 +779,7 @@ Cause the error again, but this time, expect the timeout:
 
 After a few seconds, you will see the following output:
 
-```
-Search string not found.
-```
+```Search string not found.```
 
 This time, you handled the error, displayed a custom message instead of the debug information. You can exit Telnet and the Python interpreter now, by entering the following commands:
 

@@ -1,12 +1,11 @@
 import os
 import subprocess
 import sys
-from datetime import datetime
 
 import pexpect
 
 from cisco import Cisco
-from labs import lab_utils
+from labs.old import lab_utils
 
 
 def main():

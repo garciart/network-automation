@@ -8,11 +8,11 @@ Once you have finished setting up your lab environment, click on **File** ->  **
 
 A pop-up dialog will appear, asking you to create a new project. Enter ```lab001-telnet``` in the ***Name*** textbox and click the **OK** button.
 
-![Project Dialog](../img/a10.png)
+![Project Dialog](../../img/a10.png)
 
 From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates**:
 
-![All devices](../img/a26.png)
+![All devices](../../img/a26.png)
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
@@ -20,45 +20,45 @@ All the devices you can use in your lab will appear in a docked window next to t
 
 You may also use the "Browse all devices" to see all your available devices:
 
-![All devices](../img/a26i.png)
+![All devices](../../img/a26i.png)
 
 Select a **Cloud** and place it in the Workspace, then select a **c3745** and place it on the Workspace. Note that the router's hostname is **R1**:
 
-![Populate Workspace](../img/a27.png)
+![Populate Workspace](../../img/a27.png)
 
 Select the "Add a link" icon at the bottom of the Devices Toolbar:
 
-![Add a link icon](../img/a27i.png)
+![Add a link icon](../../img/a27i.png)
 
 Move the cross-hair over **Cloud1** and select the TAP interface name (e.g., **tap0**):
 
-![Connect to the Cloud](../img/a28.png)
+![Connect to the Cloud](../../img/a28.png)
 
 Connect the other end to the built-in **FastEthernet0/0** port in **R1**:
 
-![Connect to the Router](../img/a29.png)
+![Connect to the Router](../../img/a29.png)
 
 Notice that, while the devices are connected, nothing is being transmitted, because the router is not on:
 
-![Router off](../img/a30.png)
+![Router off](../../img/a30.png)
 
 Let us fix that. Click on the green **Play** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to start all devices?", click **Yes**:
 
-![Confirm Start All](../img/a31.png)
+![Confirm Start All](../../img/a31.png)
 
 You will see that all the nodes are now green, both in the Workspace and the Topology Summary in the top left-hand corner:
 
-![All Devices Started](../img/a32.png)
+![All Devices Started](../../img/a32.png)
 
 By the way, note the console information for R1 in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745 using port 5001.
 
 However, your port number may be different. If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the R1 node and selecting **Show node information**:
 
-![Show node information](../img/a35.png)
+![Show node information](../../img/a35.png)
 
 The pop-up dialog has a lot of good information, including which port number the Console port is using:
 
-![Node information](../img/a36.png)
+![Node information](../../img/a36.png)
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
@@ -142,11 +142,11 @@ Now, press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet
 
 >Do not click on **Reload**! **Reload** will load the default settings, erasing any changes you have made. You will learn how to save configurations later.
 
-![Stop the Router](../img/a33.png)
+![Stop the Router](../../img/a33.png)
 
 After a few seconds, click on the green **Play** icon in the GNS3 Toolbar above the Workspace. When asked, "Are you sure you want to start all devices?", click **Yes**:
 
-![Confirm Start All](../img/a31.png)
+![Confirm Start All](../../img/a31.png)
 
 All the nodes should turn green.
 

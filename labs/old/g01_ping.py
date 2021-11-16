@@ -17,7 +17,7 @@ import sys
 
 import pexpect
 
-from labs import lab_utils as lu
+from labs.old import lab_utils as lu
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
