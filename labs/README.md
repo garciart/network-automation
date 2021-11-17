@@ -161,7 +161,15 @@ Finally, start the TFTP service:
 
 ```sudo systemctl start tftp```
 
-Now, enable the FTP service:
+To enable the FTP service, you may need to make some modifications to the host system. First, check if an FTP user is listed in the vsftpd configuration file:
+
+```sudo grep "ftp_username=" /etc/vsftpd/vsftpd.conf```
+
+You should see the search string, ```ftp_username=nobody```, repeated back in red. If nothing appears, it means that an FTP user is listed. Append the default user to the FTP configuration file, using the following command:
+
+```echo -e "ftp_username=nobody" | sudo tee -a /etc/vsftpd/vsftpd.conf```
+
+Finally, start the FTP service:
 
 ```sudo systemctl start vsftpd```
 
@@ -284,6 +292,14 @@ Format: Total bytes in formatted partition: 67026432
 Format: Operation completed successfully.
 
 Format of flash complete
+R1#
+```
+
+The command ```show flash:``` will display the contents of CF memory card:
+
+```
+No files on device
+66875392 bytes available (0 bytes used)
 R1#
 ```
 
@@ -779,6 +795,15 @@ ntp server 192.168.1.10
 end
 ```
 
+If anything goes wrong, enter the following commands:
+
+```
+debug tftp packets
+debug tftp events
+```
+
+You will receive verbose information about the transfer, allowing you to debug any problems.
+
 Now, you will once again back up the startup-configuration, this time using the more secure and reliable FTP service. 
 
 When transferring a file using FTP, you must supply the recipient's username and password. In addition, FTP will save the file in the recipient's home folder, preventing you from overwriting a system file or other sensitive data.
@@ -863,6 +888,12 @@ ntp server 192.168.1.10
 end
 R1#
 ```
+
+If anything goes wrong, enter the following commands:
+
+```debug ip ftp```
+
+You will receive verbose information about the transfer, allowing you to debug any problems.
 
 Of course, you can copy a file from the NVRAM to flash memory directly and vice versa:
 
@@ -998,22 +1029,26 @@ This tells the device to use the FastEthernet port 0/0 for all SCP transfers.
 
 Next, transfer the file from the device to the host:
 
->**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. Since we are still using the /var/lib/tftpboot/ directory, use two backslashes after the IP address, or SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg).
+>**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. If you want to use another directory, such as the /var/lib/tftpboot/ directory, use two backslashes after the IP address:
+>
+> ```copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp```
+>
+>Otherwise, SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg).
 
-```copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp```
+```copy nvram:/startup-config scp://gns3user@192.168.1.10/startup-config.scp```
 
 You will be prompted to confirm the remote host's IP address, the remote host's username, and destination filename. You've already provided that information; press <kbd>Enter</kbd> each time:
 
 ```
 Address or name of remote host [192.168.1.10]? 
 Destination username [gns3user]? 
-Destination filename [/var/lib/tftpboot/startup-config.scp]? 
+Destination filename [startup-config.scp]? 
 ```
 
 After a few seconds, you will see the following output. Enter the ***remote host's password*** when prompted:
 
 ```
-Writing /var/lib/tftpboot/startup-config.scp 
+Writing startup-config.scp 
 Password: 
 ! Sink: C0644 1408 startup-config.scp
 
@@ -1027,6 +1062,12 @@ If you open another Linux Terminal and enter the following command, you will see
 ll /var/lib/tftpboot
 cat /var/lib/tftpboot/startup-config.scp
 ```
+
+If anything goes wrong, enter the following commands:
+
+```debug scp all```
+
+You will receive verbose information about the transfer, allowing you to debug any problems.
 
 Go back to the SSH session and exit by entering ```exit``` at the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
 

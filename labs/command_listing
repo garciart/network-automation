@@ -1,34 +1,66 @@
 Opening Linux Commands:
+gns3_run
+
+which telnet
+which scp
+systemctl status ntpd
+systemctl status tftp
+systemctl status vsftpd
+systemctl status sshd
+sudo firewall-cmd --zone=public --add-port=20/tcp
+sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-port=22/tcp
+sudo firewall-cmd --zone=public --add-service=ssh
+sudo firewall-cmd --zone=public --add-service=ftp
 sudo firewall-cmd --zone=public --add-port=23/tcp
+sudo firewall-cmd --zone=public --add-port=123/udp
+sudo firewall-cmd --zone=public --add-service=ntp
+sudo firewall-cmd --zone=public --add-port=69/udp
 sudo firewall-cmd --zone=public --add-service=tftp
+grep "server 127.127.1.0" /etc/ntp.conf
+
+echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
+sudo systemctl start ntpd
 sudo mkdir --parents --verbose /var/lib/tftpboot
 sudo chmod 777 --verbose /var/lib/tftpboot
 sudo touch /var/lib/tftpboot/startup-config.bak
 sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
-sudo systemctl enable tftp
 sudo systemctl start tftp
+grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
 
+echo -e "ftp_username=nobody" | sudo tee -a /vsftpd/vsftpd.conf
+sudo systemctl start vsftpd
+sudo systemctl start sshd
+
+telnet 192.168.1.1 5001
 
 Cisco Commands:
 enable
-format flash:
 
+format flash:
 show flash:
-clock set 12:00:00 Jan 1 2021
+
 show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
 show version | include [IOSios] [Ss]oftware
+
+show ip interface brief
 configure terminal
 interface FastEthernet0/0
 ip address 192.168.1.20 255.255.255.0
 no shutdown
 end
+show ip interface brief
 
 ping 192.168.1.10
 
+write memory
+
 configure terminal
-line vty 0 4
 username admin password cisco
+line vty 0 4
+login local
+exit
 line console 0
 password ciscon
 login
@@ -41,16 +73,81 @@ enable password cisen
 end
 write memory
 
+disable
+
+enable
+
 show startup-config
 
+configure terminal
+no enable password
+enable secret cisen
+end
+write memory
 
+configure terminal
+no username admin password cisco
+username admin privilege 15 secret cisco
+end
+write memory
+
+configure terminal
 service password-encryption
 end
 write memory
-copy startup-config tftp://192.168.1.10/startup-config.bak
-copy tftp://192.168.1.10/startup-config.bak startup-config.bak
-copy startup-config startup-config.alt
-copy startup-config.bak startup-config
+show startup-config
+
+clock set 12:00:00 Jan 1 2021
+configure terminal
+ntp server 192.168.1.10
+end
+show ntp status
+show clock
+write memory
+configure terminal
+ip tftp source-interface FastEthernet0/0
+end
+write memory
+
+copy nvram:/startup-config tftp://192.168.1.10/startup-config.bak
+
+copy tftp://192.168.1.10/startup-config.bak flash:/startup-config.bak
+
+show flash:
+more flash:/startup-config.bak
+
+configure terminal
+ip ftp source-interface FastEthernet0/0
+end
+write memory
+
+copy nvram:/startup-config ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp
+
+copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp
+
+show flash:
+more flash:/startup-config.ftp
+
+copy nvram:/startup-config flash:/startup-config.alt
+copy flash:/startup-config.bak nvram:/startup-config
+
+configure terminal
+
+do dir nvram:
+
+configure terminal
+crypto key generate rsa general-keys label ADVENTURES modulus 1024
+
+show ip ssh
+show crypto key mypubkey rsa
+
+configure terminal
+ip scp source-interface FastEthernet0/0
+end
+write memory
+
+copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
+
 reload
 
 Telnet Command:
@@ -59,6 +156,19 @@ Telnet Command:
 
 Closing Linux Commands:
 sudo firewall-cmd --zone=public --remove-port=23/tcp
-sudo systemctl stop tftp
-sudo systemctl disable tftp
+
+sudo firewall-cmd --zone=public --remove-port=21/tcp
+sudo firewall-cmd --zone=public --remove-service=ftp
+sudo systemctl stop vsftpd
+sudo sed -i '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf
+
+sudo firewall-cmd --zone=public --remove-port=123/udp
+sudo firewall-cmd --zone=public --remove-service=ntp
+sudo systemctl stop ntpd
+sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf
+
+sudo firewall-cmd --zone=public --remove-port=69/udp
 sudo firewall-cmd --zone=public --remove-service=tftp
+sudo systemctl stop tftp
+
+sudo firewall-cmd --zone=public --remove-port=22/tcp
