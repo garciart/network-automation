@@ -1086,6 +1086,7 @@ Before you finish, you will want to shut down all the services you started. Asid
 sudo firewall-cmd --zone=public --remove-port=21/tcp
 sudo firewall-cmd --zone=public --remove-service=ftp
 sudo systemctl stop vsftpd
+sudo sed -i '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf
 ```
 
 ### Network Time Protocol (NTP) Service
