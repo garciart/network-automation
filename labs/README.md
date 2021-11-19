@@ -376,7 +376,7 @@ R1#
 >
 >```sudo ip address replace 192.168.1.10/24 dev enp0s8```
 >
->Attempt to ping the host from the device once again. If the success rate is still zero, go back and review the steps in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>Go back to the Telnet terminal and attempt to ping the host from the device again. If the success rate is still zero, go back and review the steps in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 
 Before continuing, make that change to the interface permanent by updating the device's **startup configuration**; otherwise, the device will shutdown the interface after each reload or reboot:
 
@@ -433,7 +433,7 @@ You have several options.
 2. Another way is to change the configuration, by replacing ```login``` with ```no login```, removing the authentication requirement.
 3. However, the best option is to secure the lines; whenever you can, "err" on the side of security.
 
-So, in the Linux Terminal, telnet back into the device through the Console port:
+So, in the Linux Terminal, Telnet back into the device through the Console port:
 
 ```telnet 192.168.1.1 5001```
 
@@ -476,7 +476,7 @@ write memory ; Update the startup-configuration
 
 >**NOTE:** 
 >- In real life, make sure you use better passwords.
->- The maximum length for a Cisco password is **64** characters and some special characters are allowed.
+>- The maximum length for a Cisco password is **64** characters.
 >- Never add comments after a Cisco password; they will be included in the password.
 >- Check out [xkcd's take on passwords](https://xkcd.com/936/ "xkcd:Password Strength").
 
@@ -795,14 +795,16 @@ ntp server 192.168.1.10
 end
 ```
 
-If anything goes wrong, enter the following commands:
+>**NOTE** - If you want to disable the ```--More--``` prompt, enter the command ```terminal length 0``` before showing the file.
+
+If anything goes wrong with the transfer, enter the following commands:
 
 ```
 debug tftp packets
 debug tftp events
 ```
 
-You will receive verbose information about the transfer, allowing you to debug any problems.
+You will receive verbose feedback about the transfer, allowing you to debug any problems.
 
 Now, you will once again back up the startup-configuration, this time using the more secure and reliable FTP service. 
 
@@ -842,7 +844,7 @@ ll /home/gns3user
 cat /home/gns3user/startup-config.ftp
 ```
 
-Now transfer the file from the host back to the device:
+Go back to the Telnet terminal. Transfer the file from the host back to the device:
 
 ```copy ftp://gns3user:gns3user@192.168.1.10/startup-config.ftp flash:/startup-config.ftp```
 
@@ -889,11 +891,11 @@ end
 R1#
 ```
 
-If anything goes wrong, enter the following commands:
+If anything goes wrong with the transfer, enter the following commands:
 
 ```debug ip ftp```
 
-You will receive verbose information about the transfer, allowing you to debug any problems.
+You will receive verbose feedback about the transfer, allowing you to debug any problems.
 
 Of course, you can copy a file from the NVRAM to flash memory directly and vice versa:
 
@@ -1009,6 +1011,25 @@ Password:
 R1#
 ```
 
+>**NOTE** - Later, as you continue to connect and reconnect to devices, you may encounter the following message:
+>
+>```
+>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+>@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+>@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+>IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+>Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+>It is also possible that a host key has just been changed.
+>```
+>
+>If you are certain that only you and the device are connected to each other, the IP address may already exist in the ```known_hosts``` file. Open the file and remove the IP address:
+> 
+>```vim ~/.ssh/known_hosts```
+> 
+>If you use the host only to configure devices using the same IP address, you can delete the file completely:
+> 
+>```rm ~/.ssh/known_hosts```
+
 ---
 ## Securely transfer files to and from a network device
 
@@ -1029,11 +1050,11 @@ This tells the device to use the FastEthernet port 0/0 for all SCP transfers.
 
 Next, transfer the file from the device to the host:
 
->**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. If you want to use another directory, such as the /var/lib/tftpboot/ directory, use two backslashes after the IP address:
+>**NOTE** - Be careful! By default, SCP places files in the remote host's user's home directory. If you want to use another directory, such as the ```/var/lib/tftpboot/``` directory, use two backslashes after the IP address:
 >
 > ```copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp```
 >
->Otherwise, SCP will fail, attempting to place the file in a non-existent var/lib/tftpboot directory within your user home directory (e.g. /home/gns3user/var/lib/tftpboot/scp_start.cfg).
+>Otherwise, SCP will fail, attempting to place the file in a non-existent ```var/lib/tftpboot``` directory within your user home directory (e.g. ```/home/gns3user/var/lib/tftpboot/scp_start.cfg```).
 
 ```copy nvram:/startup-config scp://gns3user@192.168.1.10/startup-config.scp```
 
@@ -1063,13 +1084,13 @@ ll /var/lib/tftpboot
 cat /var/lib/tftpboot/startup-config.scp
 ```
 
-If anything goes wrong, enter the following commands:
+Go back to the SSH terminal. If anything goes wrong with the transfer, enter the following commands:
 
 ```debug scp all```
 
 You will receive verbose information about the transfer, allowing you to debug any problems.
 
-Go back to the SSH session and exit by entering ```exit``` at the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
+Exit by entering ```exit``` at the **Privileged EXEC Mode** prompt. If, for some reason, that does not work, press <kbd>Enter</kbd>, followed by <kbd>~</kbd>.
 
 ---
 ## Shutdown
