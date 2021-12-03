@@ -8,6 +8,7 @@ systemctl status tftp
 systemctl status vsftpd
 systemctl status sshd
 sudo firewall-cmd --zone=public --add-port=20/tcp
+
 sudo firewall-cmd --zone=public --add-port=21/tcp
 sudo firewall-cmd --zone=public --add-port=22/tcp
 sudo firewall-cmd --zone=public --add-service=ssh
@@ -26,7 +27,7 @@ sudo chmod 777 --verbose /var/lib/tftpboot
 sudo touch /var/lib/tftpboot/startup-config.bak
 sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
 sudo systemctl start tftp
-grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
+sudo grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
 
 echo -e "ftp_username=nobody" | sudo tee -a /vsftpd/vsftpd.conf
 sudo systemctl start vsftpd
@@ -36,14 +37,12 @@ telnet 192.168.1.1 5001
 
 Cisco Commands:
 enable
-
 format flash:
-show flash:
 
+show flash:
 show inventory | include [Cc]hassis
 show version | include [Pp]rocessor [Bb]oard [IDid]
 show version | include [IOSios] [Ss]oftware
-
 show ip interface brief
 configure terminal
 interface FastEthernet0/0
@@ -51,11 +50,9 @@ ip address 192.168.1.20 255.255.255.0
 no shutdown
 end
 show ip interface brief
-
 ping 192.168.1.10
 
 write memory
-
 configure terminal
 username admin password cisco
 line vty 0 4
@@ -72,9 +69,7 @@ exit
 enable password cisen
 end
 write memory
-
 disable
-
 enable
 
 show startup-config
@@ -83,8 +78,8 @@ configure terminal
 no enable password
 enable secret cisen
 end
-write memory
 
+write memory
 configure terminal
 no username admin password cisco
 username admin privilege 15 secret cisco
@@ -100,10 +95,12 @@ show startup-config
 clock set 12:00:00 Jan 1 2021
 configure terminal
 ntp server 192.168.1.10
+write memory
 end
+
 show ntp status
 show clock
-write memory
+
 configure terminal
 ip tftp source-interface FastEthernet0/0
 end
@@ -129,14 +126,17 @@ show flash:
 more flash:/startup-config.ftp
 
 copy nvram:/startup-config flash:/startup-config.alt
+
 copy flash:/startup-config.bak nvram:/startup-config
 
 configure terminal
-
 do dir nvram:
+end
 
 configure terminal
 crypto key generate rsa general-keys label ADVENTURES modulus 1024
+end
+write memory
 
 show ip ssh
 show crypto key mypubkey rsa
@@ -146,12 +146,14 @@ ip scp source-interface FastEthernet0/0
 end
 write memory
 
-copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
-
-reload
+; copy nvram:/startup-config scp://gns3user@192.168.1.10//var/lib/tftpboot/startup-config.scp
+copy nvram:/startup-config scp://gns3user@192.168.1.10/startup-config.scp
 
 Telnet Command:
 [CTRL]+[]] [q]
+
+
+reload manually in GNS3
 
 
 Closing Linux Commands:
