@@ -113,6 +113,10 @@ sudo python3 -m pip install --upgrade pip
 sudo python3 -m ensurepip
 sudo yum -y install python3-devel
 sudo yum -y install python3-tools
+# Install pip support for Python 2
+sudo yum -y install python-pip
+# Install Git
+sudo yum -y install git
 # Install GNS3 dependencies
 sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but we will need the other tools later
 sudo yum -y install elfutils-libelf-devel # For Dynamips
@@ -180,6 +184,9 @@ sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
 sudo yum -y install vsftpd
+sudo yum -y install httpd
+sudo yum -y install openssh-clients
+sudo yum -y install mod_ssl openssl
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
 # Optional - Modify vimrc file
