@@ -34,7 +34,7 @@ sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
 sudo systemctl start tftp
 sudo grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
 
-echo -e "ftp_username=nobody" | sudo tee -a /vsftpd/vsftpd.conf
+echo -e "ftp_username=nobody" | sudo tee -a /etc/vsftpd/vsftpd.conf
 sudo systemctl start vsftpd
 
 sudo systemctl start sshd
