@@ -28,10 +28,12 @@ GRN = "\x1b[32m"
 YLW = "\x1b[33m"
 
 
-def main():
-    """A G-d Object. For training only; I know its cognitive complexity is in the hundreds and
+def main(sudo_password=None):
+    """A G-d Object. For training only; I know its cognitive complexity is high and
     there are WAY too many comments.
 
+    :param str sudo_password: The superuser password to execute commands that require
+        elevated privileges.
     :return: None
     :rtype: None
 
@@ -55,7 +57,7 @@ def main():
         if index == 1:
             raise RuntimeError("Script halted: Telnet client is not installed.")
         elif index == 2:
-            raise RuntimeError("Script halted: Unable to run the command as written.")
+            raise RuntimeError("Script halted: Invalid command.")
         elif index == 3:
             raise RuntimeError("Script halted: Expected search string not found.")
         else:
@@ -88,7 +90,7 @@ def main():
         if index == 1:
             raise RuntimeError("Script halted: SCP program is not installed.")
         elif index == 2:
-            raise RuntimeError("Script halted: Unable to run the command as written.")
+            raise RuntimeError("Script halted: Invalid command.")
         elif index == 3:
             raise RuntimeError("Script halted: Expected search string not found.")
         else:
@@ -104,7 +106,9 @@ def main():
         for c in list_of_commands:
             command_output, exit_status = pexpect.run(c, withexitstatus=True)
             if exit_status != 0:
-                raise RuntimeError(command_output.strip())
+                # For Python 3.x, use unicode_escape.
+                # Do not use utf-8; Some characters, such as backticks, will cause exceptions
+                raise RuntimeError(command_output.decode("string_escape").strip())
             else:
                 print(GRN + "{0}: Program installed.".format(c) + CLR)
 
@@ -115,7 +119,7 @@ def main():
         command_output, exit_status = pexpect.run("which foo", withexitstatus=True)
         if exit_status != 0:
             # Just an example; do not throw an exception
-            print(RED + command_output.strip() + CLR)
+            print(RED + command_output.decode("string_escape").strip() + CLR)
 
         print()
 
@@ -125,7 +129,7 @@ def main():
                             "systemctl status vsftpd",
                             "systemctl status sshd", ]
         for c in list_of_commands:
-            command_output, exit_status = pexpect.run(c, withexitstatus=True)
+            _, exit_status = pexpect.run(c, withexitstatus=True)
             if exit_status != 0:
                 print(YLW + "{0}: Service not installed or loaded.".format(c) + CLR)
             else:
@@ -143,7 +147,7 @@ def main():
             withexitstatus=True)
         if exit_status != 0:
             # Just an example; do not throw an exception
-            print(RED + "{0}: Timed-out as expected.".format(command_output) + CLR)
+            print(RED + "{0}: Timed-out as expected.".format(command_output.decode("string_escape").strip()) + CLR)
         else:
             raise RuntimeError("Oops! I was wrong!")
 
@@ -160,14 +164,14 @@ def main():
         if exit_status != 0:
             raise RuntimeError("{0}: Could not modify firewall.".format(command_output))
         else:
-            print(GRN + "{0}: Success.".format(command_output.strip()) + CLR)
+            print(GRN + "{0}: Success.".format(command_output.decode("string_escape").strip()) + CLR)
 
         print()
 
         print("Getting a password and using it to run multiple commands...\n")
         # Clear incoming and outgoing text before using getpass()
         time.sleep(0.5)
-        sudo_password = getpass()
+        sudo_password_for_loop = getpass()
         list_of_commands = ["sudo firewall-cmd --zone=public --add-port=21/tcp",
                             "sudo firewall-cmd --zone=public --add-port=22/tcp",
                             "sudo firewall-cmd --zone=public --add-service=ssh",
@@ -180,7 +184,7 @@ def main():
         for c in list_of_commands:
             command_output, exit_status = pexpect.run(
                 c,
-                events={"(?i)password": sudo_password + "\r"},
+                events={"(?i)password": sudo_password_for_loop + "\r"},
                 withexitstatus=True)
             if exit_status != 0:
                 raise RuntimeError("{0}: Could not modify firewall.".format(c))
@@ -188,6 +192,9 @@ def main():
                 print(GRN + "{0}: Success.".format(c) + CLR)
 
         print()
+
+        print("Getting and storing a password to use with subsequent sudo commands...")
+        sudo_password = (sudo_password if sudo_password is not None else getpass()) + "\r"
 
         print("Verifying the NTP configuration...")
         # Check if the NTP server address is in the ntp.conf file
@@ -199,7 +206,7 @@ def main():
             command_output, exit_status = pexpect.run("which bash", withexitstatus=True)
             # You cannot continue without Bash, so raise an exception
             if exit_status != 0:
-                raise RuntimeError(command_output.strip())
+                raise RuntimeError(command_output.decode("string_escape").strip())
             else:
                 # Use the bash to run a piped command in Pexpect
                 bash = command_output
@@ -209,11 +216,11 @@ def main():
                 command_output, exit_status = pexpect.run(
                     "{0} -c 'echo -e \"server 127.127.1.0\" | sudo tee -a /etc/ntp.conf'".format(
                         bash),
-                    events={"(?i)password": getpass() + "\r"},
+                    events={"(?i)password": sudo_password + "\r"},
                     withexitstatus=True)
                 if exit_status != 0:
                     # You cannot continue without NTP, so raise an exception
-                    raise RuntimeError(command_output.strip())
+                    raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "NTP configuration verified." + CLR)
 
         print()
@@ -222,19 +229,18 @@ def main():
         # Clear incoming and outgoing text before using getpass()
         time.sleep(0.5)
         command_output, exit_status = pexpect.run("sudo systemctl start ntpd",
-                                                  events={"(?i)password": getpass() + "\r"},
+                                                  events={"(?i)password": sudo_password + "\r"},
                                                   withexitstatus=True)
         if exit_status != 0:
             # You cannot continue without NTP, so raise an exception
-            raise RuntimeError(command_output.strip())
+            raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "NTP service started" + CLR)
 
         print()
 
         print("Verifying the TFTP configuration...")
-        # Clear incoming and outgoing text before using getpass()
+        # Wait for incoming and outgoing text to clear
         time.sleep(0.5)
-        sudo_password = getpass()
         list_of_commands = ["sudo mkdir --parents --verbose /var/lib/tftpboot",
                             "sudo chmod 777 --verbose /var/lib/tftpboot",
                             "sudo touch /var/lib/tftpboot/startup-config.bak",
@@ -246,46 +252,46 @@ def main():
                 withexitstatus=True)
             if exit_status != 0:
                 # You cannot continue without TFTP, so raise an exception
-                raise RuntimeError(command_output.strip())
+                raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "TFTP configuration verified." + CLR)
 
         print()
 
         print("Starting the TFTP service...")
-        # Clear incoming and outgoing text before using getpass()
+        # Wait for incoming and outgoing text to clear
         time.sleep(0.5)
         command_output, exit_status = pexpect.run("sudo systemctl start tftp",
-                                                  events={"(?i)password": getpass() + "\r"},
+                                                  events={"(?i)password": sudo_password + "\r"},
                                                   withexitstatus=True)
         if exit_status != 0:
             # You cannot continue without TFTP, so raise an exception
-            raise RuntimeError(command_output.strip())
+            raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "TFTP service started" + CLR)
 
         print()
 
         print("Starting the FTP service...")
-        # Clear incoming and outgoing text before using getpass()
+        # Wait for incoming and outgoing text to clear
         time.sleep(0.5)
         command_output, exit_status = pexpect.run("sudo systemctl start vsftpd",
-                                                  events={"(?i)password": getpass() + "\r"},
+                                                  events={"(?i)password": sudo_password + "\r"},
                                                   withexitstatus=True)
         if exit_status != 0:
             # You cannot continue without FTP, so raise an exception
-            raise RuntimeError(command_output.strip())
+            raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "FTP service started" + CLR)
 
         print()
 
         print("Starting the SSH service...")
-        # Clear incoming and outgoing text before using getpass()
+        # Wait for incoming and outgoing text to clear
         time.sleep(0.5)
         command_output, exit_status = pexpect.run("sudo systemctl start sshd",
-                                                  events={"(?i)password": getpass() + "\r"},
+                                                  events={"(?i)password": sudo_password + "\r"},
                                                   withexitstatus=True)
         if exit_status != 0:
             # You cannot continue without SSH, so raise an exception
-            raise RuntimeError(command_output.strip())
+            raise RuntimeError(command_output.decode("string_escape").strip())
         print(GRN + "SSH service started" + CLR)
 
         print()
