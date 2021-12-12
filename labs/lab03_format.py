@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Lab 2: Access a network device's Privileged EXEC Mode
+"""Lab 3: Format a network device's flash memory
 
 Project: Automation
 
@@ -82,15 +82,28 @@ def main(device_hostname, device_ip_address, port=23):
                 break
     print(GRN + "Connected to device using Telnet.\n" + CLR)
 
-    # A reloaded device's prompt will be either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
-    # Just in case the device boots into User EXEC mode, enable Privileged EXEC Mode
-    # If the device is already in Privileged EXEC Mode, the enable command will not affect anything
+    # A reloaded device's prompt will be either R1> (User EXEC mode) or R1# (Privileged EXEC Mode).
+    # Just in case the device boots into User EXEC mode, enable Privileged EXEC Mode .
+    # If the device is already in Privileged EXEC Mode, the enable command will not affect anything.
     child.sendline("enable\r")
     index = child.expect_exact(["Password:", prompt_list[1], ])
     if index == 0:
         password = getpass()
         child.sendline(password + "\r")
         child.expect_exact(prompt_list[1])
+
+    # Format the flash memory. Look for the final characters of the following strings:
+    # "Format operation may take a while. Continue? [confirm]"
+    # "Format operation will destroy all data in "flash:".  Continue? [confirm]"
+    # "66875392 bytes available (0 bytes used)"
+    child.sendline("format flash:\r")
+    child.expect_exact("Continue? [confirm]")
+    child.sendline("\r")
+    child.expect_exact("Continue? [confirm]")
+    child.sendline("\r")
+    child.expect_exact("Format of flash complete", timeout=120)
+    child.sendline("show flash\r")
+    child.expect_exact("(0 bytes used)")
 
     print(YLW + "Closing telnet connection...\n" + CLR)
     child.sendcontrol("]")
@@ -103,7 +116,7 @@ def main(device_hostname, device_ip_address, port=23):
 
 if __name__ == "__main__":
     try:
-        main("R1", "192.168.1.1", port=5003)
+        main("R1", "192.168.1.1", port=5001)
     except RuntimeError:
         pass
     except pexpect.TIMEOUT:
