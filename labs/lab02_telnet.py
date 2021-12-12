@@ -30,12 +30,20 @@ CISCO_PROMPTS = [
     ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
 
 
-def main(device_hostname, device_ip_address, port=23):
+def main(device_hostname, device_ip_address, port_number=23):
+    """Connect to the device via Telnet.
+
+    :param str device_hostname: The hostname of the device.
+    :param str device_ip_address: The IP address that will be used to connect to the device.
+    :param int port_number: The port number for the connection.
+    :raise pexpect.ExceptionPexpect: If the result of a spawn or sendline command does not match
+        the expected result (raised from the pexpect module).
+    """
     print(YLW + "Connecting to device using Telnet...\n" + CLR)
     # Add hostname to standard Cisco prompt endings
     prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
     # Spawn the child and change default settings
-    child = pexpect.spawn("telnet {0} {1}".format(device_ip_address, port))
+    child = pexpect.spawn("telnet {0} {1}".format(device_ip_address, port_number))
     # Slow down commands to prevent race conditions with output
     child.delaybeforesend = 0.5
     # Echo both input and output to the screen
@@ -54,7 +62,8 @@ def main(device_hostname, device_ip_address, port=23):
         child.sendline("reload\r")
         child.expect_exact("Proceed with reload? [confirm]")
         child.sendline("\r")
-        child.expect_exact(pexpect.EOF)
+        # Expect the child to close
+        child.expect_exact([pexpect.EOF, pexpect.TIMEOUT, ])
         exit()
     except pexpect.TIMEOUT:
         # Clear initial questions until a prompt is reached
@@ -72,26 +81,29 @@ def main(device_hostname, device_ip_address, port=23):
                 child.sendline("no\r")
             elif index == 3:
                 # If configured, warn and prompt for a password
-                print(YLW + "Warning" + CLR +
-                      " - This device has already been configured and secured.\n" +
+                print(YLW + "Warning - This device has already been configured and secured.\n" +
                       "Changes made by this script may be incompatible with the current " +
-                      "configuration.\n")
+                      "configuration.\n" + CLR)
                 password = getpass()
                 child.sendline(password + "\r")
             else:
+                # Prompt found; continue script
                 break
     print(GRN + "Connected to device using Telnet.\n" + CLR)
 
+    print(YLW + "Enabling Privileged EXEC Mode...\n" + CLR)
     # A reloaded device's prompt will be either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
     # Just in case the device boots into User EXEC mode, enable Privileged EXEC Mode
-    # If the device is already in Privileged EXEC Mode, the enable command will not affect anything
+    # The enable command will not affect anything if the device is already in Privileged EXEC Mode
     child.sendline("enable\r")
     index = child.expect_exact(["Password:", prompt_list[1], ])
     if index == 0:
         password = getpass()
         child.sendline(password + "\r")
         child.expect_exact(prompt_list[1])
+    print(GRN + "Privileged EXEC Mode enabled.\n" + CLR)
 
+    # Close the Telnet client
     print(YLW + "Closing telnet connection...\n" + CLR)
     child.sendcontrol("]")
     child.sendline("q\r")
@@ -103,9 +115,7 @@ def main(device_hostname, device_ip_address, port=23):
 
 if __name__ == "__main__":
     try:
-        main("R1", "192.168.1.1", port=5003)
-    except RuntimeError:
-        pass
+        main("R1", "192.168.1.1", port_number=5001)
     except pexpect.TIMEOUT:
         print(RED + "Error: Unable to find the expect search string.\n" + CLR +
               pexpect.ExceptionPexpect(pexpect.TIMEOUT).get_trace())

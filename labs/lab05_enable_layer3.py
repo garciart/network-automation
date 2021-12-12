@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Lab 3: Format a network device's flash memory
+"""Lab 5: Enable Layer 3 communications to and from a network device
 
 Project: Automation
 
@@ -10,6 +10,8 @@ Requirements:
 * GNS3
 """
 from __future__ import print_function
+
+import re
 
 import pexpect
 
@@ -34,22 +36,10 @@ def main(device_hostname, device_ip_address, port_number=23):
 
     child = utility.connect_via_telnet(device_hostname, device_ip_address, port_number)
     utility.enable_privileged_exec_mode(child, device_hostname)
+    utility.format_flash_memory(child, device_hostname)
+    utility.get_device_information(child, device_hostname)
 
-    print(YLW + "Formatting flash memory...\n" + CLR)
-    # Format the flash memory. Look for the final characters of the following strings:
-    # "Format operation may take a while. Continue? [confirm]"
-    # "Format operation will destroy all data in "flash:".  Continue? [confirm]"
-    # "66875392 bytes available (0 bytes used)"
-    child.sendline("format flash:\r")
-    child.expect_exact("Continue? [confirm]")
-    child.sendline("\r")
-    child.expect_exact("Continue? [confirm]")
-    child.sendline("\r")
-    child.expect_exact("Format of flash complete", timeout=120)
-    child.sendline("show flash\r")
-    child.expect_exact("(0 bytes used)")
-    child.expect_exact(prompt_list[1])
-    print(GRN + "Flash memory formatted.\n" + CLR)
+    # TODO: CODE GOES HERE
 
     utility.close_telnet_connection(child)
 
