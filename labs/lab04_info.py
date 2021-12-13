@@ -34,12 +34,13 @@ CISCO_PROMPTS = [
 def main(device_hostname, device_ip_address, port_number=23):
     prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
 
-    child = utility.connect_via_telnet(device_hostname, device_ip_address, port_number)
+    child = utility.connect_via_telnet(
+        device_hostname, device_ip_address, port_number, "admin", "cisco")
     utility.enable_privileged_exec_mode(child, device_hostname)
-    utility.format_flash_memory(child, device_hostname)
+    # utility.format_flash_memory(child, device_hostname)
 
     print(YLW + "Getting device information...\n" + CLR)
-    child.sendline("show version | include [IOSios] [Ss]oftware\r")
+    child.sendline("show version | include [IOSios] [Ss]oftware")
     child.expect_exact(prompt_list[1])
 
     software_ver = str(child.before).split(
@@ -48,7 +49,7 @@ def main(device_hostname, device_ip_address, port_number=23):
         raise RuntimeError("Cannot get the device's software version.")
     print(GRN + "Software version: {0}".format(software_ver) + CLR)
 
-    child.sendline("show inventory | include [Cc]hassis\r")
+    child.sendline("show inventory | include [Cc]hassis")
     child.expect_exact(prompt_list[1])
 
     device_name = str(child.before).split(
@@ -57,7 +58,7 @@ def main(device_hostname, device_ip_address, port_number=23):
         raise RuntimeError("Cannot get the device's name.")
     print(GRN + "Device name: {0}".format(device_name) + CLR)
 
-    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
+    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]")
     child.expect_exact(prompt_list[1])
 
     serial_num = str(child.before).split(
@@ -71,7 +72,7 @@ def main(device_hostname, device_ip_address, port_number=23):
 
 if __name__ == "__main__":
     try:
-        main("R1", "192.168.1.1", port_number=5001)
+        main("R1", "192.168.1.20", port_number=23)
     except RuntimeError:
         pass
     except pexpect.TIMEOUT:

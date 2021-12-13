@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Lab Utility Module.
-Use this module to interact with the operating system, instead of running commands separately.
+Contains commands common to more than one script.
 
 Project: Automation
 
@@ -60,7 +60,7 @@ def run_cli_commands(list_of_commands, sudo_password=None):
         command_output, exitstatus = pexpect.run(
             c,
             events={
-                "(?i)password": sudo_password if sudo_password is not None else getpass() + "\r"},
+                "(?i)password": sudo_password if sudo_password is not None else (getpass() + "\r")},
             withexitstatus=True)
         logging.debug(
             # For Python 3.x, use unicode_escape.
@@ -171,89 +171,9 @@ def disable_ntp():
                       "sudo firewall-cmd --zone=public --remove-port=123/udp", ])
 
 
-def connect_via_telnet(device_hostname, device_ip_address, port_number=23):
-    """Connect to the device via Telnet.
-
-    :param str device_hostname: The hostname of the device.
-    :param str device_ip_address: The IP address that will be used to connect to the device.
-    :param int port_number: The port number for the connection.
-    """
-    print(YLW + "Connecting to device using Telnet...\n" + CLR)
-    # Add hostname to standard Cisco prompt endings
-    prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    # Spawn the child and change default settings
-    child = pexpect.spawn("telnet {0} {1}".format(device_ip_address, port_number))
-    # Slow down commands to prevent race conditions with output
-    child.delaybeforesend = 0.5
-    # Echo both input and output to the screen
-    # child.logfile = sys.stdout
-    # Ensure you are not accessing an active session
-    try:
-        child.expect_exact(prompt_list, timeout=10)
-        # If this is a new session, you will not find a prompt
-        # If a prompt is found, print the warning and reload
-        # Otherwise, catch the TIMEOUT and proceed
-        print(RED +
-              "You may be accessing an open or uncleared virtual teletype session.\n" +
-              "Output from previous commands may cause pexpect expect calls to fail.\n" +
-              "To prevent this, we are reloading this device to clear any artifacts.\n" +
-              "Reloading now...\n" + CLR)
-        child.sendline("reload\r")
-        child.expect_exact("Proceed with reload? [confirm]")
-        child.sendline("\r")
-        # Expect the child to close
-        child.expect_exact([pexpect.EOF, pexpect.TIMEOUT, ])
-        exit()
-    except pexpect.TIMEOUT:
-        # Clear initial questions until a prompt is reached
-        while True:
-            index = child.expect_exact(
-                ["Press RETURN to get started",
-                 "Would you like to terminate autoinstall? [yes/no]:",
-                 "Would you like to enter the initial configuration dialog? [yes/no]:",
-                 "Password:", ] + prompt_list)
-            if index == 0:
-                child.sendline("\r")
-            elif index == 1:
-                child.sendline("yes\r")
-            elif index == 2:
-                child.sendline("no\r")
-            elif index == 3:
-                # If configured, warn and prompt for a password
-                print(YLW + "Warning - This device has already been configured and secured.\n" +
-                      "Changes made by this script may be incompatible with the current " +
-                      "configuration.\n" + CLR)
-                password = getpass()
-                child.sendline(password + "\r")
-            else:
-                # Prompt found; continue script
-                break
-    print(GRN + "Connected to device using Telnet.\n" + CLR)
-    return child
 
 
-def enable_privileged_exec_mode(child, device_hostname):
-    """Enable Privileged EXEC Mode (R1#) from User EXEC mode (R1>).
 
-    **Note** - A reloaded device's prompt  will be either R1> (User EXEC mode) or
-    R1# (Privileged EXEC Mode). The enable command will not affect anything if the device
-    is already in Privileged EXEC Mode.
-
-    :param pexpect.spawn child: The connection in a child application object.
-    :param str device_hostname: The hostname of the device.
-    :return: None
-    :rtype: None
-    """
-    print(YLW + "Enabling Privileged EXEC Mode...\n" + CLR)
-    # Add hostname to standard Cisco prompt endings
-    prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    child.sendline("enable\r")
-    index = child.expect_exact(["Password:", prompt_list[1], ])
-    if index == 0:
-        password = getpass()
-        child.sendline(password + "\r")
-        child.expect_exact(prompt_list[1])
-    print(GRN + "Privileged EXEC Mode enabled.\n" + CLR)
 
 
 def close_telnet_connection(child):
@@ -265,7 +185,7 @@ def close_telnet_connection(child):
     """
     print(YLW + "Closing telnet connection...\n" + CLR)
     child.sendcontrol("]")
-    child.sendline("q\r")
+    child.sendline("q")
     index = child.expect_exact(["Connection closed.", pexpect.EOF, ])
     # Close the Telnet child process
     child.close()
@@ -286,13 +206,13 @@ def format_flash_memory(child, device_hostname):
     """
     print(YLW + "Formatting flash memory...\n" + CLR)
     prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    child.sendline("format flash:\r")
+    child.sendline("format flash:")
     child.expect_exact("Continue? [confirm]")
     child.sendline("\r")
     child.expect_exact("Continue? [confirm]")
     child.sendline("\r")
     child.expect_exact("Format of flash complete", timeout=120)
-    child.sendline("show flash\r")
+    child.sendline("show flash")
     child.expect_exact("(0 bytes used)")
     child.expect_exact(prompt_list[1])
     print(GRN + "Flash memory formatted.\n" + CLR)
@@ -309,7 +229,7 @@ def get_device_information(child, device_hostname):
     """
     print(YLW + "Getting device information...\n" + CLR)
     prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    child.sendline("show version | include [IOSios] [Ss]oftware\r")
+    child.sendline("show version | include [IOSios] [Ss]oftware")
     child.expect_exact(prompt_list[1])
 
     software_ver = str(child.before).split(
@@ -318,7 +238,7 @@ def get_device_information(child, device_hostname):
         raise RuntimeError("Cannot get the device's software version.")
     print(GRN + "Software version: {0}".format(software_ver) + CLR)
 
-    child.sendline("show inventory | include [Cc]hassis\r")
+    child.sendline("show inventory | include [Cc]hassis")
     child.expect_exact(prompt_list[1])
 
     device_name = str(child.before).split(
@@ -327,7 +247,7 @@ def get_device_information(child, device_hostname):
         raise RuntimeError("Cannot get the device's name.")
     print(GRN + "Device name: {0}".format(device_name) + CLR)
 
-    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
+    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]")
     child.expect_exact(prompt_list[1])
 
     serial_num = str(child.before).split(
