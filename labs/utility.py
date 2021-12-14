@@ -14,6 +14,7 @@ from __future__ import print_function
 import logging
 import os
 import re
+import socket
 import sys
 import time
 from getpass import getpass
@@ -26,7 +27,7 @@ __license__ = "MIT"
 
 __all__ = ["run_cli_commands", "enable_ssh", "disable_ssh", "enable_ftp", "disable_ftp",
            "enable_tftp", "disable_tftp", "set_utc_time", "enable_ntp", "disable_ntp",
-           "connect_via_telnet", "enable_privileged_exec_mode", "close_telnet_connection", ]
+           "validate_ip_address", "validate_port_number", "validate_subnet_mask", ]
 
 # Enable error and exception logging
 logging.Formatter.converter = time.gmtime
@@ -171,91 +172,83 @@ def disable_ntp():
                       "sudo firewall-cmd --zone=public --remove-port=123/udp", ])
 
 
+def validate_ip_address(ip_address, ipv4_only=True):
+    """Checks that the argument is a valid IP address. Causes an exception if invalid.
 
+    :param str ip_address: The IP address to check.
+    :param bool ipv4_only: If the method should only validate IPv4-type addresses.
 
-
-
-
-def close_telnet_connection(child):
-    """Close the Telnet client
-
-    :param pexpect.spawn child: The connection in a child application object.
-    :return: None
-    :rtype: None
+    :raises ValueError: If the IP address is invalid.
     """
-    print(YLW + "Closing telnet connection...\n" + CLR)
-    child.sendcontrol("]")
-    child.sendline("q")
-    index = child.expect_exact(["Connection closed.", pexpect.EOF, ])
-    # Close the Telnet child process
-    child.close()
-    print(GRN + "Telnet connection closed: {0}\n".format(index) + CLR)
+    if ip_address is not None and ip_address.strip():
+        ip_address = ip_address.strip()
+        try:
+            socket.inet_pton(socket.AF_INET, ip_address)
+        except socket.error:
+            if ipv4_only:
+                raise ValueError(
+                    "Argument contains an invalid IPv4 address: {0}".format(ip_address))
+            else:
+                try:
+                    socket.inet_pton(socket.AF_INET6, ip_address)
+                except socket.error:
+                    raise ValueError(
+                        "Argument contains an invalid IP address: {0}".format(ip_address))
+    else:
+        raise ValueError("Argument contains an invalid IP address: {0}".format(ip_address))
 
 
-def format_flash_memory(child, device_hostname):
-    """Format the flash memory. Look for the final characters of the following strings:
+def validate_port_number(port_number):
+    """Check if the port number is within range. Causes an exception if invalid.
 
-    - "Format operation may take a while. Continue? [confirm]"
-    - "Format operation will destroy all data in "flash:".  Continue? [confirm]"
-    - "66875392 bytes available (0 bytes used)"
-
-    :param pexpect.spawn child: The connection in a child application object.
-    :param str device_hostname: The hostname of the device.
-    :return: None
-    :rtype: None
+    :param int port_number: The port number to check.
+    :raises ValueError: if the port number is invalid.
     """
-    print(YLW + "Formatting flash memory...\n" + CLR)
-    prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    child.sendline("format flash:")
-    child.expect_exact("Continue? [confirm]")
-    child.sendline("\r")
-    child.expect_exact("Continue? [confirm]")
-    child.sendline("\r")
-    child.expect_exact("Format of flash complete", timeout=120)
-    child.sendline("show flash")
-    child.expect_exact("(0 bytes used)")
-    child.expect_exact(prompt_list[1])
-    print(GRN + "Flash memory formatted.\n" + CLR)
+    if port_number not in range(0, 65535):
+        raise ValueError("Invalid port number.")
 
 
-def get_device_information(child, device_hostname):
-    """Get the device's flash memory. This will only work after a reload.
+def validate_subnet_mask(subnet_mask):
+    """Checks that the argument is a valid subnet mask. Causes an exception if invalid.
 
-    :param pexpect.spawn child: The connection in a child application object.
-    :param str device_hostname: The hostname of the device.
-    :returns: The device's Internetwork Operating System (IOS) version, model number,
-      and serial number.
-    :rtype: tuple
+    :param str subnet_mask: The subnet mask to check.
+
+    :raises ValueError: if the subnet mask is invalid.
+
+    .. seealso::
+        https://codereview.stackexchange.com/questions/209243/verify-a-subnet-mask-for-validity-in-python
     """
-    print(YLW + "Getting device information...\n" + CLR)
-    prompt_list = ["{0}{1}".format(device_hostname, p) for p in CISCO_PROMPTS]
-    child.sendline("show version | include [IOSios] [Ss]oftware")
-    child.expect_exact(prompt_list[1])
+    if subnet_mask is not None and subnet_mask.strip():
+        subnet_mask = subnet_mask.strip()
+        a, b, c, d = (int(octet) for octet in subnet_mask.split("."))
+        mask = a << 24 | b << 16 | c << 8 | d
+        if mask < 1:
+            raise ValueError("Invalid subnet mask: {0}".format(subnet_mask))
+        else:
+            # Count the number of consecutive 0 bits at the right.
+            # https://wiki.python.org/moin/BitManipulation#lowestSet.28.29
+            m = mask & -mask
+            right0bits = -1
+            while m:
+                m >>= 1
+                right0bits += 1
+            # Verify that all the bits to the left are 1"s
+            if mask | ((1 << right0bits) - 1) != 0xffffffff:
+                raise ValueError("Invalid subnet mask: {0}".format(subnet_mask))
+    else:
+        raise ValueError("Invalid subnet mask: {0}.".format(subnet_mask))
 
-    software_ver = str(child.before).split(
-        "show version | include [IOSios] [Ss]oftware\r")[1].split("\r")[0].strip()
-    if not re.compile(r"[IOSios] [Ss]oftware").search(software_ver):
-        raise RuntimeError("Cannot get the device's software version.")
-    print(GRN + "Software version: {0}".format(software_ver) + CLR)
 
-    child.sendline("show inventory | include [Cc]hassis")
-    child.expect_exact(prompt_list[1])
 
-    device_name = str(child.before).split(
-        "show inventory | include [Cc]hassis\r")[1].split("\r")[0].strip()
-    if not re.compile(r"[Cc]hassis").search(device_name):
-        raise RuntimeError("Cannot get the device's name.")
-    print(GRN + "Device name: {0}".format(device_name) + CLR)
 
-    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]")
-    child.expect_exact(prompt_list[1])
 
-    serial_num = str(child.before).split(
-        "show version | include [Pp]rocessor [Bb]oard [IDid]\r")[1].split("\r")[0].strip()
-    if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(serial_num):
-        raise RuntimeError("Cannot get the device's serial number.")
-    print(GRN + "Serial number: {0}".format(serial_num) + CLR)
-    return software_ver, device_name, serial_num
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
