@@ -11,9 +11,9 @@ Requirements:
 """
 from __future__ import print_function
 
+import hashlib
 import logging
 import os
-import re
 import socket
 import sys
 import time
@@ -25,15 +25,17 @@ import pexpect
 __author__ = "Rob Garcia"
 __license__ = "MIT"
 
-__all__ = ["run_cli_commands", "enable_ssh", "disable_ssh", "enable_ftp", "disable_ftp",
+__all__ = ["run_cli_commands", "open_telnet_port", "close_telnet_port", "enable_ssh",
+           "disable_ssh", "enable_ftp", "disable_ftp",
            "enable_tftp", "disable_tftp", "set_utc_time", "enable_ntp", "disable_ntp",
-           "validate_ip_address", "validate_port_number", "validate_subnet_mask", ]
+           "validate_ip_address", "validate_port_number", "validate_subnet_mask",
+           "validate_filepath", "get_hash", ]
 
 # Enable error and exception logging
 logging.Formatter.converter = time.gmtime
 logging.basicConfig(level=logging.NOTSET,
                     filemode="w",
-                    # filename="/var/log/utility.log",
+                    # Use /var/log/utility.log for production
                     filename="{0}/utility.log".format(os.getcwd()),
                     format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
@@ -42,9 +44,6 @@ CLR = "\x1b[0m"
 RED = "\x1b[31;1m"
 GRN = "\x1b[32m"
 YLW = "\x1b[33m"
-
-CISCO_PROMPTS = [
-    ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
 
 
 def run_cli_commands(list_of_commands, sudo_password=None):
@@ -55,6 +54,8 @@ def run_cli_commands(list_of_commands, sudo_password=None):
     :param str sudo_password: The superuser password to execute commands that require
     elevated privileges. The user will be prompted for the password if not supplied
     during the call to the method.
+    :return: None
+    :rtype: None
     """
     for c in list_of_commands:
         logging.debug("Command: {0}".format(c))
@@ -64,22 +65,49 @@ def run_cli_commands(list_of_commands, sudo_password=None):
                 "(?i)password": sudo_password if sudo_password is not None else (getpass() + "\r")},
             withexitstatus=True)
         logging.debug(
+            # For Python 2.x, use string_escape.
             # For Python 3.x, use unicode_escape.
             # Do not use utf-8; Some characters, such as backticks, will cause exceptions
             "Output:\n{0}\nExit status: {1}\n".format(
                 command_output.decode("string_escape").strip(), exitstatus))
 
 
+def open_telnet_port():
+    """List of commands to open the Telnet port.
+
+    :return: None
+    :rtype: None
+    """
+    run_cli_commands(["which telnet",
+                      "sudo firewall-cmd --zone=public --add-port=23/tcp", ])
+
+
+def close_telnet_port():
+    """List of commands to close the Telnet port.
+
+    :return: None
+    :rtype: None
+    """
+    run_cli_commands(["sudo firewall-cmd --zone=public --remove-port=23/tcp", ])
+
+
 def enable_ssh():
     """List of commands to enable the Secure Shell (SSH) Protocol Service.
+
+    :return: None
+    :rtype: None
     """
-    run_cli_commands(["sudo firewall-cmd --zone=public --add-service=ssh",
+    run_cli_commands(["which ssh",
+                      "sudo firewall-cmd --zone=public --add-service=ssh",
                       "sudo firewall-cmd --zone=public --add-port=22/tcp",
                       "sudo systemctl start sshd", ])
 
 
 def disable_ssh():
     """List of commands to disable Secure Shell (SSH) Protocol Service.
+
+    :return: None
+    :rtype: None
     """
     run_cli_commands(["sudo systemctl stop sshd",
                       "sudo firewall-cmd --zone=public --remove-port=22/tcp",
@@ -89,21 +117,28 @@ def disable_ssh():
 def enable_ftp():
     """List of commands to enable the Very Secure File Transfer Protocol Daemon (vsftpd)
     service.
+
+    :return: None
+    :rtype: None
     """
-    run_cli_commands(["sudo firewall-cmd --zone=public --add-port=20/tcp",
+    run_cli_commands(["which vsftpd",
+                      "sudo firewall-cmd --zone=public --add-port=20/tcp",
                       "sudo firewall-cmd --zone=public --add-port=21/tcp",
                       "sudo firewall-cmd --zone=public --add-service=ftp",
-                      "sudo sed -i '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                      "echo -e 'ftp_username=nobody' | sudo tee -a /etc/vsftpd/vsftpd.conf",
+                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+                      "sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
                       "sudo systemctl start vsftpd", ])
 
 
 def disable_ftp():
     """List of commands to disable the Very Secure File Transfer Protocol Daemon (vsftpd)
     service.
+
+    :return: None
+    :rtype: None
     """
     run_cli_commands(["sudo systemctl stop vsftpd",
-                      "sudo sed -i '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
                       "sudo firewall-cmd --zone=public --remove-service=ftp",
                       "sudo firewall-cmd --zone=public --remove-port=21/tcp",
                       "sudo firewall-cmd --zone=public --remove-port=20/tcp", ])
@@ -111,8 +146,12 @@ def disable_ftp():
 
 def enable_tftp():
     """List of commands to enable the Trivial File Transfer Protocol (TFTP) Service.
+
+    :return: None
+    :rtype: None
     """
-    run_cli_commands(["sudo firewall-cmd --zone=public --add-port=69/udp",
+    run_cli_commands(["which tftp",
+                      "sudo firewall-cmd --zone=public --add-port=69/udp",
                       "sudo firewall-cmd --zone=public --add-service=tftp",
                       "sudo mkdir --parents --verbose /var/lib/tftpboot",
                       "sudo chmod 777 --verbose /var/lib/tftpboot",
@@ -121,6 +160,9 @@ def enable_tftp():
 
 def disable_tftp():
     """List of commands to disable the Trivial File Transfer Protocol (TFTP) Service.
+
+    :return: None
+    :rtype: None
     """
     run_cli_commands(["sudo systemctl stop tftp",
                       "sudo firewall-cmd --zone=public --remove-service=tftp",
@@ -143,31 +185,41 @@ def set_utc_time(new_datetime):
         datetime.datetime.strptime(new_datetime, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         raise RuntimeError("Invalid date-time format; expected \"YYYY-MM-DD HH:MM:SS\".")
-    run_cli_commands(["sudo timedatectl set-ntp false",
-                      "sudo timedatectl set-timezone UTC",
-                      "sudo timedatectl set-time \"{0}\"".format(new_datetime),
-                      "sudo timedatectl set-local-rtc 0",
-                      "sudo date --set \"{0} UTC\"".format(new_datetime), ])
+    try:
+        run_cli_commands(["which timedatectl",
+                          "sudo timedatectl set-ntp false",
+                          "sudo timedatectl set-timezone UTC",
+                          "sudo timedatectl set-time \"{0}\"".format(new_datetime),
+                          "sudo timedatectl set-local-rtc 0", ])
+    finally:
+        run_cli_commands(["sudo date --set \"{0} UTC\"".format(new_datetime), ])
 
 
 def enable_ntp():
     """List of commands to enable the Network Time Protocol (NTP) Service.
+
+    :return: None
+    :rtype: None
     """
-    run_cli_commands(["sudo firewall-cmd --zone=public --add-port=123/udp",
+    run_cli_commands(["which ntpd",
+                      "sudo firewall-cmd --zone=public --add-port=123/udp",
                       "sudo firewall-cmd --zone=public --add-service=ntp",
-                      "sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf",
-                      "sudo sed -i '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
-                      "echo -e 'server 127.127.1.0' | sudo tee -a /etc/ntp.conf",
-                      "echo -e 'fudge 127.127.1.0 stratum 10' | sudo tee -a /etc/ntp.conf",
+                      "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
+                      "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
+                      "sed --in-place --expression '$aserver 127.127.1.0' /etc/ntp.conf",
+                      "sed --in-place --expression '$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
                       "sudo systemctl start ntpd", ])
 
 
 def disable_ntp():
     """List of commands to disable the Network Time Protocol (NTP) Service.
+
+    :return: None
+    :rtype: None
     """
     run_cli_commands(["sudo systemctl stop ntpd",
-                      "sudo sed -i '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
-                      "sudo sed -i '/server 127.127.1.0/d' /etc/ntp.conf",
+                      "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
+                      "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
                       "sudo firewall-cmd --zone=public --remove-service=ntp",
                       "sudo firewall-cmd --zone=public --remove-port=123/udp", ])
 
@@ -177,7 +229,8 @@ def validate_ip_address(ip_address, ipv4_only=True):
 
     :param str ip_address: The IP address to check.
     :param bool ipv4_only: If the method should only validate IPv4-type addresses.
-
+    :return: None
+    :rtype: None
     :raises ValueError: If the IP address is invalid.
     """
     if ip_address is not None and ip_address.strip():
@@ -202,6 +255,8 @@ def validate_port_number(port_number):
     """Check if the port number is within range. Causes an exception if invalid.
 
     :param int port_number: The port number to check.
+    :return: None
+    :rtype: None
     :raises ValueError: if the port number is invalid.
     """
     if port_number not in range(0, 65535):
@@ -212,7 +267,8 @@ def validate_subnet_mask(subnet_mask):
     """Checks that the argument is a valid subnet mask. Causes an exception if invalid.
 
     :param str subnet_mask: The subnet mask to check.
-
+    :return: None
+    :rtype: None
     :raises ValueError: if the subnet mask is invalid.
 
     .. seealso::
@@ -239,16 +295,38 @@ def validate_subnet_mask(subnet_mask):
         raise ValueError("Invalid subnet mask: {0}.".format(subnet_mask))
 
 
+def validate_filepath(filepath):
+    """Check if the filepath exists. Causes an exception if invalid.
+
+    :param str filepath: The filepath to check.
+    :return: None
+    :rtype: None
+    :raises ValueError: if the filepath is invalid.
+    """
+    if not os.path.exists(filepath):
+        raise ValueError("Invalid filepath.")
 
 
+def get_hash(filepath):
+    """Hash a file.
 
-
-
-
-
-
-
-
+    :param str filepath: The file to be hashed.
+    :return: A list of hashes for the file.
+    :rtype: list
+    """
+    file_hashes = []
+    commands = {"MD5": hashlib.md5(open(filepath, 'rb').read()).hexdigest(),
+                "SHA1": hashlib.sha1(open(filepath, 'rb').read()).hexdigest(),
+                "SHA256": hashlib.sha256(open(filepath, 'rb').read()).hexdigest(),
+                "SHA512": hashlib.sha512(open(filepath, 'rb').read()).hexdigest(),
+                "SHA224": hashlib.sha224(open(filepath, 'rb').read()).hexdigest(),
+                "SHA384": hashlib.sha384(open(filepath, 'rb').read()).hexdigest(), }
+    for key, value in commands.items():
+        try:
+            file_hashes.append(value)
+        except ValueError:
+            file_hashes.append("{0} is not supported on this device.".format(key))
+    return file_hashes
 
 
 if __name__ == "__main__":
