@@ -307,25 +307,30 @@ def validate_filepath(filepath):
         raise ValueError("Invalid filepath.")
 
 
-def get_hash(filepath):
+def get_file_hash(filepath):
     """Hash a file.
-
     :param str filepath: The file to be hashed.
-    :return: A list of hashes for the file.
-    :rtype: list
+    :return: A dictionary of hashes for the file.
+    :rtype: dict
+    :raises ValueError: if the filepath mask is invalid.
     """
-    file_hashes = []
-    commands = {"MD5": hashlib.md5(open(filepath, 'rb').read()).hexdigest(),
-                "SHA1": hashlib.sha1(open(filepath, 'rb').read()).hexdigest(),
-                "SHA256": hashlib.sha256(open(filepath, 'rb').read()).hexdigest(),
-                "SHA512": hashlib.sha512(open(filepath, 'rb').read()).hexdigest(),
-                "SHA224": hashlib.sha224(open(filepath, 'rb').read()).hexdigest(),
-                "SHA384": hashlib.sha384(open(filepath, 'rb').read()).hexdigest(), }
+    if not os.path.exists(filepath):
+        raise ValueError("Invalid filepath.")
+    file_hashes = {}
+    # TODO: Is it worth it to use collections.OrderedDict?
+    commands = {"MD5": "hashlib.md5(open('{0}', 'rb').read()).hexdigest()",
+                "SHA1": "hashlib.sha1(open('{0}', 'rb').read()).hexdigest()",
+                "SHA224": "hashlib.sha224(open('{0}', 'rb').read()).hexdigest()",
+                "SHA256": "hashlib.sha256(open('{0}', 'rb').read()).hexdigest()",
+                "SHA384": "hashlib.sha384(open('{0}', 'rb').read()).hexdigest()",
+                "SHA512": "hashlib.sha512(open('{0}', 'rb').read()).hexdigest()", }
     for key, value in commands.items():
         try:
-            file_hashes.append(value)
+            file_hashes.update({
+                key: "{0}".format(eval(value.format(filepath)))
+            })
         except ValueError:
-            file_hashes.append("{0} is not supported on this device.".format(key))
+            file_hashes.update({key: "Not supported on this device."})
     return file_hashes
 
 
