@@ -89,6 +89,9 @@ class Cisco:
             raise ValueError("Device hostname required.")
         else:
             self._device_hostname = device_hostname
+        # Add the hostname to the standard Cisco prompt endings
+        self._cisco_prompts = [
+            "{0}{1}".format(self._device_hostname, p) for p in self._cisco_prompts]
         # The following commands will raise exceptions if invalid
         utility.validate_ip_address(device_ip_address)
         self._device_ip_address = device_ip_address
@@ -109,9 +112,6 @@ class Cisco:
         print(YLW + "Connecting to device using Telnet...\n" + CLR)
         # Allow only one login attempt
         login_attempted = False
-        # Add the hostname to the standard Cisco prompt endings
-        self._cisco_prompts = [
-            "{0}{1}".format(self._device_hostname, p) for p in self._cisco_prompts]
         # Spawn the child and change default settings
         child = pexpect.spawn("telnet {0} {1}".format(self._device_ip_address, self._telnet_port))
         # Slow down commands to prevent race conditions with output
@@ -266,6 +266,28 @@ class Cisco:
             raise RuntimeError("Cannot get the device's serial number.")
         print(GRN + "Serial number: {0}".format(serial_num) + CLR)
         return software_ver, device_name, serial_num
+
+    def enable_l3_communications(self, child):
+        """Enable Layer 3 communications to and from a network device.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :return: None
+        :rtype: None
+        """
+        print(YLW + "Enabling Layer 3 communications...\n" + CLR)
+        child.sendline("configure terminal" + self._eol)
+        child.expect_exact(self._cisco_prompts[2])
+        child.sendline("interface FastEthernet0/0" + self._eol)
+        child.expect_exact(self._cisco_prompts[3])
+        child.sendline("ip address 192.168.1.20 255.255.255.0" + self._eol)
+        child.expect_exact(self._cisco_prompts[3])
+        child.sendline("no shutdown" + self._eol)
+        child.expect_exact(self._cisco_prompts[3])
+        child.sendline("end" + self._eol)
+        child.expect_exact(self._cisco_prompts[1])
+        child.sendline("end" + self._eol)
+        child.expect_exact(self._cisco_prompts[1])
+        print(GRN + "Layer 3 communications enabled.\n" + CLR)
 
     def close_telnet_connection(self, child):
         """Close the Telnet client
