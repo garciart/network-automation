@@ -14,6 +14,7 @@ import os
 import re
 import sys
 import time
+from datetime import datetime
 from getpass import getpass
 
 # Module metadata dunders
@@ -51,6 +52,7 @@ class Cisco:
     _console_password = None
     _aux_password = None
     _enable_password = None
+    _sudo_password = None
 
     # End-of-line (EOL) issue: Depending on the physical port you use (Console, VTY, etc.),
     # AND the port number you use (23, 5001, etc.), Cisco may require a carriage return ("\r")
@@ -71,7 +73,8 @@ class Cisco:
                  vty_password=None,
                  console_password=None,
                  aux_password=None,
-                 enable_password=None):
+                 enable_password=None,
+                 sudo_password=None):
         """Class instantiation
 
         :param str device_hostname: The hostname of the device (req).
@@ -102,6 +105,8 @@ class Cisco:
         self._console_password = console_password
         self._aux_password = aux_password
         self._enable_password = enable_password
+        self._sudo_password = sudo_password if sudo_password is not None else getpass(
+            "Enter sudo password: ")
 
     def connect_via_telnet(self, verbose=False):
         """Connect to the device via Telnet.
@@ -112,6 +117,8 @@ class Cisco:
         print(YLW + "Connecting to device using Telnet...\n" + CLR)
         # Allow only one login attempt
         login_attempted = False
+        # Open Telnet port
+        utility.open_telnet_port(self._sudo_password)
         # Spawn the child and change default settings
         child = pexpect.spawn("telnet {0} {1}".format(self._device_ip_address, self._telnet_port))
         # Slow down commands to prevent race conditions with output
@@ -119,6 +126,9 @@ class Cisco:
         # Echo both input and output to the screen
         if verbose:
             child.logfile = sys.stdout
+        else:
+            fout = open("cisco-{0}".format(datetime.utcnow().strftime("%y%m%d%H%M%SZ")), "wb")
+            child.logfile = fout
         # Ensure you are not accessing an active session
         try:
             child.expect_exact(self._cisco_prompts, timeout=10)
@@ -144,12 +154,15 @@ class Cisco:
                       "configuration.\n" + CLR)
 
             # Clear initial questions until a prompt is reached
+            # Use an initial timeout is 30 seconds. After you determine the EOL, set to 1 second
+            timeout = 30
             while True:
                 index = child.expect_exact(
                     ["Press RETURN to get started",
                      "Would you like to terminate autoinstall? [yes/no]:",
                      "Would you like to enter the initial configuration dialog? [yes/no]:",
-                     "Username:", "Password:", pexpect.TIMEOUT, ] + self._cisco_prompts)
+                     "Username:", "Password:", pexpect.TIMEOUT, ] + self._cisco_prompts,
+                    timeout=timeout)
                 if index == 0:
                     child.sendline(self._eol)
                 elif index == 1:
@@ -159,20 +172,28 @@ class Cisco:
                 elif index == 3:
                     check_and_warn()
                     if self._vty_username is None:
-                        raw_input("Username: ")
+                        self._vty_username = raw_input("Username: ")
                     child.sendline(self._vty_username + self._eol)
                 elif index == 4:
                     # Not all connections require a username
                     check_and_warn()
+
+                    # TODO: Fix this for console, aux, and vty password
                     if self._vty_password is None:
-                        getpass()
+                        self._vty_password = getpass()
                     child.sendline(self._vty_password + self._eol)
+
                     login_attempted = True
                 elif index == 5:
                     if self._eol == "":
                         self._eol = "\r"
+                        timeout = 1
                         child.sendline(self._eol)
                     else:
+                        # Tested: The loop will TIMEOUT, not EOF, if no connection found,
+                        # and end up here.
+                        child.close()
+                        utility.close_telnet_port(self._sudo_password)
                         raise RuntimeError("Cannot determine EOL setting.")
                 else:
                     # Prompt found; continue script
@@ -202,7 +223,7 @@ class Cisco:
         index = child.expect_exact(["Password:", self._cisco_prompts[1], ])
         if index == 0:
             if self._enable_password is None:
-                getpass()
+                getpass("Enter enable password: ")
             child.sendline(self._enable_password + self._eol)
             child.expect_exact(self._cisco_prompts[1])
         print(GRN + "Privileged EXEC Mode enabled.\n" + CLR)
@@ -302,6 +323,7 @@ class Cisco:
         index = child.expect_exact(["Connection closed.", pexpect.EOF, ])
         # Close the Telnet child process
         child.close()
+        utility.close_telnet_port(self._sudo_password)
         print(GRN + "Telnet connection closed: {0}\n".format(index) + CLR)
 
 
