@@ -62,8 +62,11 @@ def run_cli_commands(list_of_commands, sudo_password=None):
         command_output, exitstatus = pexpect.run(
             c,
             events={
-                "(?i)password": sudo_password if sudo_password is not None else (getpass() + "\r")},
+                "(?i)password": (sudo_password + "\r") if sudo_password is not None else (
+                        getpass() + "\r")},
             withexitstatus=True)
+        if exitstatus != 0:
+            raise RuntimeError("Unable to execute command {0}: {1}".format(c, command_output))
         logging.debug(
             # For Python 2.x, use string_escape.
             # For Python 3.x, use unicode_escape.
@@ -75,6 +78,9 @@ def run_cli_commands(list_of_commands, sudo_password=None):
 def open_telnet_port(sudo_password):
     """List of commands to open the Telnet port.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -86,6 +92,9 @@ def open_telnet_port(sudo_password):
 def close_telnet_port(sudo_password):
     """List of commands to close the Telnet port.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -96,6 +105,9 @@ def close_telnet_port(sudo_password):
 def enable_ssh(sudo_password):
     """List of commands to enable the Secure Shell (SSH) Protocol Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -109,6 +121,9 @@ def enable_ssh(sudo_password):
 def disable_ssh(sudo_password):
     """List of commands to disable Secure Shell (SSH) Protocol Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -122,23 +137,30 @@ def enable_ftp(sudo_password):
     """List of commands to enable the Very Secure File Transfer Protocol Daemon (vsftpd)
     service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
-    run_cli_commands(["which vsftpd",
-                      "sudo firewall-cmd --zone=public --add-port=20/tcp",
-                      "sudo firewall-cmd --zone=public --add-port=21/tcp",
-                      "sudo firewall-cmd --zone=public --add-service=ftp",
-                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                      "sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
-                      "sudo systemctl start vsftpd", ],
-                     sudo_password)
+    run_cli_commands([
+        "which vsftpd",
+        "sudo firewall-cmd --zone=public --add-port=20/tcp",
+        "sudo firewall-cmd --zone=public --add-port=21/tcp",
+        "sudo firewall-cmd --zone=public --add-service=ftp",
+        "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+        "sudo sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
+        "sudo systemctl start vsftpd", ],
+        sudo_password)
 
 
 def disable_ftp(sudo_password):
     """List of commands to disable the Very Secure File Transfer Protocol Daemon (vsftpd)
     service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -153,6 +175,9 @@ def disable_ftp(sudo_password):
 def enable_tftp(sudo_password):
     """List of commands to enable the Trivial File Transfer Protocol (TFTP) Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -168,6 +193,9 @@ def enable_tftp(sudo_password):
 def disable_tftp(sudo_password):
     """List of commands to disable the Trivial File Transfer Protocol (TFTP) Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -184,6 +212,9 @@ def set_utc_time(new_datetime, sudo_password):
     **Note** - For maximum compatibility with devices, the timezone will be set UTC.
 
     :param str new_datetime: The desired UTC date and time, in "YYYY-MM-DD HH:MM:SS" format.
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     :raise RuntimeError: If the desired UTC date and time are in the wrong format.
@@ -208,23 +239,30 @@ def set_utc_time(new_datetime, sudo_password):
 def enable_ntp(sudo_password):
     """List of commands to enable the Network Time Protocol (NTP) Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
-    run_cli_commands(["which ntpd",
-                      "sudo firewall-cmd --zone=public --add-port=123/udp",
-                      "sudo firewall-cmd --zone=public --add-service=ntp",
-                      "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
-                      "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
-                      "sed --in-place --expression '$aserver 127.127.1.0' /etc/ntp.conf",
-                      "sed --in-place --expression '$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
-                      "sudo systemctl start ntpd", ],
-                     sudo_password)
+    run_cli_commands([
+        "which ntpd",
+        "sudo firewall-cmd --zone=public --add-port=123/udp",
+        "sudo firewall-cmd --zone=public --add-service=ntp",
+        "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
+        "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
+        "sudo sed --in-place --expression '$aserver 127.127.1.0' /etc/ntp.conf",
+        "sudo sed --in-place --expression '$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
+        "sudo systemctl start ntpd", ],
+        sudo_password)
 
 
 def disable_ntp(sudo_password):
     """List of commands to disable the Network Time Protocol (NTP) Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
     :return: None
     :rtype: None
     """
@@ -319,31 +357,29 @@ def validate_filepath(filepath):
         raise ValueError("Invalid filepath.")
 
 
-def get_file_hash(filepath):
+def get_file_hash(filepaths):
     """Hash a file.
 
-    :param str filepath: The file to be hashed.
+    :param list filepaths: The files to be hashed.
     :return: A dictionary of hashes for the file.
     :rtype: dict
     :raises ValueError: if the filepath mask is invalid.
     """
-    if not os.path.exists(filepath):
-        raise ValueError("Invalid filepath.")
+    if not isinstance(filepaths, list):
+        filepaths = [filepaths, ]
     file_hashes = {}
-    # TODO: Is it worth it to use collections.OrderedDict?
-    commands = {"MD5": "hashlib.md5(open('{0}', 'rb').read()).hexdigest()",
-                "SHA1": "hashlib.sha1(open('{0}', 'rb').read()).hexdigest()",
-                "SHA224": "hashlib.sha224(open('{0}', 'rb').read()).hexdigest()",
-                "SHA256": "hashlib.sha256(open('{0}', 'rb').read()).hexdigest()",
-                "SHA384": "hashlib.sha384(open('{0}', 'rb').read()).hexdigest()",
-                "SHA512": "hashlib.sha512(open('{0}', 'rb').read()).hexdigest()", }
-    for key, value in commands.items():
-        try:
-            file_hashes.update({
-                key: "{0}".format(eval(value.format(filepath)))
-            })
-        except ValueError:
-            file_hashes.update({key: "Not supported on this device."})
+    for f in filepaths:
+        # noinspection PyTypeChecker
+        if not os.path.exists(f):
+            raise ValueError("Invalid filepath.")
+        for a in hashlib.algorithms:
+            try:
+                h = hashlib.new(a)
+                # noinspection PyTypeChecker
+                h.update(open(f, "rb").read())
+                file_hashes.update({a: h.hexdigest()})
+            except ValueError:
+                file_hashes.update({a: False})
     logging.info(file_hashes)
     return file_hashes
 
