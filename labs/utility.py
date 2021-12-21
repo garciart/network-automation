@@ -130,7 +130,7 @@ def enable_ftp(sudo_password):
                       "sudo firewall-cmd --zone=public --add-port=21/tcp",
                       "sudo firewall-cmd --zone=public --add-service=ftp",
                       "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                      "sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
+                      "sed --in-place --expression '\\$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
                       "sudo systemctl start vsftpd", ],
                      sudo_password)
 
@@ -216,8 +216,8 @@ def enable_ntp(sudo_password):
                       "sudo firewall-cmd --zone=public --add-service=ntp",
                       "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
                       "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
-                      "sed --in-place --expression '$aserver 127.127.1.0' /etc/ntp.conf",
-                      "sed --in-place --expression '$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
+                      "sed --in-place --expression '\\$aserver 127.127.1.0' /etc/ntp.conf",
+                      "sed --in-place --expression '\\$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
                       "sudo systemctl start ntpd", ],
                      sudo_password)
 
