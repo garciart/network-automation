@@ -125,14 +125,15 @@ def enable_ftp(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["which vsftpd",
-                      "sudo firewall-cmd --zone=public --add-port=20/tcp",
-                      "sudo firewall-cmd --zone=public --add-port=21/tcp",
-                      "sudo firewall-cmd --zone=public --add-service=ftp",
-                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                      "sed --in-place --expression '\\$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
-                      "sudo systemctl start vsftpd", ],
-                     sudo_password)
+    run_cli_commands([
+        "which vsftpd",
+        "sudo firewall-cmd --zone=public --add-port=20/tcp",
+        "sudo firewall-cmd --zone=public --add-port=21/tcp",
+        "sudo firewall-cmd --zone=public --add-service=ftp",
+        "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+        "sed --in-place --expression '\\$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
+        "sudo systemctl start vsftpd", ],
+        sudo_password)
 
 
 def disable_ftp(sudo_password):
@@ -319,31 +320,28 @@ def validate_filepath(filepath):
         raise ValueError("Invalid filepath.")
 
 
-def get_file_hash(filepath):
+def get_file_hash(filepaths):
     """Hash a file.
 
-    :param str filepath: The file to be hashed.
+    :param list filepaths: The files to be hashed.
     :return: A dictionary of hashes for the file.
     :rtype: dict
     :raises ValueError: if the filepath mask is invalid.
     """
-    if not os.path.exists(filepath):
-        raise ValueError("Invalid filepath.")
+    if not isinstance(filepaths, list):
+        filepaths = [filepaths, ]
     file_hashes = {}
-    # TODO: Is it worth it to use collections.OrderedDict?
-    commands = {"MD5": "hashlib.md5(open('{0}', 'rb').read()).hexdigest()",
-                "SHA1": "hashlib.sha1(open('{0}', 'rb').read()).hexdigest()",
-                "SHA224": "hashlib.sha224(open('{0}', 'rb').read()).hexdigest()",
-                "SHA256": "hashlib.sha256(open('{0}', 'rb').read()).hexdigest()",
-                "SHA384": "hashlib.sha384(open('{0}', 'rb').read()).hexdigest()",
-                "SHA512": "hashlib.sha512(open('{0}', 'rb').read()).hexdigest()", }
-    for key, value in commands.items():
-        try:
-            file_hashes.update({
-                key: "{0}".format(eval(value.format(filepath)))
-            })
-        except ValueError:
-            file_hashes.update({key: "Not supported on this device."})
+    for f in filepaths:
+        if not os.path.exists(f):
+            raise ValueError("Invalid filepath.")
+        for a in hashlib.algorithms:
+            try:
+                h = hashlib.new(a)
+                # noinspection PyTypeChecker
+                h.update(open(f, "rb").read())
+                file_hashes.update({a: h.hexdigest()})
+            except ValueError:
+                file_hashes.update({a: False})
     logging.info(file_hashes)
     return file_hashes
 
