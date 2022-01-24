@@ -212,28 +212,28 @@ rm setup_output.txt
 sudo reboot now
 ```
 
->**NOTE** - For the labs, you will use images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
+>**NOTE** - To make life easier, I created a desktop shortcut, named "Network Automation", to run our batch script, ```gns3_run```. If you would like to do the same, open a Terminal and enter the following commands:
 >
->Here are the names of the files, their hashes, and some additional information:
+>```
+>sudo cp /usr/local/share/applications/gns3.desktop /usr/local/share/applications/net-auto-demo.desktop
+>sudo sed --in-place 's/Terminal=false/Terminal=true/g' /usr/local/share/applications/net-auto-demo.desktop
+>sudo sed --in-place 's/Exec=gns3 %f/Exec=gns3_run/g' /usr/local/share/applications/net-auto-demo.desktop
+>sudo sed --in-place 's/Name=GNS3/Name=Network Automation/g' /usr/local/share/applications/net-auto-demo.desktop
+>```
 >
->- **Cisco 3745 Multi-Service Access Router:**
->   * IOS version 12.4.25d (Mainline):
->   * File Name: c3745-adventerprisek9-mz.124-25d.bin
->   * MD5: 563797308a3036337c3dee9b4ab54649
->   * Flash Memory: 64 MB
->   * DRAM: 256MB
->   * End-of-Sale Date: 2007-03-27
->   * End-of-Support Date: 2012-03-27
->   * IOS End-of-Support Date: 2016-01-31
->- **Cisco 7206 VXR 6-Slot Router:**
->   * IOS version 12.4.25g (Mainline):
->   * File Name: c7200-a3jk9s-mz.124-25g.bin
->   * MD5: 3a78cb61831b3ef1530f7402f5986556
->   * Flash Memory: 64 MB
->   * DRAM: 256MB
->   * End-of-Sale Date: 2012-09-29 
->   * End-of-Support Date: 2017-09-30
->   * IOS End-of-Support Date: 2016-01-31
+>The icon will appear in both the **Education** and **Internet** application groups.
+
+>**NOTE** - I use editors, such as ```vi``` and ```nano```, to quickly fix code when I am working on actual devices, but I recommend using a code editor or IDE when writing a script from scratch. If configured correctly, they can catch syntax and semantic errors, improving the quality of your code. My favorites are **VS Code** and **PyCharm**; here are links to their installation instructions for Linux:
+>
+>- [Running Visual Studio Code on Linux](https://code.visualstudio.com/docs/setup/linux "Running Visual Studio Code on Linux")
+>- [Install PyCharm](https://www.jetbrains.com/help/pycharm/installation-guide.html "Install PyCharm")
+>
+>Regardless of the editor you use:
+>
+>- When asked to set up an interpreter, remember that I used CentOS 7.9 and Python 2.7 for this project.
+>- To improve your code, I recommend installing the **SonarLint** plugin:
+>  - In VS Code, click on the **Extensions** icon (or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>), and enter ```sonarlint``` in the search box.
+>  - In PyCharm, click on the gear icon (:gear:) in the top right-hand corner and select ```Plugins...``` When the **Plugins** window appears, enter ```sonarlint``` in the search box.
 
 -----
 
@@ -366,7 +366,32 @@ However, before you start on the lab, you need to make some adjustments. From th
 
 ---
 
-Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules. Here is the back of a Cisco 3745 Router:
+Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules.
+
+>**NOTE** - For the labs, you will use images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
+>
+>Here are the names of the files, their hashes, and some additional information:
+>
+>- **Cisco 3745 Multi-Service Access Router:**
+>   * IOS version 12.4.25d (Mainline):
+>   * File Name: c3745-adventerprisek9-mz.124-25d.bin
+>   * MD5: 563797308a3036337c3dee9b4ab54649
+>   * Flash Memory: 64 MB
+>   * DRAM: 256MB
+>   * End-of-Sale Date: 2007-03-27
+>   * End-of-Support Date: 2012-03-27
+>   * IOS End-of-Support Date: 2016-01-31
+>- **Cisco 7206 VXR 6-Slot Router:**
+>   * IOS version 12.4.25g (Mainline):
+>   * File Name: c7200-a3jk9s-mz.124-25g.bin
+>   * MD5: 3a78cb61831b3ef1530f7402f5986556
+>   * Flash Memory: 64 MB
+>   * DRAM: 256MB
+>   * End-of-Sale Date: 2012-09-29 
+>   * End-of-Support Date: 2017-09-30
+>   * IOS End-of-Support Date: 2016-01-31
+
+Here is the back of a Cisco 3745 Router:
 
 ![Cisco 3745 Rear View](img/a19.png)
 
