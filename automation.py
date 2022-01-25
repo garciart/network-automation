@@ -20,7 +20,7 @@ import pexpect
 print("Connecting to the device...")
 
 # Connect to the device and allow time for any boot-up messages to clear
-child = pexpect.spawn("telnet 192.168.1.1 5001")
+child = pexpect.spawn("telnet 192.168.1.1 5000")
 time.sleep(5)
 
 # Look for a welcome message to ensure the device was reloaded and you are not eavesdropping
@@ -63,7 +63,7 @@ index = child.expect(["Automation is fun!", pexpect.TIMEOUT, ])
 if index == 0:
     print("Search string found.")
 else:
-    print("Search string not found.")
+    print("Search string not found, as expected.")
 
 # Close Telnet and disconnect from device
 print("Disconnecting from the device...")

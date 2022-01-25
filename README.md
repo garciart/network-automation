@@ -231,9 +231,7 @@ sudo reboot now
 >Regardless of the editor you use:
 >
 >- When asked to set up an interpreter, remember that I used CentOS 7.9 and Python 2.7 for this project.
->- To improve your code, I recommend installing the **SonarLint** plugin:
->  - In VS Code, click on the **Extensions** icon (or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>), and enter ```sonarlint``` in the search box.
->  - In PyCharm, click on the gear icon (:gear:) in the top right-hand corner and select ```Plugins...``` When the **Plugins** window appears, enter ```sonarlint``` in the search box.
+>- To improve your code, I recommend installing the **SonarLint** plugin. In VS Code, click on the **Extensions** icon (or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) and enter ```sonarlint``` in the search box. In PyCharm, click on the gear icon (:gear:) in the top right-hand corner and select ```Plugins...``` When the **Plugins** window appears, enter ```sonarlint``` in the search box.
 
 -----
 

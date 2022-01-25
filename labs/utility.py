@@ -111,10 +111,9 @@ def enable_ssh(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["which sshd",
+    run_cli_commands(["sudo systemctl start sshd",
                       "sudo firewall-cmd --zone=public --add-service=ssh",
-                      "sudo firewall-cmd --zone=public --add-port=22/tcp",
-                      "sudo systemctl start sshd", ],
+                      "sudo firewall-cmd --zone=public --add-port=22/tcp", ],
                      sudo_password)
 
 
@@ -127,9 +126,9 @@ def disable_ssh(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["sudo systemctl stop sshd",
-                      "sudo firewall-cmd --zone=public --remove-port=22/tcp",
-                      "sudo firewall-cmd --zone=public --remove-service=ssh", ],
+    run_cli_commands(["sudo firewall-cmd --zone=public --remove-port=22/tcp",
+                      "sudo firewall-cmd --zone=public --remove-service=ssh",
+                      "sudo systemctl stop sshd", ],
                      sudo_password)
 
 
@@ -144,13 +143,12 @@ def enable_ftp(sudo_password):
     :rtype: None
     """
     run_cli_commands([
-        "which vsftpd",
-        "sudo firewall-cmd --zone=public --add-port=20/tcp",
-        "sudo firewall-cmd --zone=public --add-port=21/tcp",
-        "sudo firewall-cmd --zone=public --add-service=ftp",
         "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
         "sudo sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
-        "sudo systemctl start vsftpd", ],
+        "sudo systemctl start vsftpd",
+        "sudo firewall-cmd --zone=public --add-port=20/tcp",
+        "sudo firewall-cmd --zone=public --add-port=21/tcp",
+        "sudo firewall-cmd --zone=public --add-service=ftp", ],
         sudo_password)
 
 
@@ -164,11 +162,11 @@ def disable_ftp(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["sudo systemctl stop vsftpd",
-                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                      "sudo firewall-cmd --zone=public --remove-service=ftp",
+    run_cli_commands(["sudo firewall-cmd --zone=public --remove-service=ftp",
                       "sudo firewall-cmd --zone=public --remove-port=21/tcp",
-                      "sudo firewall-cmd --zone=public --remove-port=20/tcp", ],
+                      "sudo firewall-cmd --zone=public --remove-port=20/tcp",
+                      "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+                      "sudo systemctl stop vsftpd", ],
                      sudo_password)
 
 
@@ -181,12 +179,11 @@ def enable_tftp(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["which tftp",
+    run_cli_commands(["sudo systemctl start tftp",
                       "sudo firewall-cmd --zone=public --add-port=69/udp",
                       "sudo firewall-cmd --zone=public --add-service=tftp",
                       "sudo mkdir --parents --verbose /var/lib/tftpboot",
-                      "sudo chmod 777 --verbose /var/lib/tftpboot",
-                      "sudo systemctl start tftp", ],
+                      "sudo chmod 777 --verbose /var/lib/tftpboot", ],
                      sudo_password)
 
 
@@ -199,9 +196,9 @@ def disable_tftp(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["sudo systemctl stop tftp",
-                      "sudo firewall-cmd --zone=public --remove-service=tftp",
-                      "sudo firewall-cmd --zone=public --remove-port=69/udp", ],
+    run_cli_commands(["sudo firewall-cmd --zone=public --remove-service=tftp",
+                      "sudo firewall-cmd --zone=public --remove-port=69/udp",
+                      "sudo systemctl stop tftp", ],
                      sudo_password)
 
 
@@ -225,8 +222,7 @@ def set_utc_time(new_datetime, sudo_password):
     except ValueError:
         raise RuntimeError("Invalid date-time format; expected \"YYYY-MM-DD HH:MM:SS\".")
     try:
-        run_cli_commands(["which timedatectl",
-                          "sudo timedatectl set-ntp false",
+        run_cli_commands(["sudo timedatectl set-ntp false",
                           "sudo timedatectl set-timezone UTC",
                           "sudo timedatectl set-time \"{0}\"".format(new_datetime),
                           "sudo timedatectl set-local-rtc 0", ],
@@ -246,14 +242,13 @@ def enable_ntp(sudo_password):
     :rtype: None
     """
     run_cli_commands([
-        "which ntpd",
-        "sudo firewall-cmd --zone=public --add-port=123/udp",
-        "sudo firewall-cmd --zone=public --add-service=ntp",
         "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
         "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
         "sudo sed --in-place --expression '$aserver 127.127.1.0' /etc/ntp.conf",
         "sudo sed --in-place --expression '$afudge 127.127.1.0 stratum 10' /etc/ntp.conf",
-        "sudo systemctl start ntpd", ],
+        "sudo systemctl start ntpd",
+        "sudo firewall-cmd --zone=public --add-port=123/udp",
+        "sudo firewall-cmd --zone=public --add-service=ntp", ],
         sudo_password)
 
 
@@ -266,11 +261,11 @@ def disable_ntp(sudo_password):
     :return: None
     :rtype: None
     """
-    run_cli_commands(["sudo systemctl stop ntpd",
-                      "sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
+    run_cli_commands(["sudo sed --in-place '/fudge 127.127.1.0 stratum 10/d' /etc/ntp.conf",
                       "sudo sed --in-place '/server 127.127.1.0/d' /etc/ntp.conf",
                       "sudo firewall-cmd --zone=public --remove-service=ntp",
-                      "sudo firewall-cmd --zone=public --remove-port=123/udp", ],
+                      "sudo firewall-cmd --zone=public --remove-port=123/udp",
+                      "sudo systemctl stop ntpd", ],
                      sudo_password)
 
 
