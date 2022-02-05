@@ -41,7 +41,7 @@ def main(device_hostname, device_ip_address, port_number=23, vty_username=None, 
     :param str vty_password: Password when logging in remotely.
     :param str enable_password: Password to enable Privileged EXEC Mode.
     """
-    print(YLW + "Connecting to device using Telnet...\n" + CLR)
+    print("Connecting to device using Telnet...\n")
     # End-of-line (EOL) issue: Depending on the physical port you use (Console, VTY, etc.),
     # AND the port number you use (23, 5001, etc.), Cisco may require a carriage return ("\r")
     # when using pexpect.sendline. Also, each terminal emulator may have different EOL
@@ -68,11 +68,11 @@ def main(device_hostname, device_ip_address, port_number=23, vty_username=None, 
         child.expect_exact(prompt_list, timeout=10)
         # If this is a new session, you will not find a prompt. If a prompt is found,
         # print the warning and reload; otherwise, catch the TIMEOUT and proceed.
-        print(RED +
+        print(
               "You may be accessing an open or uncleared virtual teletype session.\n" +
               "Output from previous commands may cause pexpect expect calls to fail.\n" +
               "To prevent this, we are reloading this device to clear any artifacts.\n" +
-              "Reloading now...\n" + CLR)
+              "Reloading now...\n")
         child.sendline("reload" + _eol)
         child.expect_exact("Proceed with reload? [confirm]")
         child.sendline(_eol)
@@ -84,9 +84,9 @@ def main(device_hostname, device_ip_address, port_number=23, vty_username=None, 
         def check_and_warn():
             if login_attempted is True:
                 raise RuntimeError("Invalid credentials provided.")
-            print(YLW + "Warning - This device has already been configured and secured.\n" +
+            print("Warning - This device has already been configured and secured.\n" +
                   "Changes made by this script may be incompatible with the current " +
-                  "configuration.\n" + CLR)
+                  "configuration.\n")
 
         # Clear initial questions until a prompt is reached
         while True:
@@ -120,9 +120,9 @@ def main(device_hostname, device_ip_address, port_number=23, vty_username=None, 
             else:
                 # Prompt found; continue script
                 break
-    print(GRN + "Connected to device using Telnet.\n" + CLR)
+    print(GRN + "Connected to device using Telnet.\n")
 
-    print(YLW + "Enabling Privileged EXEC Mode...\n" + CLR)
+    print("Enabling Privileged EXEC Mode...\n")
     # A reloaded device's prompt will be either R1> (User EXEC mode) or R1# (Privileged EXEC Mode)
     # Just in case the device boots into User EXEC mode, enable Privileged EXEC Mode
     # The enable command will not affect anything if the device is already in Privileged EXEC Mode
@@ -134,16 +134,16 @@ def main(device_hostname, device_ip_address, port_number=23, vty_username=None, 
         enable_password = enable_password if enable_password is not None else getpass()
         child.sendline(enable_password + _eol)
         child.expect_exact(prompt_list[1])
-    print(GRN + "Privileged EXEC Mode enabled.\n" + CLR)
+    print(GRN + "Privileged EXEC Mode enabled.\n")
 
     # Close the Telnet client
-    print(YLW + "Closing telnet connection...\n" + CLR)
+    print("Closing telnet connection...\n")
     child.sendcontrol("]")
     child.sendline("q" + _eol)
     index = child.expect_exact(["Connection closed.", pexpect.EOF, ])
     # Close the Telnet child process
     child.close()
-    print(GRN + "Telnet connection closed: {0}\n".format(index) + CLR)
+    print("Telnet connection closed: {0}\n".format(index))
 
 
 if __name__ == "__main__":
@@ -151,8 +151,8 @@ if __name__ == "__main__":
         main("R1", "192.168.1.20", port_number=23, vty_username="admin", vty_password="cisco",
              enable_password="cisen")
     except pexpect.TIMEOUT:
-        print(RED + "Error: Unable to find the expect search string.\n" + CLR +
+        print("Error: Unable to find the expect search string.\n" +
               pexpect.ExceptionPexpect(pexpect.TIMEOUT).get_trace())
     except pexpect.EOF:
-        print(RED + "Error: Child closed unexpectedly.\n" + CLR +
+        print("Error: Child closed unexpectedly.\n" +
               pexpect.ExceptionPexpect(pexpect.EOF).get_trace())

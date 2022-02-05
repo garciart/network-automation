@@ -30,6 +30,10 @@ sudo ip link set br0 up # Enable the bridge
 sudo ip tuntap add tap0 mode tap # Create the tap
 sudo ip link set tap0 up # Enable the tap
 sudo ip link set tap0 master br0 # Connect the tap to the bridge
+# Add another tap
+sudo ip tuntap add tap1 mode tap # Create the tap
+sudo ip link set tap1 up # Enable the tap
+sudo ip link set tap1 master br0 # Connect the tap to the bridge
 
 # Configure the isolated Ethernet network adapter
 sudo ip address flush dev "$host_interface" # Clear out any old adapter IP address
