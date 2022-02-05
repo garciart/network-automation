@@ -378,6 +378,18 @@ def get_file_hash(filepaths):
     logging.info(file_hashes)
     return file_hashes
 
+def error_message(exc_info):
+    """Formats exception or error information for logging and debugging.
+
+    :param tuple exc_info: Exception details from sys module.
+    :param Exception options: The exception object for pexpect's ExceptionPexpect (pex) or
+        for subprocess' CalledProcessError (cpe).
+
+    :return: The formatted message.
+
+    .. seealso:: https://realpython.com/the-most-diabolical-python-antipattern/#why-log-the-full-stack-trace
+    """
+
 
 if __name__ == "__main__":
     print(RED + "ERROR: Script {0} cannot be run independently.".format(
