@@ -119,7 +119,7 @@ def main():
         child.expect_exact("R1#")
         print(child.before)
 
-        print("Reloading device and closing telnet connection...")
+        print("Reloading device and closing Telnet connection...")
         child.sendline("reload\r")
         index = child.expect_exact(
             ["System configuration has been modified. Save? [yes/no]:", "Proceed with reload? [confirm]", ])

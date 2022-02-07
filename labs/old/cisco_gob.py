@@ -115,7 +115,7 @@ def main():
         raise RuntimeError("Cannot get the device's serial number.")
     print("- Serial number: {0}".format(_serial_num))
 
-    print("Closing telnet connection...")
+    print("Closing Telnet connection...")
     child.sendline("disable\r")
     # time.sleep(1)
     child.expect_exact(PROMPT_LIST[0])
