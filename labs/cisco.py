@@ -317,7 +317,7 @@ class Cisco:
         :return: None
         :rtype: None
         """
-        print(YLW + "Closing telnet connection...\n" + CLR)
+        print(YLW + "Closing Telnet connection...\n" + CLR)
         child.sendcontrol("]")
         child.sendline("q" + self._eol)
         index = child.expect_exact(["Connection closed.", pexpect.EOF, ])

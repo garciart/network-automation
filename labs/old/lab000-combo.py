@@ -465,7 +465,7 @@ def close_telnet_conn(child):
     :return: None
     :rtype: None
     """
-    print("Closing telnet connection...")
+    print("Closing Telnet connection...")
     __reset_prompt(child)
     child.sendline("disable\r")
     time.sleep(1)
