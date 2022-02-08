@@ -498,11 +498,11 @@ def connect_via_telnet(device_hostname, device_ip_address, port_number=23, usern
               "Output from previous commands may cause pexpect searches to fail.\n" +
               "To prevent this in the future, reload the device to clear any artifacts.")
         # Move the pexpect cursor forward to the newest hostname prompt
-        tracer_round = "R{0}".format(int(time.time()))
+        tracer_round = ";{0}".format(int(time.time()))
         # Add the carriage return here, not in the tracer_round.
         # Otherwise, you won't find the tracer_round later
         child.sendline(tracer_round + "\r")
-        child.expect_exact("Translating \"{0}\"".format(tracer_round), timeout=1)
+        child.expect_exact("{0}".format(tracer_round), timeout=1)
     # Always try to find hostname prompts before anything else
     index_offset = len(device_prompts)
     while True:

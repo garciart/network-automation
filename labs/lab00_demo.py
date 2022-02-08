@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Lab 1: Set up the Host's Linux Environment
+"""Lab 0: Demo using the Host's Linux Environment
 
 Project: Automation
 

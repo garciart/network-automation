@@ -68,9 +68,10 @@ wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprise
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
 # Used to create interfaces to connect the host to GNS3
 sudo yum -y install bridge-utils
-# Install pexpect to control interactions with external devices
+# Install pexpect and Ansible to control interactions with external devices
 sudo yum -y install pexpect # (For Python 2.7+)
 sudo python3 -m pip install pexpect # (For Python 3.6+)
+sudo yum -y install ansible
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin
