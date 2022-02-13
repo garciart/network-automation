@@ -52,9 +52,9 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
 
     if index != 0:
         # If you find a hostname prompt (e.g., R1#) before any other prompt, you are accessing an open line
-        print("You may be accessing an open or uncleared virtual teletype session.\n" +
+        print("\x1b[31;1mYou may be accessing an open or uncleared virtual teletype session.\n" +
               "Output from previous commands may cause pexpect searches to fail.\n" +
-              "To prevent this in the future, reload the device to clear any artifacts.")
+              "To prevent this in the future, reload the device to clear any artifacts.\x1b[0m")
         # Move the pexpect cursor forward to the newest hostname prompt
         tracer_round = ";{0}".format(int(time.time()))
         # Add the carriage return here, not in the tracer_round.
@@ -78,9 +78,9 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
         elif index in (index_offset + 0, index_offset + 1):
             raise RuntimeError("Invalid credentials provided.")
         elif index in (index_offset + 2, index_offset + 3):
-            print("Warning - This device has already been configured and secured.\n" +
-                  "Changes made by this script may be incompatible with the current configuration.")
-            if index == 0:
+            print("\x1b[31;1mWarning - This device has already been configured and secured.\n" +
+                  "Changes made by this script may be incompatible with the current configuration.\x1b[0m")
+            if index == index_offset + 2:
                 # child.sendline((_username if _username is not None else raw_input("Username: ")) + "\r")
                 child.sendline(username + "\r")
                 child.expect_exact("Password:")

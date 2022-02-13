@@ -18,6 +18,10 @@ import pexpect
 
 import labs.lab01_telnet
 import labs.lab02_exec_mode
+import labs.lab03_format
+import labs.lab04_info
+import labs.lab05_enable_layer3
+import labs.lab06_secure_device
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -28,23 +32,65 @@ def main():
     child = None
     try:
         print("Lab 1: Connect to an unconfigured device through the Console port")
-        device_hostname = "R1"
+        device_hostname = "R2"
         gateway_ip_addr = "192.168.1.1"
         device_console_port = 5002
         console_password = "ciscon"
         child = labs.lab01_telnet.connect(
             device_hostname, gateway_ip_addr, device_console_port, password=console_password)
-        print("Lab 2: Lab 2: Access a network device's Privileged EXEC Mode")
+
+        print("Lab 2: Access a network device's Privileged EXEC Mode")
+        # Part 1: Up from User EXEC mode
         child.sendline("disable\r")
         child.expect_exact(device_hostname + ">")
         enable_password = "cisen"
-        child = labs.lab02_exec_mode.enable(child, device_hostname, enable_password)
+        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+        # Part 2: Down from Global Configuration mode
         child.sendline("configure terminal\r")
         child.expect_exact(device_hostname + "(config)#")
         child.sendline("interface FastEthernet0/0\r")
         child.expect_exact(device_hostname + "(config-if)#")
-        child = labs.lab02_exec_mode.enable(child, device_hostname, enable_password)
+        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+
+        print("Lab 3: Format a network device's flash memory")
+        child = labs.lab03_format.run(child, device_hostname)
+
+        print("Lab 4: Get information about a network device")
+        child = labs.lab04_info.run(child, device_hostname)
+
+        print("Lab 5: Enable Layer 3 communications")
+        child = labs.lab05_enable_layer3.run(
+            child, device_hostname, "192.168.1.30", new_netmask="255.255.255.0", commit=True)
+
+        print("Lab 6a: Secure a network device")
+        child = labs.lab06_secure_device.run(child,
+                                             device_hostname,
+                                             device_username="admin",
+                                             device_password="cisco",
+                                             privilege=15,
+                                             console_password="ciscon",
+                                             auxiliary_password="cisaux",
+                                             enable_password="cisen",
+                                             commit=True)
+
+        print("Lab 6b: Ping the device from the host")
+        _, exitstatus = pexpect.run("ping -c 4 {0}".format("192.168.1.30"), withexitstatus=True)
+        if exitstatus != 0:
+            # No need to read the output. Ping returns a non-zero value if no packets are received
+            raise RuntimeError("Cannot connect to netowrk device.")
+
+        print("Lab 6c: Connect to a configured device through the Console port")
         labs.lab01_telnet.disconnect(child)
+        child.close()
+        child = labs.lab01_telnet.connect(
+            device_hostname, "192.168.1.30", username="admin", password="cisco")
+
+        print("Lab 6d: Access a network device's Privileged EXEC Mode")
+        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+
+        print("Lab 6e: Get information about a network device")
+        child = labs.lab04_info.run(child, device_hostname)
+
     except (pexpect.ExceptionPexpect, ValueError, RuntimeError, OSError,):
         # Unpack sys.exc_info() to get error information
         e_type, e_value, _ = sys.exc_info()
