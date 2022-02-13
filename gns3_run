@@ -57,6 +57,8 @@ gns3 # Start GNS3
 echo
 echo -e "Resetting the network..."
 echo "$s_pass" | sudo -S ip link set "$host_interface" down &> /dev/null
+sudo ip link set tap1 down
+sudo ip link delete tap1
 sudo ip link set tap0 down
 sudo ip link delete tap0
 sudo ip link set br0 down

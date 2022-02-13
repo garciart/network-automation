@@ -14,14 +14,12 @@ from __future__ import print_function
 import sys
 import time
 
-import pexpect
-
 # Module metadata dunders
 __author__ = "Rob Garcia"
 __license__ = "MIT"
 
 
-def enable(child, device_hostname, password=""):
+def run(child, device_hostname, password=""):
     print("Access a network device's Privileged EXEC Mode...")
 
     # Listing of Cisco IOS prompts without a hostname
@@ -31,10 +29,10 @@ def enable(child, device_hostname, password=""):
     device_prompts = ["{0}{1}".format(device_hostname, p) for p in cisco_prompts]
     # Move the pexpect cursor forward to the newest hostname prompt
     tracer_round = ";{0}".format(int(time.time()))
-    # Add the carriage return here, not in the tracer_round.
-    # Otherwise, you won't find the tracer_round later
+    # Add a carriage return here, not in the tracer_round, or you won't find the tracer_round later
     child.sendline(tracer_round + "\r")
     child.expect_exact("{0}".format(tracer_round), timeout=1)
+
     index = child.expect_exact(device_prompts, 1)
     if index == 0:
         child.sendline("enable\r")
