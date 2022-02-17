@@ -36,9 +36,10 @@ def main():
         gateway_ip_addr = "192.168.1.1"
         device_console_port = 5002
         console_password = "ciscon"
+        # child = labs.lab01_telnet.connect(device_hostname, gateway_ip_addr, device_console_port, password=console_password)
+        # TODO: NEED TO FIX EOL FOR VTY!
         child = labs.lab01_telnet.connect(
-            device_hostname, gateway_ip_addr, device_console_port, password=console_password)
-
+            device_hostname, "192.168.1.30", username="admin", password="cisco")
         print("Lab 2: Access a network device's Privileged EXEC Mode")
         # Part 1: Up from User EXEC mode
         child.sendline("disable\r")
