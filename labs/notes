@@ -1,3 +1,22 @@
+End-of-line (EOL) issues: pexpect.sendline() sends a line feed ("\n") after the text. However, depending on:
+The physical port you use to connect to the device (e.g., VTY, Console, etc.)
+The protocol (e.g., Telnet, SSH, etc.) or the terminal emulator you use (e.g., PuTTY, Minicom, etc.)
+The network port (e.g., 23, 2000, 4000, etc.) or emulation you use (e.g., VT100, VT102, ansi, etc.)
+The device may require a carriage return ("\r") before the line feed, creating a CRLF (i.e., pexpect.sendline("text\r")).
+
+Our GNS3 setup uses a form of "Reverse Telnet"; we connect through the GNS3 service's IP address, and
+
+
+
+Add an additional Ethernet network interface
+Create a bridge and assign the bridge a "gateway" address
+Connect the additional Ethernet network interface to the bridge
+Bind the GNS3 service to the bridge's IP address
+
+
+One solution is to edit the terminal emulator's runtime configuration file (telnetrc, minirc, etc), then using the telnet transparent command on the device to change the CRLF setting before running a script. However, you would have to do this each time.
+
+
 FOR FLASH FORMAT LAB!
 
 When you first configured the router, you gave it a default IOS image (c3745-adventerprisek9-mz.124-25d.bin). However, when the router first starts, it looks for an IOS image in flash memory. This is because the 3745 can store multiple IOS's in flash memory; you tell the router which one you want to use, by inputting ```boot system flash:<the IOS filename>.bin``` at a configuration prompt and saving it in the start-up configuration file. If the router does not find an IOS there, it will look in its Read-Only Memory (ROM) for a default IOS.

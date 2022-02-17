@@ -171,9 +171,17 @@ wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprise
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
 # Used to create interfaces to connect the host to GNS3
 sudo yum -y install bridge-utils
-# Install pexpect to control interactions with external devices
+# Install modules to control interactions with external devices
 sudo yum -y install pexpect # (For Python 2.7+)
 sudo python3 -m pip install pexpect # (For Python 3.6+)
+sudo yum -y install paramiko
+sudo yum -y install ansible
+# Install Selenium for Firefox
+sudo yum -y install firefox
+sudo yum install Xvfb # virtual display driver that allows Firefox to send output to a virtual display
+pip install selenium
+wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
+sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
 wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin

@@ -33,7 +33,7 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
     # Slow down commands to prevent race conditions with output
     child.delaybeforesend = 0.5
     # Echo both input and output to the screen
-    child.logfile = sys.stdout
+    child.logfile_read = sys.stdout
     # Listing of Cisco IOS prompts without a hostname
     cisco_prompts = [
         ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
@@ -72,7 +72,7 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
              "Password:",
              "Would you like to enter the initial configuration dialog? [yes/no]:",
              "Would you like to terminate autoinstall? [yes/no]:",
-             "Press RETURN to get started", ])
+             "Press RETURN to get started", ], timeout=60)
         if index < index_offset:
             break
         elif index in (index_offset + 0, index_offset + 1):
@@ -82,7 +82,7 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
                   "Changes made by this script may be incompatible with the current configuration.\x1b[0m")
             if index == index_offset + 2:
                 # child.sendline((_username if _username is not None else raw_input("Username: ")) + "\r")
-                child.sendline(username + "\r")
+                child.sendline(username)
                 child.expect_exact("Password:")
             # child.sendline((_password if _password is not None else getpass("Enter password: ")) + "\r")
             child.sendline(password + "\r")
