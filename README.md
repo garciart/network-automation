@@ -54,7 +54,7 @@ Regardless of the hypervisor you use, make sure you:
 
 ![Memory size](img/a00.png "Settings -> Memory size")
  
-2. Allocate at least **16 GB** of hard disk space for your machine (e.g., in VirtualBox...):
+2. Allocate at least **20 GB** of hard disk space for your machine (e.g., in VirtualBox...):
 
 ![File location and size](img/a01.png "Settings -> File location and size")**
 
