@@ -5,18 +5,18 @@
 ***NOTE - While I do not expect you to be an expert in any of the technologies that I cover in this tutorial, I expect that:***
 
 - ***You have used the Linux Terminal before***
-- ***You understand the basics of computer networking, especially the TCP/IP or OSI models***
+- ***You understand the basics of computer networking, and the TCP/IP or OSI models***
 - ***You have programmed in Python before***
 
 ---
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco IOS images, since Cisco no longer supports those devices or their Internetwork Operating Systems (IOS). They recommend using newer images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, you will use the freely available Dynamips images instead.***
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco Internetwork Operating Systems (IOS) images, since Cisco no longer supports those devices or their IOS's. They recommend using newer images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, you will use the freely available Dynamips images instead.***
 
-***In addition, Cisco Packet Tracer, while an excellent tool, is a network emulator, not a simulator. Its ability to interact with host devices is limited, and it is not suitable for our purposes.***
+***In addition, while Cisco Packet Tracer is an excellent tool, its ability to interact with host devices is limited, and it is not suitable for our purposes.***
 
 ## Introduction
 
-Manually configuring a network device is not a difficult process. You simpy access the device's command line interface (CLI) through a console, auxiliary, or virtual teletype port, and enter the commands manually or upload a script written in a specialized language, such as Cisco's Tool Command Language (TCL).
+Manually configuring a network device is not a difficult process. You simply access the device's command line interface (CLI) through a console, auxiliary, or virtual (VTY) port, and enter the commands manually or run a script using a special feature, such as Cisco IOS Scripting with Tool Command Language (TCL).
 
 However, imagine how long it would take to configure or update dozens, or even hundreds of devices. In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
 
@@ -78,7 +78,7 @@ Once you have finished creating your virtual machine, spin it up, and update and
 
 ```sudo yum -y upgrade```
 
->**NOTE** - If you are using VirtualBox, I recommend installing Guest Additions, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the software on the Guest Additions' ISO:
+>**NOTE** - If you are using VirtualBox, I recommend installing their Guest Additions software suite, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the software on the Guest Additions' ISO:
 >
 >```
 >sudo yum -y install epel-release
@@ -92,12 +92,13 @@ Next, open a Terminal and install git:
 
 ```sudo yum -y install git```
 
-Clone this repository; it should appear in your home directory (e.g., ```/home/gns3user/Automation```), and then enter the repository:
+Clone this repository; it will appear in your home directory under the name ```network-automation```:
 
-```
-git clone https://github.com/garciart/Automation.git
-cd Automation
-```
+```git clone https://github.com/garciart/network-automation.git```
+
+Enter the repository when complete:
+
+```cd network-automation```
 
 Now for the setup: There are a few good posts and articles on how to install GNS3 on CentOS. However, each of them is slightly different, so, to make life easier, I distilled them into the following list of commands:
 
@@ -183,7 +184,7 @@ pip install selenium
 wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
-wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
+wget -P ~/ https://raw.githubusercontent.com/garciart/network-automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_run
 sudo mv ~/gns3_run /usr/bin/
@@ -201,9 +202,9 @@ sudo chmod 777 /var/lib/tftpboot
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 ```
 
-Now, the first time you install GNS3, I suggest you open a Linux Terminal and enter each of the above lines, one at a time, and studying their output. Look up any commands or programs you are unfamiliar with.
+Now, the first time you install GNS3, I suggest you open a Linux Terminal and enter each of the above lines, one at a time, and study their output. Look up any commands or programs you are unfamiliar with.
 
->If you run into errors downloading IOS images from the [tfr.org](http://tfr.org "tfr.org") website, you can download the files from other websites, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes.
+>If you run into errors downloading IOS images from the [tfr.org](http://tfr.org "tfr.org") website, Google is your friend, and I have also included them in this repository in the ```IOS``` folder. Just remember to place them in the ```/GNS3/images/IOS``` folder in your home directory (e.g., ```/home/gns3user/GNS3/images/IOS```). Also, remember to check the md5 hash after downloading, to ensure you have not downloaded malware; you can use our included script, [file_hash_check.py](file_hash_check.py), to check the hashes.
 
 If you need to reinstall GNS3, you can use the [executable script](gns3_setup_centos "CentOS Setup Script") I created and included in this repo. Make the shell script executable and run it, piping any errors and the output into a text file. It will take a while to finish, so be patient:
 
@@ -213,7 +214,7 @@ sudo chmod +x gns3_setup_centos
 grep -i -e "error" -e "warning" setup_output.txt
 ```
 
-Installation will take a few minutes, but once it is complete, check the text file for any errors. Correct any errors or, if necessary, delete the VM and start over again. Otherwise, if there are no errors, you can delete the output file and reboot the VM:
+Installation will take a few minutes, but once it is complete, check ```setup_output.txt``` for any errors. Correct any errors or, if necessary, delete the VM and start over again. Otherwise, if there are no errors, you can delete the output file and reboot the VM:
 
 ```
 rm setup_output.txt
@@ -259,17 +260,19 @@ Before you start, here is the subnet information for the network:
 - GNS3 Device Starting IP: 192.168.1.20
 ```
 
-As I stated before, you will create virtual network devices in GNS3, which will exist within our virtual local area network (VLAN). However, writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. You want to code on our host machine and test the code in GNS3. Therefore, you want to connect the GNS3 VLAN to our host machine. To do this, you will:
+Writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. Therefore, to code on our host machine and test against GNS3, you will connect the host machine to the GNS3 server by:
 
-- Create a virtual network bridge.
-- Create a Layer 2 TAP interface and connect the TAP to the bridge.
-- Connect the host's isolated network interface to the bridge.
-- Bind the GNS3 local server gateway to the bridge.
-- Connect the router to the bridge through the TAP.
+- Creating a virtual network bridge.
+- Binding the GNS3 local server's gateway to the bridge.
+- Connecting the host's isolated network interface to the bridge.
+- Creating Layer 2 TAP interfaces and connecting the TAPs to the bridge.
+- Connecting devices to the host through the TAPs on the bridge.
 
-First, you need to find out the name of our host machine's isolated Ethernet network adapter. You do not want to use the primary interface, since you will be overwriting the IP address and other information.
+First, you need to find out the name of our host machine's isolated Ethernet network adapter.
 
-Per RedHat's [Consistent Network Device Naming conventions](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming "Consistent Network Device Naming"), network interfaces for Ethernet will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.) in CentOS. Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
+> **NOTE** - You do not want to use the VM's primary network interface, since you will be overwriting its IP address and other information.
+
+Per RedHat's [Consistent Network Device Naming conventions](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-consistent_network_device_naming "Consistent Network Device Naming"), network interfaces for Ethernet adapters will start with ```em```, ```en```, and ```et``` (e.g., ```em1```, ```eth0```, etc.) in CentOS. Open a Terminal and look for your isolated network interface, by inputting ```ip addr show label e*```:
 
 ```
 $ ip addr show label e*
@@ -284,9 +287,9 @@ $ ip addr show label e*
     link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
 ```
 
-Look for the interface that does not have an IP address (i.e., no inet). In this case, the isolated interface is named ```enp0s8```. 
+Look for the interface that does not have an IP address (i.e., no ```inet``` information). In this case, the isolated interface is named ```enp0s8```. 
 
-You will now "bridge" the host machine and GNS3 together:
+You will now attach the host machine and the GNS3 server using a "bridge":
 
 ```
 # Configure the bridge
@@ -299,6 +302,11 @@ sudo ip tuntap add tap0 mode tap # Create the tap
 sudo ip link set tap0 up # Enable the tap
 sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
+# Add another tap, for flexibility
+sudo ip tuntap add tap1 mode tap # Create the tap
+sudo ip link set tap1 up # Enable the tap
+sudo ip link set tap1 master br0 # Connect the tap to the bridge
+
 # Configure the isolated Ethernet network adapter 
 sudo ip address flush dev enp0s8 # Clear out any old adapter IP address
 sudo ip link set enp0s8 up # Enable the adapter
@@ -307,7 +315,7 @@ sleep 3 # Allow time to make the connection
 sudo ip address add 192.168.1.10/24 dev enp0s8 # Set the adapter IP address
 ```
 
->**NOTE** - Why do you need a TAP? Why not just connect to the bridge? Yes, for a simple network, like our example, you can connect directly to the bridge. However, in other labs, you will connect multiple devices to the host through Layer 2 TAP interfaces (e.g., tap1, tap2, etc.), so just get into the habit of connecting to a TAP instead of directly to the bridge.
+>**NOTE** - Why do you need a TAP? Why not just connect a device directly to the bridge? Yes, for a simple network, like our example, you can connect a device directly to the host through the bridge. However, in other labs, you will connect multiple devices to the host through Layer 2 TAP interfaces (e.g., tap1, tap2, etc.), so just get into the habit of connecting to a TAP instead of directly to the bridge.
 
 Check the configuration and the bridge by inputting ```ip addr show dev br0``` and ```brctl show br0```:
 
@@ -342,7 +350,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
->**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eyes: below.
+>**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eyes: [below](this-will-return-you-to-the-main-gns3-graphical-user-interface).
 
 In **Local sever configuration**, under **Host binding**, select the bridge's IP address (```192.168.1.1```):
 
@@ -356,7 +364,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
->>> :eyes: - This will return you to the main GNS3 Graphical User Interface (GUI):
+> :eyes: - This will return you to the main GNS3 Graphical User Interface (GUI):
 
 ![Main Screen](img/a09.png)
 
@@ -840,7 +848,7 @@ Like I stated earlier, running this set of commands is easy to do for one device
 #!/usr/bin/python
 """Automation Demo
 
-Project: Automation
+Project: network-automation
 
 To run this lab:
 
