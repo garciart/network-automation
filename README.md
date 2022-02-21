@@ -26,11 +26,18 @@ However, there are some great tools, like Graphical Network Simulator-3 (GNS3), 
 
 This tutorial is broken down into three parts:
 
+- [What is GNS3?](#what-is-gns3 "What is GNS3?")
 - [Installing GNS3](#installing-gns3 "Installing GNS3")
 - [Setting up the environment](#setting-up-the-environment "Setting up the environment")
 - [Your First Lab](#your-first-lab "Your First Lab")
 
 >**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
+
+-----
+
+## What is GNS3?
+
+Graphical Network Simulator-3 is a network software emulator, written in Python. It replicates the hardware and software features of real devices in a virtual environment. It was first released in 2008, and it has been downloaded over 18 million times. While it is free and open source (GNU GPL, i.e., "copyleft"), with an active community of over two million members, it is also used by companies such as Google, NASA, AT&T, and Walmart.
 
 -----
 
@@ -350,7 +357,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 ![Setup Wizard](img/a05.png)
 
->**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eyes: [below](this-will-return-you-to-the-main-gns3-graphical-user-interface).
+>**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eyes: <a id="eyes">below</a>.
 
 In **Local sever configuration**, under **Host binding**, select the bridge's IP address (```192.168.1.1```):
 
@@ -364,7 +371,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 ![Setup Wizard Summary](img/a08.png)
 
-> :eyes: - This will return you to the main GNS3 Graphical User Interface (GUI):
+> :eyes: - <span id="eyes">This will return you to the main GNS3 Graphical User Interface (GUI)<span>:
 
 ![Main Screen](img/a09.png)
 
@@ -380,11 +387,7 @@ However, before you start on the lab, you need to make some adjustments. From th
 
 ---
 
-Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on the selected cards and modules.
-
->**NOTE** - For the labs, you will use images for the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services, and the Cisco 7206 VXR Router. Both are older routers, but their IOS's are available for download, and they are sufficient for our labs.
->
->Here are the names of the files, their hashes, and some additional information:
+Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on which cards or modules are installed. It is an older router, but its IOS is available for download, and it is sufficient for conducting our labs. Here is some additional information:
 >
 >- **Cisco 3745 Multi-Service Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -395,15 +398,6 @@ Now you need to add a device. For our initial labs, you will use the Cisco 3745 
 >   * End-of-Sale Date: 2007-03-27
 >   * End-of-Support Date: 2012-03-27
 >   * IOS End-of-Support Date: 2016-01-31
->- **Cisco 7206 VXR 6-Slot Router:**
->   * IOS version 12.4.25g (Mainline):
->   * File Name: c7200-a3jk9s-mz.124-25g.bin
->   * MD5: 3a78cb61831b3ef1530f7402f5986556
->   * Flash Memory: 64 MB
->   * DRAM: 256MB
->   * End-of-Sale Date: 2012-09-29 
->   * End-of-Support Date: 2017-09-30
->   * IOS End-of-Support Date: 2016-01-31
 
 Here is the back of a Cisco 3745 Router:
 
@@ -412,10 +406,10 @@ Here is the back of a Cisco 3745 Router:
  In between the power supply modules, from top to bottom, the 3745 has:
  
  - Three (3) WAN interface card (WIC) slots (uncovered in the image).
- - Built-in Modules:
-     - A console (labeled in light blue) and an auxiliary port (labeled in black) on the left. By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
+ - Built-in Modules (from right-to-left):
+     - A console port (labeled in light blue) and an auxiliary port (labeled in black). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
      - An optional CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards. This card will correspond to Personal Computer Memory Card International Association (PCMCIA) disk1, accessible as ```slot0:``` in the IOS; more about this later.
-     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow), on the right.
+     - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow).
 - Four (4) network adapter module slots (two uncovered and two covered in the image).
 
 I will explain how to fill in the slots later in this tutorial.
@@ -468,7 +462,7 @@ Practice filling open slots with an adapter, but ***DO NOT CLICK ON NEXT!***:
 
 ![Network Adapters](img/a20b.png)
 
-Did you notice that, aside from the built-in GT96100-FE adapter, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters.
+Did you notice that, aside from the built-in GT96100-FE adapter, there are six open slots, but you can only use four of them? That is because the 3745 only has four open slots for network adapters, as shown in the picture above.
 
 Aside from the built-in network adapter, you will not need any additional network adapters yet, so empty all the slots except for **slot 0** (GNS3 will not let you delete it anyway). When complete, click on **Next >**:
 
@@ -488,15 +482,7 @@ For WAN Interface Cards (WICs), you have three slots, but only two options:
 
 ![WIC-2T Two port serial module](img/wic-2t.png)
  
-Go ahead and practice placing a WIC in open slots, but ***DO NOT CLICK ON NEXT!***:
-
-![WIC Modules](img/a21b.png)
-
-This time, since the 3745 has three WIC slots, you can populate each of them with different modules, or even the same module.
-
-You will not need any WIC modules yet, so empty all the slots and click on **Next >**:
-
-![WIC Modules](img/a21a.png)
+You will not need any WIC modules yet, so make sure all the slots are empty, and click on **Next >**.
 
 >**NOTE** - For more information on these modules and other configurations, check out the [Cisco 3700 Series Router Hardware](https://www.cisco.com/web/ANZ/cpp/refguide/hview/router/3700.html "
 CISCO 3700 Series Router Hardware View") page. If the site becomes unavailable, I have also included [a pdf copy here.](/3700.pdf "CISCO 3700 Series Router Hardware View")
@@ -514,11 +500,13 @@ Click on **Edit** to increase the device's flash memory from 0 to 64 MiB:
 
 ![Preferences](img/a23.png)
 
-In the **Dynamips IOS router template configuration** pop-up dialog, select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB. While you are here, make sure **Automatically delete NVRAM and disk files** is unselected; otherwise, you will have to reformat the flash memory each time you reload the device. When you are done, click **OK** to continue:
+In the **Dynamips IOS router template configuration** pop-up dialog, select the **Memories and disks** tab. Set the PCMCIA disk0 to 64 MiB. While you are here, make sure **Automatically delete NVRAM and disk files** is unselected; otherwise, you will have to reformat the flash memory each time you reload the device:
 
 ![Dynamips IOS router template configuration](img/a24.png)
 
-This brings you back to the template details window. Take a moment to look it over; there is some good information here, such as the name of the startup configuration file, which you will edit later:
+When you are done, click **OK** to continue.
+
+Once you return to the template details window, make sure the memory for **PCMCIA disk0** is **64 MiB** and **Auto delete** is set to **False**.
 
 ![Preferences](img/a25.png)
 
@@ -528,9 +516,9 @@ This brings you back to the template details window. Take a moment to look it ov
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal (the **Project** window should appear).
+Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal.
 
-A pop-up dialog will appear, asking you to create a new project. Enter ```Automation``` in the ***Name*** textbox and click the **OK** button.
+The **Project** pop-up dialog will appear, asking you to create a new project. Enter ```Automation``` in the ***Name*** textbox and click the **OK** button.
 
 ![Project Dialog](img/a10.png)
 
@@ -540,9 +528,9 @@ From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates** (or **Al
 
 All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
 
->**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. I recommend both **Snap to grid**, which will keep your workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
+>**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. I recommend both **Snap to grid**, which will keep your Workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
 
-You may also use the "Browse all devices" to see all your available devices:
+You may also click the "Browse all devices" icon to see all of your available devices:
 
 ![All devices](img/a26i.png)
 
@@ -570,13 +558,13 @@ Let us fix that. Click on the green **Play** icon in the GNS3 Toolbar above the 
 
 ![Confirm Start All](img/a31.png)
 
-You will see that all the nodes are now green, both in the Workspace and the Topology Summary in the top left-hand corner:
+You will see that all the nodes are now green, both in the Workspace and the **Topology Summary** in the top left-hand corner:
 
 ![All Devices Started](img/a32.png)
 
-By the way, note the console information for R1 in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IP address yet, you can connect to R1 using Telnet through the Console port on the back of the 3745 using port 5001.
+By the way, note the console information for **R1** in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IP address yet, you can connect to **R1** using Telnet through the Console port on the back of the 3745 using port 5001.
 
-However, your port number may be different. If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the R1 node and selecting **Show node information**:
+However, your port number may be different. If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the **R1** node and selecting **Show node information**:
 
 ![Show node information](img/a35.png)
 
@@ -590,13 +578,13 @@ The pop-up dialog has a lot of good information, including which port number the
 
 Now, before we begin to code, you will perform a dry run by entering the commands directly in a console terminal, as you would do with a real device.
 
->**NOTE** - Normally, you cannot Telnet or Secure Shell (SSH) into a device until you assign the device an IP address. To do solve this chicken-or-egg problem, you would:
+>**NOTE** - Normally, you cannot Telnet into a device until you assign the device an IP address. To do solve this chicken-or-egg problem, you would:
 >
 >- Connect an RS232 Port to RJ45 Ethernet cable from the host to the device's Console port.
->- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (i.e., /dev/ttyS0) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
+>- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IP address.
 > 
->However, I do not know how to do this in GNS3, so you will be simulating that connection using the gateway and the Console port number.
+>However, GNS3 simulates this connection through the server gateway and the Console port number. By the way, you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
@@ -662,7 +650,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> 
 ```
 
-In Python, you will interact with the device using the pexpect module. Pexpect creates or "spawns" a session with another device, known as a "child". Using commands such as  ```sendline``` and ```expect```, you can interact with the device through the child.
+In Python, you will interact with the device using the **Pexpect** module. Pexpect creates or "spawns" a session with another device, known as a "child". Using commands such as  ```sendline``` and ```expect```, you can interact with the device through the child.
 
 First, at the ```>>>``` prompt, import the module into the interpreter:
 
@@ -672,7 +660,7 @@ Second, create a Telnet child process:
 
 ```>>> child = pexpect.spawn("telnet 192.168.1.1 5001")```
 
-If you have looked at previous boot-up messages, you will notice that the string, "Press RETURN to get started", always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
+Looking at previous boot-up messages, you may have noticed that the string, "Press RETURN to get started", always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
 
 ```>>> child.expect("Press RETURN to get started")```
 
@@ -680,11 +668,11 @@ After a few seconds, you will see the following output:
 
 ```0```
 
-0? What does that mean? The Pexpect expect class collects the output of the child during the spawn call. It takes your search string, converts it to a list, and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and since you only have one search string, the index will be 0. If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
+0? What does that mean? The Pexpect expect class collects the output of the child during the spawn call. It takes lists of search strings and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and since you only have one search string, the index will be 0 (Pexpect will convert single strings to a list). If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
 
 Pexpect will begin the next search right after the last match. This prevents Pexpect from continuing to use the same match, over and over again. 
 
-Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (\n)):
+Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (`\n`) to complete the CRLF sequence):
 
 ```>>> child.sendline("\r")```
 
@@ -694,15 +682,13 @@ After a few seconds, you will see the following output:
 
 The return value states that two characters were successfully sent to the child: '\r' and'\n'. That is good, and when we look for our search string of ```R1#``` in the output, we should expect to find the default Privilege EXEC Mode prompt:
 
-```>>> child.expect("R1#")0
-```
+```>>> child.expect("R1#")0```
 
 >**NOTE** - Always try to match each send with an expect. If you do not, Pexpect may look for the search string in the wrong place.
 
 Next, as you did earlier, get the device's hardware and software information. Send the command ```show version``` (14 characters, including the newline, will be sent):
 
-```>>> child.sendline("show version\r")14
-```
+```>>> child.sendline("show version\r")14```
 
 The ```show version``` command produces too much output for one Telnet screen, so it pauses the output midway with a ```--More--``` prompt, so you can examine the first part before proceeding to the second. Therefore, this time, you will expect several responses and capture the index of the response:
 
