@@ -19,7 +19,7 @@ __author__ = "Rob Garcia"
 __license__ = "MIT"
 
 
-def run(child, device_hostname, password=""):
+def run(child, device_hostname, password="", eol="\r"):
     print("Access a network device's Privileged EXEC Mode...")
 
     # Listing of Cisco IOS prompts without a hostname
@@ -30,21 +30,20 @@ def run(child, device_hostname, password=""):
     # Move the pexpect cursor forward to the newest hostname prompt
     tracer_round = ";{0}".format(int(time.time()))
     # Add a carriage return here, not in the tracer_round, or you won't find the tracer_round later
-    child.sendline(tracer_round + "\r")
+    child.sendline(tracer_round + eol)
     child.expect_exact("{0}".format(tracer_round), timeout=1)
 
     index = child.expect_exact(device_prompts, 1)
     if index == 0:
-        child.sendline("enable\r")
+        child.sendline("enable" + eol)
         index = child.expect_exact(["Password:", device_prompts[1], ], 1)
         if index == 0:
-            child.sendline(password + "\r")
+            child.sendline(password + eol)
             child.expect_exact(device_prompts[1], 1)
     elif index != 1:
-        child.sendline("end\r")
+        child.sendline("end" + eol)
         child.expect_exact(device_prompts[1], 1)
     print("Privileged EXEC Mode accessed.")
-    return child
 
 
 if __name__ == "__main__":

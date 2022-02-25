@@ -75,7 +75,6 @@ sudo yum -y install paramiko
 sudo yum -y install ansible
 # Install Selenium for Firefox
 sudo yum -y install firefox
-sudo yum install Xvfb # virtual display driver that allows Firefox to send its GUI output to virtual display
 pip install selenium
 wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/

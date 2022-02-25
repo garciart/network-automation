@@ -4,8 +4,15 @@ The protocol (e.g., Telnet, SSH, etc.) or the terminal emulator you use (e.g., P
 The network port (e.g., 23, 2000, 4000, etc.) or emulation you use (e.g., VT100, VT102, ansi, etc.)
 The device may require a carriage return ("\r") before the line feed, creating a CRLF (i.e., pexpect.sendline("text\r")).
 
-Our GNS3 setup uses a form of "Reverse Telnet"; we connect through the GNS3 service's IP address, and
-
+>- **Cisco 7206 VXR 6-Slot Router:**
+>   * IOS version 12.4.25g (Mainline):
+>   * File Name: c7200-a3jk9s-mz.124-25g.bin
+>   * MD5: 3a78cb61831b3ef1530f7402f5986556
+>   * Flash Memory: 64 MB
+>   * DRAM: 256MB
+>   * End-of-Sale Date: 2012-09-29
+>   * End-of-Support Date: 2017-09-30
+>   * IOS End-of-Support Date: 2016-01-31
 
 
 Add an additional Ethernet network interface

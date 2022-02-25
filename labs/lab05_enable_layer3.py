@@ -21,7 +21,7 @@ import time
 import pexpect
 
 
-def run(child, device_hostname, new_ip_address, new_netmask="255.255.255.0", commit=True):
+def run(child, device_hostname, new_ip_address, new_netmask="255.255.255.0", commit=True, eol="\r"):
     print("Enabling Layer 3 communications...")
 
     # Listing of Cisco IOS prompts without a hostname
@@ -32,7 +32,7 @@ def run(child, device_hostname, new_ip_address, new_netmask="255.255.255.0", com
     # Move the pexpect cursor forward to the newest hostname prompt
     tracer_round = ";{0}".format(int(time.time()))
     # Add a carriage return here, not in the tracer_round, or you won't find the tracer_round later
-    child.sendline(tracer_round + "\r")
+    child.sendline(tracer_round + eol)
     child.expect_exact("{0}".format(tracer_round), timeout=1)
     # WATCH YOUR CURSORS! You must consume the prompt after the tracer round
     # or the pexepect cursor will stop at the wrong prompt
@@ -40,30 +40,36 @@ def run(child, device_hostname, new_ip_address, new_netmask="255.255.255.0", com
     #                       Not here -> R2#
     child.expect_exact(device_prompts[1], 1)
 
-    child.sendline("configure terminal\r")
+    child.sendline("configure terminal" + eol)
     child.expect_exact(device_prompts[2])
-    child.sendline("interface FastEthernet0/0\r")
+    child.sendline("interface FastEthernet0/0" + eol)
     child.expect_exact(device_prompts[3])
-    child.sendline("ip address {0} {1}\r".format(new_ip_address, new_netmask))
+    child.sendline("ip address {0} {1}".format(new_ip_address, new_netmask) + eol)
     child.expect_exact(device_prompts[3])
-    child.sendline("no shutdown\r")
+    child.sendline("no shutdown" + eol)
     child.expect_exact(device_prompts[3])
-    child.sendline("end\r")
+    child.sendline("end" + eol)
     child.expect_exact(device_prompts[1])
 
     # Save changes if True
     if commit:
-        child.sendline("write memory\r")
+        child.sendline("write memory" + eol)
         child.expect_exact(device_prompts[1])
+    print("Layer 3 communications enabled.")
 
-    # Ping the device from the host
-    _, exitstatus = pexpect.run("ping -c 4 {0}".format(new_ip_address), withexitstatus=True)
+
+def ping_from_device(child, destination_ip_addr, count=4, eol="\r"):
+    child.sendline("ping {0} repeat {1}".format(destination_ip_addr, count) + eol)
+    index = child.expect(["percent (0/4)", r"percent \([1-4]/4\)", ])
+    if index == 0:
+        raise RuntimeError("Cannot ping {0} from this device.".format(destination_ip_addr))
+
+
+def ping_device(device_ip_addr, count=4):
+    _, exitstatus = pexpect.run("ping -c {0} {1}".format(count, device_ip_addr), withexitstatus=True)
     if exitstatus != 0:
         # No need to read the output. Ping returns a non-zero value if no packets are received
-        raise RuntimeError("Cannot enable Layer 3 communications.")
-
-    print("Layer 3 communications enabled.")
-    return child
+        raise RuntimeError("Cannot ping the device at {0}.".format(device_ip_addr))
 
 
 if __name__ == "__main__":
