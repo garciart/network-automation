@@ -21,7 +21,7 @@ __author__ = "Rob Garcia"
 __license__ = "MIT"
 
 
-def connect(device_hostname, device_ip_addr, port_number=23, username="", password=""):
+def connect(device_hostname, device_ip_addr, port_number=23, username="", password="", eol="\r"):
     print("Checking Telnet client is installed...")
     _, exitstatus = pexpect.run("which telnet", withexitstatus=True)
     if exitstatus != 0:
@@ -41,15 +41,6 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
     device_prompts = ["{0}{1}".format(device_hostname, p) for p in cisco_prompts]
     # noinspection PyTypeChecker
     index = child.expect_exact([pexpect.TIMEOUT, ] + device_prompts, 1)
-
-    # End-of-line (EOL) issue: Depending on the physical port you use (Console, VTY, etc.),
-    # AND the port number you use (23, 5001, etc.), Cisco may require a carriage return ("\r")
-    # when using pexpect.sendline. Also, each terminal emulator may have different EOL
-    # settings. One solution is to append the carriage return to each sendline.
-    # Nother solution is to edit the terminal emulator's runtime configuration file
-    # (telnetrc, minirc, etc) before running this script, then setting or unsetting the
-    # telnet transparent setting on the device.
-
     if index != 0:
         # If you find a hostname prompt (e.g., R1#) before any other prompt, you are accessing an open line
         print("\x1b[31;1mYou may be accessing an open or uncleared virtual teletype session.\n" +
@@ -59,7 +50,7 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
         tracer_round = ";{0}".format(int(time.time()))
         # Add the carriage return here, not in the tracer_round.
         # Otherwise, you won't find the tracer_round later
-        child.sendline(tracer_round + "\r")
+        child.sendline(tracer_round + eol)
         child.expect_exact("{0}".format(tracer_round), timeout=1)
     # Always try to find hostname prompts before anything else
     index_offset = len(device_prompts)
@@ -81,26 +72,26 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
             print("\x1b[31;1mWarning - This device has already been configured and secured.\n" +
                   "Changes made by this script may be incompatible with the current configuration.\x1b[0m")
             if index == index_offset + 2:
-                # child.sendline((_username if _username is not None else raw_input("Username: ")) + "\r")
+                # child.sendline((_username if _username is not None else raw_input("Username: ")) + eol)
                 child.sendline(username)
                 child.expect_exact("Password:")
-            # child.sendline((_password if _password is not None else getpass("Enter password: ")) + "\r")
-            child.sendline(password + "\r")
+            # child.sendline((_password if _password is not None else getpass("Enter password: ")) + eol)
+            child.sendline(password + eol)
         elif index == index_offset + 4:
-            child.sendline("no\r")
+            child.sendline("no" + eol)
         elif index == index_offset + 5:
-            child.sendline("yes\r")
+            child.sendline("yes" + eol)
         elif index == index_offset + 6:
-            child.sendline("\r")
+            child.sendline(eol)
     print("Connected to {0} on port {1} via Telnet.".format(device_ip_addr, port_number))
     return child
 
 
-def disconnect(child):
+def disconnect(child, eol="\r"):
     print("Closing Telnet connection...")
     child.sendcontrol("]")
     child.expect_exact("telnet>")
-    child.sendline("q\r")
+    child.sendline("q" + eol)
     child.expect_exact(["Connection closed.", pexpect.EOF, ])
     child.close()
     print("Telnet connection closed")

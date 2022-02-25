@@ -29,41 +29,65 @@ __license__ = "MIT"
 
 
 def main():
+    # End-of-line (EOL) issue: Depending on the physical port you use (Console, VTY, etc.),
+    # AND the port number you use (23, 5001, etc.), Cisco may require a carriage return ("\r")
+    # when using pexpect.sendline. Also, each terminal emulator may have different EOL
+    # settings. One solution is to edit the terminal emulator's runtime configuration file
+    # (telnetrc, minirc, etc) before running this script, then setting or unsetting the
+    # telnet transparent setting on the device.
+    # Our solution is, based on testing, to append the correct EOL to each sendline.
+    eol = "\r"
     child = None
     try:
         print("Lab 1: Connect to an unconfigured device through the Console port")
         device_hostname = "R2"
         gateway_ip_addr = "192.168.1.1"
         device_console_port = 5002
+        device_ip_addr = "192.168.1.30"
+        device_netmask = "255.255.255.0"
+        disk_name = "disk0"
+        # Include a console port password in case the device is secured.
+        # The default console port password for the labs is "ciscon"
         console_password = "ciscon"
-        # child = labs.lab01_telnet.connect(device_hostname, gateway_ip_addr, device_console_port, password=console_password)
-        # TODO: NEED TO FIX EOL FOR VTY!
         child = labs.lab01_telnet.connect(
-            device_hostname, "192.168.1.30", username="admin", password="cisco")
-        print("Lab 2: Access a network device's Privileged EXEC Mode")
-        # Part 1: Up from User EXEC mode
-        child.sendline("disable\r")
-        child.expect_exact(device_hostname + ">")
-        enable_password = "cisen"
-        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
-        # Part 2: Down from Global Configuration mode
-        child.sendline("configure terminal\r")
-        child.expect_exact(device_hostname + "(config)#")
-        child.sendline("interface FastEthernet0/0\r")
-        child.expect_exact(device_hostname + "(config-if)#")
-        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+            device_hostname, gateway_ip_addr, device_console_port, password=console_password)
 
-        print("Lab 3: Format a network device's flash memory")
-        child = labs.lab03_format.run(child, device_hostname)
+        print("Lab 2: Access a network device's Privileged EXEC Mode")
+        # Part 1: Enter Privileged EXEC Mode from the device's current mode, whatever it is
+        # Include an enable password in case the device is secured.
+        # The default enable password for the labs is "cisen"
+        enable_password = "cisen"
+        labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+
+        # Part 2: Test switching between User EXEC mode and Privileged EXEC Mode
+        child.sendline("disable" + eol)
+        child.expect_exact(device_hostname + ">")
+        labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+
+        # Part 2: Test switching between Global Configuration modes and Privileged EXEC Mode
+        child.sendline("configure terminal" + eol)
+        child.expect_exact(device_hostname + "(config)#")
+        child.sendline("interface FastEthernet0/0" + eol)
+        child.expect_exact(device_hostname + "(config-if)#")
+        labs.lab02_exec_mode.run(child, device_hostname, enable_password)
+
+        print("Lab 3: Format a network device's memory")
+        # For the Cisco 3745, the disk_name is the default value of "flash",
+        # while for the Cisco 7206, the disk_name is "disk0"
+        labs.lab03_format.run(child, device_hostname, disk_name=disk_name)
 
         print("Lab 4: Get information about a network device")
-        child = labs.lab04_info.run(child, device_hostname)
+        labs.lab04_info.run(child, device_hostname)
 
         print("Lab 5: Enable Layer 3 communications")
-        child = labs.lab05_enable_layer3.run(
-            child, device_hostname, "192.168.1.30", new_netmask="255.255.255.0", commit=True)
+        # Part 1: Enable Layer 3 communications
+        labs.lab05_enable_layer3.run(child, device_hostname, device_ip_addr, new_netmask=device_netmask, commit=True)
+        # Part 2: Ping the host from the device
+        labs.lab05_enable_layer3.ping_from_device(child, device_ip_addr)
+        # Part 3: Ping the device from the host
+        labs.lab05_enable_layer3.ping_device(device_ip_addr)
 
-        print("Lab 6a: Secure a network device")
+        print("Lab 6: Secure a network device")
         child = labs.lab06_secure_device.run(child,
                                              device_hostname,
                                              device_username="admin",
@@ -74,23 +98,18 @@ def main():
                                              enable_password="cisen",
                                              commit=True)
 
-        print("Lab 6b: Ping the device from the host")
-        _, exitstatus = pexpect.run("ping -c 4 {0}".format("192.168.1.30"), withexitstatus=True)
-        if exitstatus != 0:
-            # No need to read the output. Ping returns a non-zero value if no packets are received
-            raise RuntimeError("Cannot connect to netowrk device.")
-
-        print("Lab 6c: Connect to a configured device through the Console port")
+        # Telnet to the new IP address and repeat Labs 1, 3, 4, and part of 5
         labs.lab01_telnet.disconnect(child)
         child.close()
+        # VTY line connections do not need a carriage return!
         child = labs.lab01_telnet.connect(
-            device_hostname, "192.168.1.30", username="admin", password="cisco")
-
-        print("Lab 6d: Access a network device's Privileged EXEC Mode")
-        child = labs.lab02_exec_mode.run(child, device_hostname, enable_password)
-
-        print("Lab 6e: Get information about a network device")
-        child = labs.lab04_info.run(child, device_hostname)
+            device_hostname, device_ip_addr, username="admin", password="cisco", eol="")
+        labs.lab02_exec_mode.run(child, device_hostname, enable_password, eol="")
+        labs.lab04_info.run(child, device_hostname, eol="")
+        # Ping the host from the device
+        labs.lab05_enable_layer3.ping_from_device(child, "192.168.1.10", eol="")
+        # Ping the device from the host
+        labs.lab05_enable_layer3.ping_device(device_ip_addr)
 
     except (pexpect.ExceptionPexpect, ValueError, RuntimeError, OSError,):
         # Unpack sys.exc_info() to get error information
@@ -111,12 +130,12 @@ def main():
             # For pexpect.expect-type calls...
             else:
                 # Log what was actually found during the pexpect call
-                _e_value = "Expected {0}\nFound {1}.".format(
+                e_value = "Expected {0}\nFound {1}.".format(
                     str(e_value).split("searcher: ")[1].split("buffer (last 100 chars):")[0].strip(),
                     str(e_value).split("before (last 100 chars): ")[1].split("after:")[0].strip())
                 # Remove any unwanted escape characters here, like backspaces, etc.
-                e_value = _e_value.replace("\b", "")
-                err_msg += _e_value
+                e_value = e_value.replace("\b", "")
+                err_msg += e_value
         elif e_type in (ValueError, RuntimeError, OSError,):
             err_msg += (traceback.format_exc().strip())
         print(err_msg)

@@ -11,6 +11,7 @@ Requirements:
 """
 from __future__ import print_function
 
+import sys
 import time
 from getpass import getpass
 
@@ -27,7 +28,7 @@ GRN = "\x1b[32m"
 YLW = "\x1b[33m"
 
 
-def main():
+def run(eol="\r"):
     """A G-d Object. For training only; I know its cognitive complexity is in the hundreds and
     there are WAY too many comments.
 
@@ -45,7 +46,7 @@ def main():
     time.sleep(0.5)
     command_output, exit_status = pexpect.run(
         "sudo firewall-cmd --zone=public --remove-port=23/tcp",
-        events={"(?i)password": getpass() + "\r"},
+        events={"(?i)password": getpass() + eol},
         withexitstatus=True)
     if exit_status != 0:
         raise RuntimeError(command_output.strip())
@@ -63,7 +64,7 @@ def main():
     for c in list_of_commands:
         command_output, exit_status = pexpect.run(
             c,
-            events={"(?i)password": sudo_password + "\r"},
+            events={"(?i)password": sudo_password + eol},
             withexitstatus=True)
         if exit_status != 0:
             raise RuntimeError(command_output.strip())
@@ -82,7 +83,7 @@ def main():
     for c in list_of_commands:
         command_output, exit_status = pexpect.run(
             c,
-            events={"(?i)password": sudo_password + "\r"},
+            events={"(?i)password": sudo_password + eol},
             withexitstatus=True)
         if exit_status != 0:
             raise RuntimeError(command_output.strip())
@@ -100,7 +101,7 @@ def main():
     for c in list_of_commands:
         command_output, exit_status = pexpect.run(
             c,
-            events={"(?i)password": sudo_password + "\r"},
+            events={"(?i)password": sudo_password + eol},
             withexitstatus=True)
         if exit_status != 0:
             raise RuntimeError(command_output.strip())
@@ -112,4 +113,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    raise RuntimeError("Run script {0} with lab_runner.py.\n" +
+                       "To run {0} independently, add main function with arguments.".format(sys.argv[0]))

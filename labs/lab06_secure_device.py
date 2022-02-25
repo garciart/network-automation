@@ -18,8 +18,6 @@ __license__ = "MIT"
 import sys
 import time
 
-import pexpect
-
 
 def run(child,
         device_hostname,
@@ -29,7 +27,8 @@ def run(child,
         console_password="",
         auxiliary_password="",
         enable_password="",
-        commit=True):
+        commit=True,
+        eol="\r"):
     print("Securing the network device...")
 
     # Listing of Cisco IOS prompts without a hostname
@@ -40,7 +39,7 @@ def run(child,
     # Move the pexpect cursor forward to the newest hostname prompt
     tracer_round = ";{0}".format(int(time.time()))
     # Add a carriage return here, not in the tracer_round, or you won't find the tracer_round later
-    child.sendline(tracer_round + "\r")
+    child.sendline(tracer_round + eol)
     child.expect_exact("{0}".format(tracer_round), timeout=1)
     # WATCH YOUR CURSORS! You must consume the prompt after the tracer round
     # or the pexepect cursor will stop at the wrong prompt
@@ -48,11 +47,11 @@ def run(child,
     #                       Not here -> R2#
     child.expect_exact(device_prompts[1], 1)
 
-    child.sendline("configure terminal\r")
+    child.sendline("configure terminal" + eol)
     child.expect_exact(device_prompts[2])
 
     # Secure the device with a username and an unencrypted password
-    child.sendline("username {0} password {1}\r".format(device_username, device_password))
+    child.sendline("username {0} password {1}".format(device_username, device_password) + eol)
     # If the device already is configured with a user secret, you may see:
     # ERROR: Can not have both a user password and a user secret.
     # Please choose one or the other.
@@ -60,75 +59,75 @@ def run(child,
     child.expect_exact(device_prompts[2])
 
     # Set virtual teletype lines to use device username and password
-    child.sendline("line vty 0 4\r")
+    child.sendline("line vty 0 4" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("login local\r")
+    child.sendline("login local" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("exit\r")
+    child.sendline("exit" + eol)
     child.expect_exact(device_prompts[2])
 
     # Secure console port connections
-    child.sendline("line console 0\r")
+    child.sendline("line console 0" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("password {0}\r".format(console_password))
+    child.sendline("password {0}".format(console_password) + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("login\r")
+    child.sendline("login" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("exit\r")
+    child.sendline("exit" + eol)
     child.expect_exact(device_prompts[2])
 
     # Secure auxiliary port connections
-    child.sendline("line aux 0\r")
+    child.sendline("line aux 0" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("password {0}\r".format(auxiliary_password))
+    child.sendline("password {0}".format(auxiliary_password) + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("login\r")
+    child.sendline("login" + eol)
     child.expect_exact(device_prompts[5])
-    child.sendline("exit\r")
+    child.sendline("exit" + eol)
     child.expect_exact(device_prompts[2])
 
     # Secure Privileged EXEC Mode
-    child.sendline("enable password {0}\r".format(enable_password))
+    child.sendline("enable password {0}".format(enable_password) + eol)
     # If the device already is configured with an enable secret, you may see:
     # The enable password you have chosen is the same as your enable secret.
     # This is not recommended.  Re-enter the enable password.
     # That is OK for this lab
     child.expect_exact(device_prompts[2])
     # Test security
-    child.sendline("end\r")
+    child.sendline("end" + eol)
     child.expect_exact(device_prompts[1])
-    child.sendline("disable\r")
+    child.sendline("disable" + eol)
     child.expect_exact(device_prompts[0])
-    child.sendline("enable\r")
+    child.sendline("enable" + eol)
     child.expect_exact("Password:")
-    child.sendline("{0}\r".format(enable_password))
+    child.sendline("{0}".format(enable_password) + eol)
     child.expect_exact(device_prompts[1])
-    child.sendline("configure terminal\r")
+    child.sendline("configure terminal" + eol)
     child.expect_exact(device_prompts[2])
 
     # Encrypt the Privileged EXEC Mode password
-    child.sendline("no enable password\r")
+    child.sendline("no enable password" + eol)
     child.expect_exact(device_prompts[2])
-    child.sendline("enable secret {0}\r".format(enable_password))
+    child.sendline("enable secret {0}".format(enable_password) + eol)
     child.expect_exact(device_prompts[2])
 
     # Encrypt the device's password
-    child.sendline("no username {0} password {1}\r".format(device_username, device_password))
+    child.sendline("no username {0} password {1}".format(device_username, device_password) + eol)
     child.expect_exact(device_prompts[2])
-    child.sendline("username {0} privilege {1} secret {2}\r".format(device_username, privilege, device_password))
+    child.sendline("username {0} privilege {1} secret {2}".format(device_username, privilege, device_password) + eol)
     child.expect_exact(device_prompts[2])
 
     # Encrypt the console and auxiliary port passwords
-    child.sendline("service password-encryption\r")
+    child.sendline("service password-encryption" + eol)
     child.expect_exact(device_prompts[2])
-    child.sendline("end\r")
+    child.sendline("end" + eol)
     child.expect_exact(device_prompts[1])
 
     # Save changes if True
     if commit:
-        child.sendline("write memory\r")
+        child.sendline("write memory" + eol)
         child.expect_exact(device_prompts[1])
-    print("Network device secured.\r")
+    print("Network device secured." + eol)
     return child
 
 

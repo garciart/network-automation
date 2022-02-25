@@ -584,7 +584,7 @@ Now, before we begin to code, you will perform a dry run by entering the command
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IP address.
 > 
->However, GNS3 simulates this connection through the server gateway and the Console port number. By the way, you will not be able to open a Secure Shell (SSH) connection using this method.
+>However, GNS3 simulates this connection through the server gateway and the Console port number, similar to a [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). By the way, you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 

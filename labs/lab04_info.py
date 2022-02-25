@@ -20,7 +20,7 @@ __author__ = "Rob Garcia"
 __license__ = "MIT"
 
 
-def run(child, device_hostname):
+def run(child, device_hostname, eol="\r"):
     # Listing of Cisco IOS prompts without a hostname
     cisco_prompts = [
         ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
@@ -29,7 +29,7 @@ def run(child, device_hostname):
     # Move the pexpect cursor forward to the newest hostname prompt
     tracer_round = ";{0}".format(int(time.time()))
     # Add a carriage return here, not in the tracer_round, or you won't find the tracer_round later
-    child.sendline(tracer_round + "\r")
+    child.sendline(tracer_round + eol)
     child.expect_exact("{0}".format(tracer_round), timeout=1)
     # WATCH YOUR CURSORS! You must consume the prompt after the tracer round
     # or the pexepect cursor will stop at the wrong prompt
@@ -39,7 +39,7 @@ def run(child, device_hostname):
     child.expect_exact(device_prompts[1], 1)
 
     print("Getting device information...")
-    child.sendline("show version | include [IOSios] [Ss]oftware\r")
+    child.sendline("show version | include [IOSios] [Ss]oftware" + eol)
     child.expect_exact(device_prompts[1])
 
     software_ver = str(child.before).split(
@@ -48,7 +48,7 @@ def run(child, device_hostname):
         raise RuntimeError("Cannot get the device's software version.")
     print("Software version: {0}".format(software_ver))
 
-    child.sendline("show inventory | include [Cc]hassis\r")
+    child.sendline("show inventory | include [Cc]hassis" + eol)
     child.expect_exact(device_prompts[1])
     # child.expect_exact(device_prompts[1])
     device_name = str(child.before).split(
@@ -57,7 +57,7 @@ def run(child, device_hostname):
         raise RuntimeError("Cannot get the device's name.")
     print("Device name: {0}".format(device_name))
 
-    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]\r")
+    child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]" + eol)
     child.expect_exact(device_prompts[1])
     # child.expect_exact(device_prompts[1])
     serial_num = str(child.before).split(
