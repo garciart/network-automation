@@ -49,7 +49,7 @@ def run(child, device_hostname, disk_name="flash", eol="\r"):
     child.sendline(eol)
     child.expect_exact("Continue? [confirm]")
     child.sendline(eol)
-    # Not all devices (e.g., 3745) ask for this
+    # Not all devices ask for this
     index = child.expect_exact(["Enter volume ID", pexpect.TIMEOUT, ], timeout=1)
     if index == 0:
         child.sendline(eol)
