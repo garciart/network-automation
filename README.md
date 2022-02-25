@@ -406,7 +406,7 @@ Here is the back of a Cisco 3745 Router:
  In between the power supply modules, from top to bottom, the 3745 has:
  
  - Three (3) WAN interface card (WIC) slots (uncovered in the image).
- - Built-in Modules (from right-to-left):
+ - Built-in Modules (from left-to-right):
      - A console port (labeled in light blue) and an auxiliary port (labeled in black). By the way, when you interact with the router directly in a GNS3 console, you are using a simulated connection to the Console port.
      - An optional CompactFlash (CF) memory card slot in the center, which can use 32, 64, and 128 MiB memory cards. This card will correspond to Personal Computer Memory Card International Association (PCMCIA) disk1, accessible as ```slot0:``` in the IOS; more about this later.
      - The **GT96100-FE Network Adapter**, with two (2) built-in FastEthernet interfaces (GT96100-FE), which correspond to FastEthernet 0/0 and 0/1 (labeled in yellow).
