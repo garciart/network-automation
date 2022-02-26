@@ -584,7 +584,7 @@ Now, before we begin to code, you will perform a dry run by entering the command
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IP address.
 > 
->However, GNS3 simulates this connection through the server gateway and the Console port number, similar to a [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). By the way, you will not be able to open a Secure Shell (SSH) connection using this method.
+>However, GNS3 simulates this connection through the server gateway and the Console port number, similar to a [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
@@ -605,7 +605,7 @@ Press RETURN to get started!
 *Mar  1 00:00:05.699: %LINEPROTO-5-UPDOWN: Line protocol on Interface FastEthernet0/1, changed state to down
 ```
 
-Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the Privileged EXEC mode prompt (```R1#```) will appear:
+Once the messages have stopped appearing, press <kbd>Enter</kbd> to access a prompt. In our case, the **Privileged EXEC mode** prompt (```R1#```) will appear:
 
 ```R1#```
 
@@ -660,7 +660,7 @@ Second, create a Telnet child process:
 
 ```>>> child = pexpect.spawn("telnet 192.168.1.1 5001")```
 
-Looking at previous boot-up messages, you may have noticed that the string, "Press RETURN to get started", always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
+If you look at previous boot-up messages, you will notice that the string, ```Press RETURN to get started```, always appears after reloading the device. Therefore, this is a good message to look for to make sure you are connected:
 
 ```>>> child.expect("Press RETURN to get started")```
 
@@ -668,9 +668,9 @@ After a few seconds, you will see the following output:
 
 ```0```
 
-0? What does that mean? The Pexpect expect class collects the output of the child during the spawn call. It takes lists of search strings and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and since you only have one search string, the index will be 0 (Pexpect will convert single strings to a list). If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
+```0```? What does that mean? Well, ```expect(...)``` collects the output of the child during the spawn call. It takes lists of search strings and scrapes the output for any text that matches the items in the list. If it finds a match, it returns the index of that match, and, since you only have one search string, the index will be 0 (BTW, Pexpect will convert single strings to a list). If it does not find a match within 30 seconds (the default setting), it will return a -1 and a TIMEOUT exception.
 
-Pexpect will begin the next search right after the last match. This prevents Pexpect from continuing to use the same match, over and over again. 
+Pexpect will move its "cursor" to the end of the last match and begin subsequent searches from that point. This prevents Pexpect from continuing to match the same string, over and over again. 
 
 Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (`\n`) to complete the CRLF sequence):
 
@@ -680,15 +680,21 @@ After a few seconds, you will see the following output:
 
 ```2```
 
-The return value states that two characters were successfully sent to the child: '\r' and'\n'. That is good, and when we look for our search string of ```R1#``` in the output, we should expect to find the default Privilege EXEC Mode prompt:
+The return value states that two characters were successfully sent to the child: ```'\r'``` and ```'\n'```. That is good, and when we look for our search string of ```R1#``` in the output, we should expect to find the default **Privilege EXEC Mode** prompt:
 
-```>>> child.expect("R1#")0```
+```
+>>> child.expect("R1#")
+0
+```
 
->**NOTE** - Always try to match each send with an expect. If you do not, Pexpect may look for the search string in the wrong place.
+>**NOTE** - Always try to match a ```send``` with an ```expect```. If you do not, Pexpect may look for the search string in the wrong place.
 
-Next, as you did earlier, get the device's hardware and software information. Send the command ```show version``` (14 characters, including the newline, will be sent):
+Next, as you did earlier, get the device's hardware and software information. Send the command ```show version```; 14 characters, including the newline, will be sent:
 
-```>>> child.sendline("show version\r")14```
+```
+>>> child.sendline("show version\r")
+14
+```
 
 The ```show version``` command produces too much output for one Telnet screen, so it pauses the output midway with a ```--More--``` prompt, so you can examine the first part before proceeding to the second. Therefore, this time, you will expect several responses and capture the index of the response:
 
@@ -709,7 +715,7 @@ As expected, Pexpect expect found ```--More--``` (index == 1), instead of ```R1#
 0
 ```
 
-The first return value is how many characters were sent (i.e., ' ' and '\n'). The second return value states that the ```R1#``` prompt was found, as expected.
+The first return value is how many characters were sent (i.e., ```' '``` and ```'\n'```). The second return value states that the ```R1#``` prompt was found, as expected.
 
 >**NOTE** - In real life, you would not use this code. It will work, because you know there will only be one ```--More--``` prompt, but you should use a **while** statement instead, in case there are more ```--More--``` prompts.
 
@@ -796,7 +802,7 @@ The Pexpect error message has a lot of good info. Here is an explanation of some
 - **Line 21: match:** The search string that was matched; in this case it was ```None```.
 - **Line 22: match_index:** The index of the search item found; in this case it was ```None```.
 
-By the way, Pexpect generates this message for all expect calls, so you can look through it to make sure your code is working, even when there is not an error.
+By the way, Pexpect generates this message for all ```expect``` calls, so you can look through it to make sure your code is working, even when there is not an error.
 
 Cause the error again, but this time, expect the timeout:
 
@@ -813,7 +819,7 @@ After a few seconds, you will see the following output:
 
 ```Search string not found.```
 
-This time, you handled the error, displayed a custom message instead of the debug information. You can exit Telnet and the Python interpreter now, by entering the following commands:
+This time, you handled the error, displayed a custom message instead of the debug information. You can close the Telnet child and exit the Python interpreter now, by entering the following commands:
 
 ```
 >>> child.close()
@@ -984,7 +990,7 @@ enp0s3
 enp0s8
 Enter an ethernet interface for GNS3 to use: enp0s8
 Good to go!
-[sudo] password for gns3user: 
+[sudo] password for gns3user: ********
 
 Network interface configuration:
 3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master br0 state UP group default qlen 1000
