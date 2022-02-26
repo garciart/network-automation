@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Lab 6: Secure a network device
+"""Lab 7: Set a network device's clock
 
 Project: Automation
 
