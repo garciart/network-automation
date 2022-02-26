@@ -12,7 +12,10 @@ Requirements:
 from __future__ import print_function
 
 import sys
+import time
 import traceback
+from datetime import datetime
+from getpass import getpass
 
 import pexpect
 
@@ -22,6 +25,8 @@ import labs.lab03_format
 import labs.lab04_info
 import labs.lab05_enable_layer3
 import labs.lab06_secure_device
+import labs.lab07_clock
+from labs.utility import enable_ntp
 
 # Module metadata dunders
 __author__ = "Rob Garcia"
@@ -40,12 +45,18 @@ def main():
     child = None
     try:
         print("Lab 1: Connect to an unconfigured device through the Console port")
-        device_hostname = "R2"
+        device_hostname = "R1"
         gateway_ip_addr = "192.168.1.1"
-        device_console_port = 5002
-        device_ip_addr = "192.168.1.30"
+        device_console_port = 5001
+        device_ip_addr = "192.168.1.20"
         device_netmask = "255.255.255.0"
-        disk_name = "disk0"
+        disk_name = "flash"
+        host_ip_addr = "192.168.1.10"
+        # Listing of Cisco IOS prompts without a hostname
+        cisco_prompts = [
+            ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
+        # Prepend the hostname to the standard Cisco prompt endings
+        device_prompts = ["{0}{1}".format(device_hostname, p) for p in cisco_prompts]
         # Include a console port password in case the device is secured.
         # The default console port password for the labs is "ciscon"
         console_password = "ciscon"
@@ -61,14 +72,14 @@ def main():
 
         # Part 2: Test switching between User EXEC mode and Privileged EXEC Mode
         child.sendline("disable" + eol)
-        child.expect_exact(device_hostname + ">")
+        child.expect_exact(device_prompts[0])
         labs.lab02_exec_mode.run(child, device_hostname, enable_password)
 
         # Part 2: Test switching between Global Configuration modes and Privileged EXEC Mode
         child.sendline("configure terminal" + eol)
-        child.expect_exact(device_hostname + "(config)#")
+        child.expect_exact(device_prompts[2])
         child.sendline("interface FastEthernet0/0" + eol)
-        child.expect_exact(device_hostname + "(config-if)#")
+        child.expect_exact(device_prompts[3])
         labs.lab02_exec_mode.run(child, device_hostname, enable_password)
 
         print("Lab 3: Format a network device's memory")
@@ -79,7 +90,7 @@ def main():
         print("Lab 4: Get information about a network device")
         labs.lab04_info.run(child, device_hostname)
 
-        print("Lab 5: Enable Layer 3 communications")
+        print("Lab 5: Enable Layer 3 communications to and from a network device")
         # Part 1: Enable Layer 3 communications
         labs.lab05_enable_layer3.run(child, device_hostname, device_ip_addr, new_netmask=device_netmask, commit=True)
         # Part 2: Ping the host from the device
@@ -88,15 +99,15 @@ def main():
         labs.lab05_enable_layer3.ping_device(device_ip_addr)
 
         print("Lab 6: Secure a network device")
-        child = labs.lab06_secure_device.run(child,
-                                             device_hostname,
-                                             device_username="admin",
-                                             device_password="cisco",
-                                             privilege=15,
-                                             console_password="ciscon",
-                                             auxiliary_password="cisaux",
-                                             enable_password="cisen",
-                                             commit=True)
+        labs.lab06_secure_device.run(child,
+                                     device_hostname,
+                                     device_username="admin",
+                                     device_password="cisco",
+                                     privilege=15,
+                                     console_password="ciscon",
+                                     auxiliary_password="cisaux",
+                                     enable_password="cisen",
+                                     commit=True)
 
         # Telnet to the new IP address and repeat Labs 1, 3, 4, and part of 5
         labs.lab01_telnet.disconnect(child)
@@ -107,9 +118,24 @@ def main():
         labs.lab02_exec_mode.run(child, device_hostname, enable_password, eol="")
         labs.lab04_info.run(child, device_hostname, eol="")
         # Ping the host from the device
-        labs.lab05_enable_layer3.ping_from_device(child, "192.168.1.10", eol="")
+        labs.lab05_enable_layer3.ping_from_device(child, host_ip_addr, eol="")
         # Ping the device from the host
         labs.lab05_enable_layer3.ping_device(device_ip_addr)
+
+        print("Lab 7: Set a network device's clock")
+        sudo_password = getpass("Enter the sudo password: ")
+        enable_ntp(sudo_password)
+        child.sendline("show clock")
+        child.expect_exact(device_prompts[1])
+        now = datetime.now()
+        labs.lab07_clock.set_clock(child, device_hostname, now.strftime("%H:%M:%S %b %-d %Y"), eol="")
+        child.sendline("show clock")
+        child.expect_exact(device_prompts[1])
+        labs.lab07_clock.synch_clock(child, device_hostname, sudo_password, host_ip_addr, eol="")
+        child.sendline("show ntp status")
+        child.expect_exact(device_prompts[1])
+        child.sendline("show clock")
+        child.expect_exact(device_prompts[1])
 
     except (pexpect.ExceptionPexpect, ValueError, RuntimeError, OSError,):
         # Unpack sys.exc_info() to get error information

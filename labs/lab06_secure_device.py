@@ -128,7 +128,6 @@ def run(child,
         child.sendline("write memory" + eol)
         child.expect_exact(device_prompts[1])
     print("Network device secured." + eol)
-    return child
 
 
 if __name__ == "__main__":
