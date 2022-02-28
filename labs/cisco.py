@@ -29,8 +29,10 @@ from labs import utility
 logging.Formatter.converter = time.gmtime
 logging.basicConfig(level=logging.NOTSET,
                     filemode="w",
-                    # For production, use "/var/log/utility.log"
-                    filename="{0}/utility.log".format(os.getcwd()),
+                    # For development, use "/var/log/cisco.log"
+                    # For production, use datetime.utcnow().strftime("%Y%m%d_%H%M%SZ")
+                    filename="{0}/cisco-{1}.log".format(
+                        os.getcwd(), datetime.utcnow().strftime("%Y%m%d_%H%M%SZ")),
                     format="%(asctime)sUTC: %(levelname)s:%(name)s:%(message)s")
 
 # ANSI Color Constants
@@ -40,46 +42,36 @@ GRN = "\x1b[32m"
 YLW = "\x1b[33m"
 
 
-class Cisco:
+class Cisco(object):
     _cisco_prompts = [
         ">", "#", "(config)#", "(config-if)#", "(config-router)#", "(config-line)#", ]
 
     _device_hostname = None
-    _device_ip_address = None
-    _telnet_port = None
+    _device_prompts = None
+    _device_ip_addr = None
+    _port_number = None
     _vty_username = None
     _vty_password = None
     _console_password = None
     _aux_password = None
     _enable_password = None
-    _sudo_password = None
 
-    # End-of-line (EOL) issue: Depending on the physical port you use (Console, VTY, etc.),
-    # AND the port number you use (23, 5001, etc.), Cisco may require a carriage return ("\r")
-    # when using pexpect.sendline. Also, each terminal emulator may have different EOL
-    # settings. One solution is to edit the terminal emulator's runtime configuration file
-    # (telnetrc, minirc, etc) before running this script, then setting or unsetting the
-    # telnet transparent setting on the device, but you would have to do this every time.
-    # My solution is to send a line and wait for a TIMEOUT. If the command goes through
-    # without timing-out, I do not do anything.
-    # If I receive a TIMEOUT, I send a CR (which pushes my input through), and I then append
-    # a CR to all the rest of my commands.
     _eol = ""
 
     def __init__(self, device_hostname,
-                 device_ip_address,
-                 telnet_port=23,
+                 device_ip_addr=None,
+                 port_number=23,
                  vty_username=None,
                  vty_password=None,
                  console_password=None,
                  aux_password=None,
                  enable_password=None,
-                 sudo_password=None):
+                 eol="\r"):
         """Class instantiation
 
         :param str device_hostname: The hostname of the device (req).
-        :param str device_ip_address: The device's IP address (req).
-        :param int telnet_port: The port number for Telnet connections.
+        :param str device_ip_addr: The device's IP address (req).
+        :param int port_number: The port number for the connections.
         :param str vty_username: Username for login local setting.
         :param str vty_password: Password when logging in remotely.
         :param str console_password: Password when logging in using the console port.
@@ -92,241 +84,125 @@ class Cisco:
             raise ValueError("Device hostname required.")
         else:
             self._device_hostname = device_hostname
-        # Add the hostname to the standard Cisco prompt endings
-        self._cisco_prompts = [
-            "{0}{1}".format(self._device_hostname, p) for p in self._cisco_prompts]
+        # Prepend the hostname to the standard Cisco prompt endings
+        self._device_prompts = ["{0}{1}".format(device_hostname, p) for p in self._cisco_prompts]
         # The following commands will raise exceptions if invalid
-        utility.validate_ip_address(device_ip_address)
-        self._device_ip_address = device_ip_address
-        utility.validate_port_number(telnet_port)
-        self._telnet_port = telnet_port
+        if device_ip_addr:
+            utility.validate_ip_address(device_ip_addr)
+        self._device_ip_addr = device_ip_addr
+        if port_number:
+            utility.validate_port_number(port_number)
+        self._port_number = port_number
         self._vty_username = vty_username
         self._vty_password = vty_password
         self._console_password = console_password
         self._aux_password = aux_password
         self._enable_password = enable_password
-        self._sudo_password = sudo_password if sudo_password is not None else getpass(
-            "Enter sudo password: ")
+        self._eol = eol
 
-    def connect_via_telnet(self, verbose=False):
-        """Connect to the device via Telnet.
+    def connect_via_telnet(self, device_ip_addr=_device_ip_addr, port_number=_port_number):
+        utility.validate_ip_address(device_ip_addr)
+        utility.validate_port_number(port_number)
+        print("Checking Telnet client is installed...")
+        _, exitstatus = pexpect.run("which telnet", withexitstatus=True)
+        if exitstatus != 0:
+            raise RuntimeError("Telnet client is not installed.")
+        print("Telnet client is installed.")
+        print("Connecting to {0} on port {1} via Telnet...".format(device_ip_addr, port_number))
+        child = pexpect.spawn("telnet {0} {1}".format(device_ip_addr, port_number))
+        # Accept changes (e.g., delay, logfile, etc.) to child object
+        child = self.clear_startup_msgs(child)
+        print("Connected to {0} on port {1} via Telnet.".format(device_ip_addr, port_number))
+        return child
 
-        :return: The connection in a child application object.
-        :rtype: pexpect.spawn
-        """
-        print(YLW + "Connecting to device using Telnet...\n" + CLR)
-        # Allow only one login attempt
-        login_attempted = False
-        # Open Telnet port
-        utility.open_telnet_port(self._sudo_password)
-        # Spawn the child and change default settings
-        child = pexpect.spawn("telnet {0} {1}".format(self._device_ip_address, self._telnet_port))
+    def connect_via_serial(self,
+                           serial_device="ttyS0",
+                           baud_rate=9600,
+                           data_bits=8,
+                           parity="n",
+                           stop_bit=1,
+                           flow_control="N"):
+        child = None
+        print("Checking if a terminal emulator is installed...")
+        _, exitstatus = pexpect.run("which putty", withexitstatus=True)
+        if exitstatus != 0:
+            _, exitstatus = pexpect.run("which minicom", withexitstatus=True)
+            if exitstatus != 0:
+                raise RuntimeError("A terminal emulator is not installed.")
+            else:
+                print("minicom client is installed.")
+                # Format: minicom --device /dev/tty0 -baudrate 9600 --8bit
+                mode = "--8bit" if data_bits == 8 else "--7bit"
+                cmd = "minicom --device {0} --baudrate {1} {2}".format(
+                    serial_device, baud_rate, mode)
+        else:
+            print("PuTTY is installed.")
+            # Format: putty -serial /dev/tty0 -sercfg 9600,8,n,1,N
+            cmd = "putty -serial {0} -sercfg {1},{2},{3},{4},{5}".format(
+                serial_device, baud_rate, data_bits, parity, stop_bit, flow_control)
+        print(cmd)
+        child = pexpect.spawn(cmd)
+        # Accept changes (e.g., delay, logfile, etc.) to child object
+        child = self.clear_startup_msgs(child)
+        return child
+
+    def clear_startup_msgs(self, child, username=_vty_username, password=_vty_password):
         # Slow down commands to prevent race conditions with output
         child.delaybeforesend = 0.5
         # Echo both input and output to the screen
-        if verbose:
-            child.logfile = sys.stdout
-        else:
-            fout = open("cisco-{0}".format(datetime.utcnow().strftime("%y%m%d%H%M%SZ")), "wb")
-            child.logfile = fout
-        # Ensure you are not accessing an active session
-        try:
-            child.expect_exact(self._cisco_prompts, timeout=10)
-            # If this is a new session, you will not find a prompt. If a prompt is found,
-            # print the warning and reload; otherwise, catch the TIMEOUT and proceed.
-            print(RED +
-                  "You may be accessing an open or uncleared virtual teletype session.\n" +
-                  "Output from previous commands may cause pexpect expect calls to fail.\n" +
-                  "To prevent this, we are reloading this device to clear any artifacts.\n" +
-                  "Reloading now...\n" + CLR)
-            # Send command with a carriage return, regardless of the correct EOL
-            child.sendline("reload\r")
-            child.expect_exact(["Proceed with reload? [confirm]", pexpect.TIMEOUT, ], timeout=5)
-            child.sendline("\r")
-            raise RuntimeError("Device reloaded for security. Run this script again.")
-        except pexpect.TIMEOUT:
+        child.logfile_read = sys.stdout
 
-            def check_and_warn():
-                if login_attempted is True:
-                    raise RuntimeError("Invalid credentials provided.")
-                print(YLW + "Warning - This device has already been configured and secured.\n" +
+        # noinspection PyTypeChecker
+        index = child.expect_exact([pexpect.TIMEOUT, ] + self._device_prompts, 1)
+        if index != 0:
+            # If you find a hostname prompt (e.g., R1#) before any other prompt,
+            # you are accessing an open line
+            print("\x1b[31;1mYou may be accessing an open or uncleared virtual teletype " +
+                  "session.\nOutput from previous commands may cause pexpect searches to fail.\n" +
+                  "To prevent this in the future, reload the device to clear any artifacts.\x1b[0m")
+            # Move the pexpect cursor forward to the newest hostname prompt
+            tracer_round = ";{0}".format(int(time.time()))
+            # Add the carriage return here, not in the tracer_round.
+            # Otherwise, you won't find the tracer_round later
+            child.sendline(tracer_round + self._eol)
+            child.expect_exact("{0}".format(tracer_round), timeout=1)
+        # Always try to find hostname prompts before anything else
+        index_offset = len(self._device_prompts)
+        while True:
+            index = child.expect_exact(
+                self._device_prompts +
+                ["Login invalid",
+                 "Bad passwords",
+                 "Username:",
+                 "Password:",
+                 "Would you like to enter the initial configuration dialog? [yes/no]:",
+                 "Would you like to terminate autoinstall? [yes/no]:",
+                 "Press RETURN to get started", ], timeout=60)
+            if index < index_offset:
+                break
+            elif index in (index_offset + 0, index_offset + 1):
+                raise RuntimeError("Invalid credentials provided.")
+            elif index in (index_offset + 2, index_offset + 3):
+                print("\x1b[31;1mWarning - This device has already been configured and secured.\n" +
                       "Changes made by this script may be incompatible with the current " +
-                      "configuration.\n" + CLR)
-
-            # Clear initial questions until a prompt is reached
-            # Use an initial timeout is 30 seconds. After you determine the EOL, set to 1 second
-            timeout = 30
-            while True:
-                index = child.expect_exact(
-                    ["Press RETURN to get started",
-                     "Would you like to terminate autoinstall? [yes/no]:",
-                     "Would you like to enter the initial configuration dialog? [yes/no]:",
-                     "Username:", "Password:", pexpect.TIMEOUT, ] + self._cisco_prompts,
-                    timeout=timeout)
-                if index == 0:
-                    child.sendline(self._eol)
-                elif index == 1:
-                    child.sendline("yes" + self._eol)
-                elif index == 2:
-                    child.sendline("no" + self._eol)
-                elif index == 3:
-                    check_and_warn()
-                    if self._vty_username is None:
-                        self._vty_username = raw_input("Username: ")
-                    child.sendline(self._vty_username + self._eol)
-                elif index == 4:
-                    # Not all connections require a username
-                    check_and_warn()
-
-                    # TODO: Fix this for console, aux, and vty password
-                    if self._vty_password is None:
-                        self._vty_password = getpass()
-                    child.sendline(self._vty_password + self._eol)
-
-                    login_attempted = True
-                elif index == 5:
-                    if self._eol == "":
-                        self._eol = "\r"
-                        timeout = 1
-                        child.sendline(self._eol)
-                    else:
-                        # Tested: The loop will TIMEOUT, not EOF, if no connection found,
-                        # and end up here.
-                        child.close()
-                        utility.close_telnet_port(self._sudo_password)
-                        raise RuntimeError("Cannot determine EOL setting.")
-                else:
-                    # Prompt found; continue script
-                    break
-        print(GRN + "Connected to device using Telnet.\n" + CLR)
+                      "configuration.\x1b[0m")
+                if index == index_offset + 2:
+                    # child.sendline(
+                    #     (username if username is not None else raw_input("Username: ")) + eol)
+                    child.sendline(username)
+                    child.expect_exact("Password:")
+                    # child.sendline(
+                    #       (password if password is not None else getpass(
+                    #       "Enter password: ")) + eol)
+                child.sendline(password + self._eol)
+            elif index == index_offset + 4:
+                child.sendline("no" + self._eol)
+            elif index == index_offset + 5:
+                child.sendline("yes" + self._eol)
+            elif index == index_offset + 6:
+                child.sendline(self._eol)
         return child
-
-    def enable_privileged_exec_mode(self, child):
-        """Enable Privileged EXEC Mode (R1#) from User EXEC mode (R1>).
-
-        **Note** - A reloaded device's prompt  will be either R1> (User EXEC mode) or
-        R1# (Privileged EXEC Mode). Just in case the device boots into User EXEC mode,
-        enable Privileged EXEC ModeThe enable command will not affect anything if the device
-        is already in Privileged EXEC Mode.
-
-        :param pexpect.spawn child: The connection in a child application object.
-        :return: None
-        :rtype: None
-        """
-        print(YLW + "Enabling Privileged EXEC Mode...\n" + CLR)
-        # Add hostname to standard Cisco prompt endings
-
-        child.sendline("disable" + self._eol)
-        child.expect_exact(self._cisco_prompts[0])
-
-        child.sendline("enable" + self._eol)
-        index = child.expect_exact(["Password:", self._cisco_prompts[1], ])
-        if index == 0:
-            if self._enable_password is None:
-                getpass("Enter enable password: ")
-            child.sendline(self._enable_password + self._eol)
-            child.expect_exact(self._cisco_prompts[1])
-        print(GRN + "Privileged EXEC Mode enabled.\n" + CLR)
-
-    def format_flash_memory(self, child):
-        """Format the flash memory. Look for the final characters of the following strings:
-
-        - "Format operation may take a while. Continue? [confirm]"
-        - "Format operation will destroy all data in "flash:".  Continue? [confirm]"
-        - "66875392 bytes available (0 bytes used)"
-
-        :param pexpect.spawn child: The connection in a child application object.
-        :return: None
-        :rtype: None
-        """
-        print(YLW + "Formatting flash memory...\n" + CLR)
-        child.sendline("format flash:" + self._eol)
-        child.expect_exact("Continue? [confirm]")
-        child.sendline(self._eol)
-        child.expect_exact("Continue? [confirm]")
-        child.sendline(self._eol)
-        child.expect_exact("Format of flash complete", timeout=120)
-        child.sendline("show flash" + self._eol)
-        child.expect_exact("(0 bytes used)")
-        child.expect_exact(self._cisco_prompts[1])
-        print(GRN + "Flash memory formatted.\n" + CLR)
-
-    def get_device_information(self, child):
-        """Get the device's flash memory. This will only work after a reload.
-
-        :param pexpect.spawn child: The connection in a child application object.
-        :returns: The device's Internetwork Operating System (IOS) version, model number,
-          and serial number.
-        :rtype: tuple
-        """
-        print(YLW + "Getting device information...\n" + CLR)
-        child.sendline("show version | include [IOSios] [Ss]oftware" + self._eol)
-        child.expect_exact(self._cisco_prompts[1])
-
-        software_ver = str(child.before).split(
-            "show version | include [IOSios] [Ss]oftware\r")[1].split("\r")[0].strip()
-        if not re.compile(r"[IOSios] [Ss]oftware").search(software_ver):
-            raise RuntimeError("Cannot get the device's software version.")
-        print(GRN + "Software version: {0}".format(software_ver) + CLR)
-
-        child.sendline("show inventory | include [Cc]hassis" + self._eol)
-        child.expect_exact(self._cisco_prompts[1])
-
-        device_name = str(child.before).split(
-            "show inventory | include [Cc]hassis\r")[1].split("\r")[0].strip()
-        if not re.compile(r"[Cc]hassis").search(device_name):
-            raise RuntimeError("Cannot get the device's name.")
-        print(GRN + "Device name: {0}".format(device_name) + CLR)
-
-        child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]" + self._eol)
-        child.expect_exact(self._cisco_prompts[1])
-
-        serial_num = str(child.before).split(
-            "show version | include [Pp]rocessor [Bb]oard [IDid]\r")[1].split("\r")[0].strip()
-        if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(serial_num):
-            raise RuntimeError("Cannot get the device's serial number.")
-        print(GRN + "Serial number: {0}".format(serial_num) + CLR)
-        return software_ver, device_name, serial_num
-
-    def enable_l3_communications(self, child):
-        """Enable Layer 3 communications to and from a network device.
-
-        :param pexpect.spawn child: The connection in a child application object.
-        :return: None
-        :rtype: None
-        """
-        print(YLW + "Enabling Layer 3 communications...\n" + CLR)
-        child.sendline("configure terminal" + self._eol)
-        child.expect_exact(self._cisco_prompts[2])
-        child.sendline("interface FastEthernet0/0" + self._eol)
-        child.expect_exact(self._cisco_prompts[3])
-        child.sendline("ip address 192.168.1.20 255.255.255.0" + self._eol)
-        child.expect_exact(self._cisco_prompts[3])
-        child.sendline("no shutdown" + self._eol)
-        child.expect_exact(self._cisco_prompts[3])
-        child.sendline("end" + self._eol)
-        child.expect_exact(self._cisco_prompts[1])
-        child.sendline("end" + self._eol)
-        child.expect_exact(self._cisco_prompts[1])
-        print(GRN + "Layer 3 communications enabled.\n" + CLR)
-
-    def close_telnet_connection(self, child):
-        """Close the Telnet client
-
-        :param pexpect.spawn child: The connection in a child application object.
-        :return: None
-        :rtype: None
-        """
-        print(YLW + "Closing Telnet connection...\n" + CLR)
-        child.sendcontrol("]")
-        child.sendline("q" + self._eol)
-        index = child.expect_exact(["Connection closed.", pexpect.EOF, ])
-        # Close the Telnet child process
-        child.close()
-        utility.close_telnet_port(self._sudo_password)
-        print(GRN + "Telnet connection closed: {0}\n".format(index) + CLR)
 
 
 if __name__ == "__main__":
-    print(RED + "ERROR: Script {0} cannot be run independently.".format(
-        os.path.basename(sys.argv[0])) + CLR)
+    print("ERROR: Script {0} cannot be run independently.".format(os.path.basename(sys.argv[0])))

@@ -27,7 +27,6 @@ def connect(device_hostname, device_ip_addr, port_number=23, username="", passwo
     if exitstatus != 0:
         raise RuntimeError("Telnet client is not installed.")
     print("Telnet client is installed.")
-
     print("Connecting to {0} on port {1} via Telnet...".format(device_ip_addr, port_number))
     child = pexpect.spawn("telnet {0} {1}".format(device_ip_addr, port_number))
     # Slow down commands to prevent race conditions with output

@@ -45,12 +45,12 @@ def main():
     child = None
     try:
         print("Lab 1: Connect to an unconfigured device through the Console port")
-        device_hostname = "R1"
+        device_hostname = "R2"
         gateway_ip_addr = "192.168.1.1"
-        device_console_port = 5001
-        device_ip_addr = "192.168.1.20"
+        device_console_port = 5002
+        device_ip_addr = "192.168.1.30"
         device_netmask = "255.255.255.0"
-        disk_name = "flash"
+        disk_name = "disk0"
         host_ip_addr = "192.168.1.10"
         # Listing of Cisco IOS prompts without a hostname
         cisco_prompts = [
@@ -94,11 +94,22 @@ def main():
         # Part 1: Enable Layer 3 communications
         labs.lab05_enable_layer3.run(child, device_hostname, device_ip_addr, new_netmask=device_netmask, commit=True)
         # Part 2: Ping the host from the device
-        labs.lab05_enable_layer3.ping_from_device(child, device_ip_addr)
+        labs.lab05_enable_layer3.ping_from_device(child, host_ip_addr)
         # Part 3: Ping the device from the host
         labs.lab05_enable_layer3.ping_device(device_ip_addr)
+        # Part 4: Attempt to connect via Telnet over Ethernet without first setting a password
+        labs.lab01_telnet.disconnect(child)
+        child.close()
+        try:
+            print("Attempt to connect via Telnet over Ethernet without first setting a password...")
+            child = labs.lab01_telnet.connect(device_hostname, device_ip_addr)
+        except pexpect.EOF:
+            # EOF errors implicitly close the child; no need to close it explicitly
+            print("Attempt to connect failed as expected.")
 
         print("Lab 6: Secure a network device")
+        child = labs.lab01_telnet.connect(
+            device_hostname, gateway_ip_addr, device_console_port, password=console_password)
         labs.lab06_secure_device.run(child,
                                      device_hostname,
                                      device_username="admin",
