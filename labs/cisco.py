@@ -418,20 +418,20 @@ class Cisco(object):
         if commit:
             child.sendline("write memory" + eol)
             child.expect_exact(self._device_prompts[1])
-        print("Network device secured." + eol)
+        print("Network device secured.")
 
     def set_clock(self, child, time_to_set="12:00:00 Jan 1 2021", eol=_eol):
         self.access_priv_exec_mode(child)
 
-        print("Setting the network device's clock." + eol)
+        print("Setting the network device's clock.")
         child.sendline("clock set {0}".format(time_to_set) + eol)
         child.expect_exact(self._device_prompts[1])
-        print("Network device clock set." + eol)
+        print("Network device clock set.")
 
     def synch_clock(self, child, ntp_server_ip, commit=True, eol=_eol):
         self.access_priv_exec_mode(child)
 
-        print("Synchronizing the network device's clock." + eol)
+        print("Synchronizing the network device's clock.")
         child.sendline("configure terminal" + eol)
         child.expect_exact(self._device_prompts[2])
         child.sendline("ntp server {0}".format(ntp_server_ip) + eol)
@@ -444,7 +444,13 @@ class Cisco(object):
             child.expect_exact(self._device_prompts[1])
         print("Waiting 60 seconds for the NTP server to synchronize...")
         time.sleep(60)
-        print("Network device clock synchronized." + eol)
+        print("Network device clock synchronized.")
+
+    def set_device_hostname(self, child):
+        self.access_priv_exec_mode(child)
+
+        print("Changing the device's hostname...")
+        print("Device's hostname changed.")
 
     def _set_pexpect_cursor(self, child, eol=_eol):
         # Move the pexpect cursor forward to the newest hostname prompt
