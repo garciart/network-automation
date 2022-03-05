@@ -161,31 +161,15 @@ class Cisco(object):
                            password=None,
                            eol=None,
                            verbose=True):
-        print("Checking if a terminal emulator is installed...")
-        _, exitstatus = pexpect.run("which putty", withexitstatus=True)
+        print("Checking if Minicom is installed...")
+        _, exitstatus = pexpect.run("which minicom", withexitstatus=True)
         if exitstatus != 0:
-            raise RuntimeError("PuTTY is not installed.")
-        # Format: putty -serial /dev/tty0 -sercfg 9600,8,n,1,N
-        cmd = "putty -serial {0} -sercfg {1},{2},{3},{4},{5}".format(
-            serial_device, baud_rate, data_bits, parity, stop_bit, flow_control)
-
-        """
-        if exitstatus != 0:
-            print("PuTTY is installed.")
-            # Format: putty -serial /dev/tty0 -sercfg 9600,8,n,1,N
-            cmd = "putty -serial {0} -sercfg {1},{2},{3},{4},{5}".format(
-                serial_device, baud_rate, data_bits, parity, stop_bit, flow_control)
-        else:
-            _, exitstatus = pexpect.run("which minicom", withexitstatus=True)
-            if exitstatus != 0:
-                raise RuntimeError("A terminal emulator is not installed.")
-            print("minicom client is installed.")
-            # Format: minicom --device /dev/tty0 -baudrate 9600 --8bit
-            mode = "--8bit" if data_bits == 8 else "--7bit"
-            cmd = "minicom --device {0} --baudrate {1} {2}".format(
-                serial_device, baud_rate, mode)
-        """
-
+            raise RuntimeError("Minicom is not installed.")
+        print("Minicom is installed.")
+        # Format: minicom --device /dev/ttyS0 --baudrate 9600 --8bit --noinit
+        mode = "--8bit" if data_bits == 8 else "--7bit"
+        cmd = "minicom --device {0} --baudrate {1} {2} --noinit".format(
+            serial_device, baud_rate, mode)
         print("Connecting to device via {0}...".format(serial_device))
         child = pexpect.spawn(cmd)
         # Slow down commands to prevent race conditions with output
@@ -227,8 +211,7 @@ class Cisco(object):
                   "To prevent this in the future, reload the device to clear any artifacts.\x1b[0m")
             self._set_pexpect_cursor(child)
             return
-        # If no hostname prompt is found, cycle through the startup prompts
-        # until they are cleared
+        # If no hostname prompt is found, cycle through the startup prompts until they are cleared
         index = 0
         while 0 <= index <= 7:
             index = child.expect_exact(
@@ -239,7 +222,7 @@ class Cisco(object):
                  "Would you like to enter the initial configuration dialog? [yes/no]:",
                  "Would you like to terminate autoinstall? [yes/no]:",
                  "Press RETURN to get started",
-                 "Escape character is"] + self._device_prompts, timeout=60)
+                 "Escape character is", ] + self._device_prompts, timeout=60)
             if index in (0, 1):
                 raise RuntimeError("Invalid credentials provided.")
             elif index == 2:
