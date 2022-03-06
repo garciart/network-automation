@@ -3,6 +3,7 @@
 
 Developer notes:
 - Protected and private methods (i.e., start with underscores) can be used with multiple devices
+- Golden Rule - Start methods that use pexpect with a 'sendline' and finish with an 'expect'
 
 """
 import os
@@ -48,7 +49,7 @@ class CiscoDevice(object):
         :param str device_ip_addr: The device's IP address.
         :param int port_number: The port number for the connections.
         :param bool verbose: True (default) to echo both input and output to the screen,
-            or false to save output to a time-stamped file
+            or false to save output to a time-stamped file.
         :param str eol: The EOL sequence (LF or CLRF) used by the connection (See comments below).
         :param str username: The username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
@@ -92,7 +93,7 @@ class CiscoDevice(object):
         # The device may require a carriage return ("\r") before the line feed to create a CRLF
         # (i.e., pexpect.sendline("text\r")).
         # Therefore, the user must designate an EOL, based on the connection,
-        # which this class will append to each sendline.
+        # which will be appended to each sendline.
         self._eol = eol
 
         # Get to Privileged EXEC Mode
@@ -124,7 +125,7 @@ class CiscoDevice(object):
         # However, if the first thing you find is a hostname prompt, you are accessing
         # an open line. Warn the user, but return control back to the calling method
         # noinspection PyTypeChecker
-        index = child.expect_exact([pexpect.TIMEOUT, ] + self._device_prompts, 1)
+        index = child.expect_exact([pexpect.TIMEOUT, ] + self._device_prompts, timeout=5)
         if index != 0:
             print("\x1b[31;1mYou may be accessing an open or uncleared virtual teletype " +
                   "session.\nOutput from previous commands may cause pexpect searches to fail.\n" +
@@ -181,18 +182,18 @@ class CiscoDevice(object):
         print("Accessing Privileged EXEC Mode...")
         self.__set_pexpect_cursor(child)
         child.sendline(self._eol)
-        index = child.expect_exact(self._device_prompts, 1)
+        index = child.expect_exact(self._device_prompts)
         if index == 0:
             # Get out of User EXEC Mode
             child.sendline("enable" + self._eol)
-            index = child.expect_exact(["Password:", self._device_prompts[1], ], 1)
+            index = child.expect_exact(["Password:", self._device_prompts[1], ])
             if index == 0:
                 child.sendline(enable_password + self._eol)
-                child.expect_exact(self._device_prompts[1], 1)
+                child.expect_exact(self._device_prompts[1])
         elif index != 1:
             # Get out of Global Configuration Mode
             child.sendline("end" + self._eol)
-            child.expect_exact(self._device_prompts[1], 1)
+            child.expect_exact(self._device_prompts[1])
         print("Privileged EXEC Mode accessed.")
 
     def __set_pexpect_cursor(self, child):
@@ -210,13 +211,13 @@ class CiscoDevice(object):
         tracer_round = ";{0}".format(int(time.time()))
         # Add the EOL here, not in the tracer_round, or you won't find the tracer_round later
         child.sendline(tracer_round + self._eol)
-        child.expect_exact("{0}".format(tracer_round), timeout=1)
+        child.expect_exact("{0}".format(tracer_round))
         # WATCH YOUR CURSORS! You must also consume the prompt after tracer_round
         # or the pexepect cursor will stop at the wrong prompt
         # The next cursor will stop here -> R2#show version | include [IOSios] [Ss]oftware
         #                                   Cisco IOS Software...
         #      But it needs to stop here -> R2#
-        child.expect_exact(self._device_prompts, 1)
+        child.expect_exact(self._device_prompts)
 
     def _get_device_info(self, child, enable_password=None):
         """Get information about the network device.
@@ -225,7 +226,7 @@ class CiscoDevice(object):
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
 
         :return: The name of the default file system; the device's IOS version; the device's  name;
-            and the device's serial number
+            and the device's serial number.
         :rtype: tuple
         """
         print("Getting device information...")
@@ -240,13 +241,13 @@ class CiscoDevice(object):
             child.expect_exact(
                 ["before an image can be booted from this device", pexpect.TIMEOUT], timeout=5)
             default_filesystem = str(child.before).split(
-                "Directory of ")[1].split(":/\r")[0].strip()
+                "Directory of ")[1].split(":")[0].strip()
             if not default_filesystem.startswith(("bootflash", "flash", "slot", "disk",)):
                 raise RuntimeError("Cannot get the device's working drive.")
             print("Default drive: {0}".format(default_filesystem))
             index = 0
             while index == 0:
-                index = child.expect_exact(["More", pexpect.TIMEOUT], 1)
+                index = child.expect_exact(["More", pexpect.TIMEOUT], timeout=5)
                 if index == 0:
                     child.sendline(self._eol)
         except IndexError:
@@ -267,7 +268,6 @@ class CiscoDevice(object):
         try:
             child.sendline("show inventory | include [Cc]hassis" + self._eol)
             child.expect_exact(self._device_prompts[1])
-            # child.expect_exact(device_prompts[1])
             device_name = str(child.before).split(
                 "show inventory | include [Cc]hassis\r")[1].split("\r")[0].strip()
             if not re.compile(r"[Cc]hassis").search(device_name):
@@ -279,7 +279,6 @@ class CiscoDevice(object):
         try:
             child.sendline("show version | include [Pp]rocessor [Bb]oard [IDid]" + self._eol)
             child.expect_exact(self._device_prompts[1])
-            # child.expect_exact(device_prompts[1])
             serial_num = str(child.before).split(
                 "show version | include [Pp]rocessor [Bb]oard [IDid]\r")[1].split("\r")[0].strip()
             if not re.compile(r"[Pp]rocessor [Bb]oard [IDid]").search(serial_num):
@@ -289,6 +288,100 @@ class CiscoDevice(object):
             serial_num = None
 
         return default_filesystem, software_ver, device_name, serial_num
+
+    def _format_filesystem(self, child, filesystem):
+        """Format a file system (i.e., memory) on a network device.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :param str filesystem: The file system to format.
+
+        :return: None
+        :rtype: None
+        """
+        print("Formatting device memory...")
+        self.__access_priv_exec_mode(child)
+        # Format the memory. Look for the final characters of the following strings:
+        # "Format operation may take a while. Continue? [confirm]"
+        # "Format operation will destroy all data in "flash:".  Continue? [confirm]"
+        # "66875392 bytes available (0 bytes used)"
+        child.sendline("format {0}:".format(filesystem) + self._eol)
+        index = 1
+        while index != 0:
+            index = child.expect_exact(
+                [pexpect.TIMEOUT, "Continue? [confirm]", "Enter volume ID", ], timeout=5)
+            if index != 0:
+                child.sendline(self._eol)
+        child.expect_exact("Format of {0} complete".format(filesystem), timeout=120)
+        child.sendline("show {0}".format(filesystem) + self._eol)
+        child.expect_exact("(0 bytes used)")
+        child.expect_exact(self._device_prompts[1])
+        print("Device memory formatted.")
+
+    def _set_device_ip_addr(self, child, new_ip_address, new_netmask="255.255.255.0", commit=True):
+        """Set the device's IP address.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :param str new_ip_address: The new IPv4 address for the device.
+        :param str new_netmask: The new netmask for the device.
+        :param bool commit: True to set as the permanent IPv4 address.
+
+        :return: None
+        :rtype: None
+        """
+        print("Setting the device's IP address...")
+        self.__access_priv_exec_mode(child)
+        child.sendline("configure terminal" + self._eol)
+        child.expect_exact(self._device_prompts[2])
+        child.sendline("interface FastEthernet0/0" + self._eol)
+        child.expect_exact(self._device_prompts[3])
+        child.sendline("ip address {0} {1}".format(new_ip_address, new_netmask) + self._eol)
+        child.expect_exact(self._device_prompts[3])
+        child.sendline("no shutdown" + self._eol)
+        child.expect_exact(self._device_prompts[3])
+        child.sendline("end" + self._eol)
+        child.expect_exact(self._device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline("write memory" + self._eol)
+            child.expect_exact("[OK]")
+            child.expect_exact(self._device_prompts[1])
+        print("Device IP address set.")
+
+    def _ping_from_device(self, child, destination_ip_addr, count=4):
+        """Check the connection to another device.
+
+        :param pexpect.spawn child: The connection in a child application object.
+        :param str destination_ip_addr: The IPv4 address of the other device.
+        :param int count: The number of pings to send.
+
+        :return: None
+        :rtype: None
+        """
+        print("Pinging {0}...".format(destination_ip_addr))
+        self.__access_priv_exec_mode(child)
+        child.sendline("ping {0} repeat {1}".format(destination_ip_addr, count) + self._eol)
+        index = child.expect(["percent (0/4)", r"percent \([1-4]/4\)", ])
+        if index == 0:
+            raise RuntimeError("Cannot ping {0} from this device.".format(destination_ip_addr))
+        print("Pinged {0}.".format(destination_ip_addr))
+
+    @staticmethod
+    def ping_device(device_ip_addr, count=4):
+        """Check the connection to the device. This command is run from the host computer.
+
+        :param str device_ip_addr: The IPv4 address of the device.
+        :param int count: The number of pings to send.
+
+        :return: None
+        :rtype: None
+        """
+        print("Pinging {0}...".format(device_ip_addr))
+        _, exitstatus = pexpect.run("ping -c {0} {1}".format(count, device_ip_addr),
+                                    withexitstatus=True)
+        if exitstatus != 0:
+            # No need to read the output. Ping returns a non-zero value if no packets are received
+            raise RuntimeError("Cannot ping the device at {0}.".format(device_ip_addr))
+        print("Pinged {0}.".format(device_ip_addr))
 
     def run(self):
         """Configuration sequence goes here
@@ -301,6 +394,10 @@ class CiscoDevice(object):
             child = self._connect_via_telnet("192.168.1.1", 5001, eol="\r")
             filesystem, software_ver, device_name, serial_num = self._get_device_info(child)
             print(filesystem)
+            self._format_filesystem(child, filesystem=filesystem)
+            self._set_device_ip_addr(child, "192.168.1.20", commit=True)
+            self._ping_from_device(child, "192.168.1.10")
+            self.ping_device("192.168.1.20")
         finally:
             if child:
                 child.close()
