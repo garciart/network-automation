@@ -547,32 +547,41 @@ class CiscoDevice(object):
         child.close()
         print("Telnet connection closed")
 
-    def _enable_ssh(self, child, label, modulus=1024, sshv1=False, commit=True):
+    def _enable_ssh(self, child, label, modulus=1024, version=None, timeout=120, retries=3,
+                    commit=True):
         """Enable SSH communications.
 
         :param pexpect.spawn child: Connection in a child application object.
         :param str label: Name for the Rivest, Shamir, and Adelman (RSA) key pair.
         :param int modulus: Modulus of a certification authority (CA) key.
-        :param bool sshv1: Force SSH version 1 (for older devices and systems)
+        :param int version: Force SSH version 1 or 2 (default is 1.99)
+        :param int timeout: Wait time for a response from the client before closing the connection.
+        :param int retries: Number of SSH authentication retries allowed.
         :param bool commit: True to save changes to startup-config.
 
         :return: None
         :rtype: None
         """
         self.__access_priv_exec_mode(child)
-        child.sendline("configure terminal")
+        child.sendline("configure terminal" + self._eol)
         child.expect_exact(self._device_prompts[2])
-        child.sendline("crypto key zeroize rsa")
+        child.sendline("crypto key zeroize rsa" + self._eol)
         index = child.expect_exact(["Do you really want to remove these keys? [yes/no]:",
                                     self._device_prompts[1]])
         if index == 0:
-            child.sendline("yes")
-            child.expect_exact(self._device_prompts[2])
-        child.sendline("crypto key generate rsa general-keys label {0} modulus {1}".format(
-            label, modulus))
+            child.sendline("yes" + self._eol)
         child.expect_exact(self._device_prompts[2])
-        if sshv1:
-            child.sendline("ip ssh ersion 1")
+        child.sendline("crypto key generate rsa general-keys label {0} modulus {1}".format(
+            label, modulus) + self._eol)
+        child.expect_exact(self._device_prompts[2])
+        if version == 1 or version == 2:
+            child.sendline("ip ssh version {0}".format(version) + self._eol)
+            child.expect_exact(self._device_prompts[2])
+        if timeout >= 0:
+            child.sendline("ip ssh timeout {0}".format(timeout) + self._eol)
+            child.expect_exact(self._device_prompts[2])
+        if retries >= 0:
+            child.sendline("ip ssh authentication-retries {0}".format(retries) + self._eol)
             child.expect_exact(self._device_prompts[2])
         child.sendline("end" + self._eol)
         child.expect_exact(self._device_prompts[1])
@@ -659,9 +668,9 @@ class CiscoDevice(object):
                                 commit=True)
 
             # Reload the device and close the connection
-            child.sendline("reload\r")
+            child.sendline("reload" + self._eol)
             child.expect_exact("Proceed with reload? [confirm]")
-            child.sendline("\r")
+            child.sendline(self._eol))
             self._close_telnet(child)
             print("Device reloading (please wait)...")
 
@@ -687,13 +696,14 @@ class CiscoDevice(object):
 
             # Enable SSH
             self._enable_ssh(child, "adventures", 1024)
-            child.sendline("show ip ssh")
+            child.sendline("show ip ssh" + self._eol)
             child.expect_exact(self._device_prompts[1])
             print(child.before)
 
             """
             # Close the Telnet connection and reconnect using SSH
             self._close_telnet(child)
+            utility.enable_ssh("gns3user")
             username = "admin"
             password = "cisco"
             device_ip_address = "192.168.1.20"
@@ -702,24 +712,56 @@ class CiscoDevice(object):
 
             # Set and synchronize the device's clock
             utility.enable_ntp("gns3user")
-            child.sendline("show clock")
+            child.sendline("show clock" + self._eol)
             child.expect_exact(self._device_prompts[1])
             now = datetime.now()
             self._set_clock(child, now.strftime("%H:%M:%S %b %-d %Y"))
-            child.sendline("show clock")
+            child.sendline("show clock" + self._eol)
             child.expect_exact(self._device_prompts[1])
             self._synch_clock(child, "192.168.1.10")
-            child.sendline("show ntp status")
+            child.sendline("show ntp status" + self._eol)
             child.expect_exact(self._device_prompts[1])
-            child.sendline("show clock")
+            child.sendline("show clock" + self._eol)
             child.expect_exact(self._device_prompts[1])
-            self._close_telnet(child)
 
             # Transfer files back and forth using TFTP
+            commit = True
+            utility.enable_tftp()
+            self.__access_priv_exec_mode(child)
+            child.sendline("configure terminal" + self._eol)
+            child.expect_exact(self._device_prompts[2])
+            ethernet_port = "Gi1"
+            child.sendline("ip tftp source-interface {0}".format(ethernet_port) + self._eol)
+            child.expect_exact(self._device_prompts[2])
+            child.sendline("end" + self._eol)
+            child.expect_exact(self._device_prompts[1])
+            # Save changes if True
+            if commit:
+                child.sendline("write memory" + self._eol)
+                child.expect_exact(self._device_prompts[1])
+            file_to_download = "nvram:/startup-config"
+            destination_ip_addr = "192.168.1.10"
+            destination_file_name = "startup-config-tftp.cfg"
+            child.sendline("copy {0} tftp://{1}/{2}".format(
+                file_to_download, destination_ip_addr, destination_file_name) + self._eol)
+            # noinspection PyTypeChecker
+            index = child.expect_exact(["Address or name of remote host",
+                                        "Destination filename", ] + self._device_prompts[1])
+
+            """
+            STOPPED HERE!
+            """
+
+            utility.disable_tftp()
 
             # Transfer files back and forth using FTP
+            utility.enable_ftp()
+
+            utility.disable_ftp()
 
             # Close all connections and services
+            self._close_telnet(child)
+            utility.disable_ntp()
 
         finally:
             if child:
