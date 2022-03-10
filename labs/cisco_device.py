@@ -578,7 +578,7 @@ class CiscoDevice(object):
             child.sendline("ip ssh version {0}".format(version) + self._eol)
             child.expect_exact(self._device_prompts[2])
         if timeout >= 0:
-            child.sendline("ip ssh timeout {0}".format(timeout) + self._eol)
+            child.sendline("ip ssh time-out {0}".format(timeout) + self._eol)
             child.expect_exact(self._device_prompts[2])
         if retries >= 0:
             child.sendline("ip ssh authentication-retries {0}".format(retries) + self._eol)
@@ -700,10 +700,12 @@ class CiscoDevice(object):
             child.expect_exact(self._device_prompts[1])
             print(child.before)
 
+            sudo_password = "gns3user"
+
             """
             # Close the Telnet connection and reconnect using SSH
             self._close_telnet(child)
-            utility.enable_ssh("gns3user")
+            utility.enable_ssh(sudo_password)
             username = "admin"
             password = "cisco"
             device_ip_address = "192.168.1.20"
@@ -711,7 +713,7 @@ class CiscoDevice(object):
             """
 
             # Set and synchronize the device's clock
-            utility.enable_ntp("gns3user")
+            utility.enable_ntp(sudo_password)
             child.sendline("show clock" + self._eol)
             child.expect_exact(self._device_prompts[1])
             now = datetime.now()
@@ -726,7 +728,8 @@ class CiscoDevice(object):
 
             # Transfer files back and forth using TFTP
             commit = True
-            utility.enable_tftp()
+            utility.enable_tftp(sudo_password)
+
             self.__access_priv_exec_mode(child)
             child.sendline("configure terminal" + self._eol)
             child.expect_exact(self._device_prompts[2])
@@ -742,26 +745,51 @@ class CiscoDevice(object):
             file_to_download = "nvram:/startup-config"
             destination_ip_addr = "192.168.1.10"
             destination_file_name = "startup-config-tftp.cfg"
+
+            commands = ["sudo touch /var/lib/tftpboot/startup-config-tftp.cfg",
+                        "sudo chmod 777 --verbose /var/lib/tftpboot/startup-config-tftp.cfg", ]
+            utility.run_cli_commands(commands, sudo_password=sudo_password)
+
             child.sendline("copy {0} tftp://{1}/{2}".format(
                 file_to_download, destination_ip_addr, destination_file_name) + self._eol)
-            # noinspection PyTypeChecker
-            index = child.expect_exact(["Address or name of remote host",
-                                        "Destination filename", ] + self._device_prompts[1])
+            child.expect_exact("Address or name of remote host")
+            child.sendline("{0}".format(destination_ip_addr) + self._eol)
+            child.expect_exact("Destination filename")
+            child.sendline("{0}".format(destination_file_name) + self._eol)
+            index = 0
+            while 0 <= index <= 2:
+                index = child.expect_exact(["Error",
+                                            "Do you want to overwrite?",
+                                            "Password:",
+                                            "bytes copied in"], timeout=120)
+                if index == 0:
+                    # Get error information between "Error" and the prompt; some hints:
+                    # Timeout = Port not open or firewall may be closed
+                    # No such file or directory = Destination file may not exist
+                    # Undefined error = Destination file permissions may be
+                    child.expect_exact(self._device_prompts[1])
+                    raise RuntimeError(
+                        "Cannot upload new configuration file: Error {0}".format(child.before))
+                if index == 1:
+                    child.sendline("yes" + self._eol)
+                if index == 2:
+                    child.sendline(sudo_password + self._eol)
+            print("Configuration file backed up.")
 
             """
             STOPPED HERE!
             """
 
-            utility.disable_tftp()
+            utility.disable_tftp(sudo_password)
 
             # Transfer files back and forth using FTP
-            utility.enable_ftp()
+            utility.enable_ftp(sudo_password)
 
-            utility.disable_ftp()
+            utility.disable_ftp(sudo_password)
 
             # Close all connections and services
             self._close_telnet(child)
-            utility.disable_ntp()
+            utility.disable_ntp(sudo_password)
 
         finally:
             if child:
