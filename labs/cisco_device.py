@@ -155,14 +155,14 @@ class CiscoDevice(object):
                      "Press RETURN to get started", ] + self._device_prompts, timeout=timeout)
                 # Do not use range (it is zero-based and does not assess the high value)
                 if index in (0, 1,):
-                    raise RuntimeError("Invalid credentials provided.")
+                    raise ValueError("Invalid credentials provided.")
                 elif index == 2:
                     if username is None:
-                        raise RuntimeError("Username requested, but none provided.")
+                        raise ValueError("Username requested, but none provided.")
                     child.sendline(username + self._eol)
                 elif index == 3:
                     if password is None:
-                        raise RuntimeError("Password requested, but none provided.")
+                        raise ValueError("Password requested, but none provided.")
                     child.sendline(password + self._eol)
                     print("\x1b[31;1m" +
                           "Warning - This device has already been configured and secured.\n" +
@@ -318,6 +318,10 @@ class CiscoDevice(object):
         :return: None
         :rtype: None
         """
+        # Validate inputs
+        if not file_system.startswith(("bootflash", "flash", "slot", "disk", )):
+            raise ValueError("Invalid Cisco file system name.")
+
         print("Formatting device memory...")
         self.__access_priv_exec_mode(child)
         # Format the memory. Look for the final characters of the following strings:
@@ -350,7 +354,13 @@ class CiscoDevice(object):
         :return: None
         :rtype: None
         """
+        # Validate inputs
+        # ethernet_port, while not validated, should start with F(ast), G(iga), etc.
+        utility.validate_ip_address(new_ip_address)
+        utility.validate_subnet_mask(new_netmask)
+
         print("Setting the device's IP address...")
+
         self.__access_priv_exec_mode(child)
         child.sendline("configure terminal" + self._eol)
         child.expect_exact(self._device_prompts[2])
@@ -379,6 +389,14 @@ class CiscoDevice(object):
         :return: None
         :rtype: None
         """
+        # Validate inputs
+        # ethernet_port, while not validated, should start with F(ast), G(iga), etc.
+        utility.validate_ip_address(destination_ip_addr)
+        # While the ping count can be greater than 10,
+        # restrict to less than 10 when checking connections
+        if count < 1 or count >= 32:
+            raise ValueError("Ping count is restricted to less than 32 pings.")
+
         print("Pinging {0}...".format(destination_ip_addr))
         self.__access_priv_exec_mode(child)
         child.sendline("ping {0} repeat {1}".format(destination_ip_addr, count) + self._eol)
@@ -635,6 +653,68 @@ class CiscoDevice(object):
         time.sleep(60)
         print("Network device clock synchronized.")
 
+    def _download_from_device_tftp(self, child, ethernet_port, file_to_download,
+                                   destination_ip_addr, destination_file_name, commit=True):
+        """Download a file form the device using the TFTP protocol.
+
+        Developer Notes:
+          - TFTP must be installed: i.e., sudo yum -y install tftp tftp-server.
+          - While the destination's TFTP service does not need to be running,
+            the firewall ports must allow TFTP traffic.
+          - The destination file must ealready exist, even if empty.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param str ethernet_port: Ethernet interface port name to configure.
+        :param str file_to_download: File to download
+            (e.g., startup-config, flash:/foo.txt, etc.)
+        :param str destination_ip_addr: IPv4 address of the device.
+        :param str destination_file_name: Name for the downloaded file (Must already exist,
+            even if empty.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+        """
+        print("Downloading {0} from the device...".format(file_to_download))
+        self.__access_priv_exec_mode(child)
+        child.sendline("configure terminal" + self._eol)
+        child.expect_exact(self._device_prompts[2])
+
+        child.sendline("ip tftp source-interface {0}".format(ethernet_port) + self._eol)
+        child.expect_exact(self._device_prompts[2])
+        child.sendline("end" + self._eol)
+        child.expect_exact(self._device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline("write memory" + self._eol)
+            child.expect_exact(self._device_prompts[1])
+
+        child.sendline("copy {0} tftp://{1}/{2}".format(
+            file_to_download, destination_ip_addr, destination_file_name) + self._eol)
+        child.expect_exact("Address or name of remote host")
+        child.sendline("{0}".format(destination_ip_addr) + self._eol)
+        child.expect_exact("Destination filename")
+        child.sendline("{0}".format(destination_file_name) + self._eol)
+        index = 0
+        while 0 <= index <= 1:
+            index = child.expect_exact(["Error",
+                                        "Do you want to overwrite?",
+                                        "bytes copied in"], timeout=120)
+            if index == 0:
+                # Get error information between "Error" and the prompt; some hints:
+                # Timeout = Port not open or firewall may be closed
+                # No such file or directory = Destination file may not exist
+                # Undefined error = Destination file permissions may be
+                child.expect_exact(self._device_prompts[1])
+                raise RuntimeError(
+                    "Cannot upload new configuration file: Error {0}".format(child.before))
+            if index == 1:
+                child.sendline("yes" + self._eol)
+        print("{0} downloaded from the device.".format(file_to_download))
+
+    def _upload_to_device_tftp(self, child):
+        pass
+
     def run(self):
         """Configuration sequence goes here
 
@@ -727,54 +807,19 @@ class CiscoDevice(object):
             child.expect_exact(self._device_prompts[1])
 
             # Transfer files back and forth using TFTP
-            commit = True
             utility.enable_tftp(sudo_password)
 
-            self.__access_priv_exec_mode(child)
-            child.sendline("configure terminal" + self._eol)
-            child.expect_exact(self._device_prompts[2])
             ethernet_port = "Gi1"
-            child.sendline("ip tftp source-interface {0}".format(ethernet_port) + self._eol)
-            child.expect_exact(self._device_prompts[2])
-            child.sendline("end" + self._eol)
-            child.expect_exact(self._device_prompts[1])
-            # Save changes if True
-            if commit:
-                child.sendline("write memory" + self._eol)
-                child.expect_exact(self._device_prompts[1])
             file_to_download = "nvram:/startup-config"
             destination_ip_addr = "192.168.1.10"
-            destination_file_name = "startup-config-tftp.cfg"
-
-            commands = ["sudo touch /var/lib/tftpboot/startup-config-tftp.cfg",
-                        "sudo chmod 777 --verbose /var/lib/tftpboot/startup-config-tftp.cfg", ]
+            destination_file_name = "startup-config.tftp"
+            commands = ["sudo touch /var/lib/tftpboot/{0}".format(destination_file_name),
+                        "sudo chmod 777 --verbose /var/lib/tftpboot/{0}".format(
+                            destination_file_name), ]
             utility.run_cli_commands(commands, sudo_password=sudo_password)
 
-            child.sendline("copy {0} tftp://{1}/{2}".format(
-                file_to_download, destination_ip_addr, destination_file_name) + self._eol)
-            child.expect_exact("Address or name of remote host")
-            child.sendline("{0}".format(destination_ip_addr) + self._eol)
-            child.expect_exact("Destination filename")
-            child.sendline("{0}".format(destination_file_name) + self._eol)
-            index = 0
-            while 0 <= index <= 2:
-                index = child.expect_exact(["Error",
-                                            "Do you want to overwrite?",
-                                            "Password:",
-                                            "bytes copied in"], timeout=120)
-                if index == 0:
-                    # Get error information between "Error" and the prompt; some hints:
-                    # Timeout = Port not open or firewall may be closed
-                    # No such file or directory = Destination file may not exist
-                    # Undefined error = Destination file permissions may be
-                    child.expect_exact(self._device_prompts[1])
-                    raise RuntimeError(
-                        "Cannot upload new configuration file: Error {0}".format(child.before))
-                if index == 1:
-                    child.sendline("yes" + self._eol)
-                if index == 2:
-                    child.sendline(sudo_password + self._eol)
-            print("Configuration file backed up.")
+            self._download_from_device_tftp(child, ethernet_port, file_to_download,
+                                            destination_ip_addr, destination_file_name, commit=True)
 
             """
             STOPPED HERE!
