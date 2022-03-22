@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Cisco 9500 device class.
+"""Cisco device class.
 
 Developer notes:
 - Protected and private methods (i.e., start with underscores) can be used with multiple devices
