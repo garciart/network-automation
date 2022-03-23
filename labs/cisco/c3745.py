@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test of the CiscoIOS class (cisco_ios.py) using the Cisco 3745 router image in GNS3.
+
 """
 import sys
 
@@ -78,7 +79,8 @@ class Cisco3745(object):
                 child = c3745.connect_via_telnet(reporter,
                                                  options['telnet_ip_addr'],
                                                  telnet_port_num=options['telnet_port_num'],
-                                                 eol=self._eol)
+                                                 eol=self._eol,
+                                                 verbose=False)
             else:
                 raise RuntimeError('Connection type must be \'serial\' or \'telnet\'.')
             default_file_system, software_ver, device_name, serial_num = c3745.get_device_info(
@@ -87,7 +89,7 @@ class Cisco3745(object):
             reporter.note('Software version: {0}'.format(software_ver))
             reporter.note('Device name: {0}'.format(device_name))
             reporter.note('Serial number: {0}'.format(serial_num))
-            c3745.format_file_system(child, reporter, self._eol, default_file_system)
+            # c3745.format_file_system(child, reporter, self._eol, default_file_system)
             c3745.set_router_ip_addr(child, reporter,
                                      eol=self._eol,
                                      ethernet_port=self._ethernet_port,
@@ -109,6 +111,11 @@ class Cisco3745(object):
                                         self._pma_ip_addr,
                                         self._config_file_path,
                                         default_file_system)
+            c3745.enable_ssh(child, reporter, self._eol, label='ADVENTURES', modulus=1024,
+                             version=2)
+            c3745.download_from_device_scp(child, reporter, self._eol, self._ethernet_port,
+                                           'startup-config', self._pma_ip_addr, 'gns3user',
+                                           'gns3user', 'startup-3745.scp')
         except BaseException:
             ex_type, ex_value, traceback = sys.exc_info()
             reporter.error()
