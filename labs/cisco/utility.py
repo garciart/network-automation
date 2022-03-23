@@ -143,17 +143,24 @@ def validate_password(passwords):
                              'from being used as an SSH CLI argument.')
 
 
-def run_cli_command(command):
+def run_cli_command(command, sudo_password=None):
     """Runs OS commands. Exceptions must be handled by the instantiating module.
     This function uses pexpect instead of subprocess to simplify piping and redirection.
 
     :param command: The command to run through the CLI.
+    :param str sudo_password: The superuser password to execute commands that require
+        elevated privileges.
 
     :returns: The result of the command.
     :rtype: str
     :raises RuntimeError: If unable to execute the command.
     """
-    sudo_password = 'gns3user'
+
+    # TEMP FOR TESTING #
+    if sudo_password is None:
+        sudo_password = 'gns3user'
+
+    # TEMP FOR TESTING #
     command_output, exitstatus = pexpect.run(
         'sudo ' + command,
         events={'(?i)password': (sudo_password + '\r')},
@@ -168,8 +175,11 @@ def run_cli_command(command):
     return command_output.decode('string_escape').strip()
 
 
-def enable_tftp():
+def enable_tftp(sudo_password=None):
     """List of commands to enable the Trivial File Transfer Protocol (TFTP) Service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+        elevated privileges.
 
     :returns: None
     :rtype: None
@@ -180,10 +190,10 @@ def enable_tftp():
                 'firewall-cmd --zone=public --add-service=tftp',
                 'firewall-cmd --zone=public --add-port=69/udp', ]
     for c in commands:
-        run_cli_command(c)
+        run_cli_command(c, sudo_password)
 
 
-def prep_for_tftp_download(placeholder_file_path):
+def prep_for_tftp_download(placeholder_file_path, sudo_password=None):
     """Prepare PMA to accept a file for download via TFTP.
 
     **Note** - TFTP is very limited. TFTP can only copy to an existing file; it cannot create
@@ -191,6 +201,8 @@ def prep_for_tftp_download(placeholder_file_path):
     the shell the necessary permissions to accept the data.
 
     :param str placeholder_file_path: File to download. Path must start with /var/lib/tftpboot/.
+    :param str sudo_password: The superuser password to execute commands that require
+        elevated privileges.
 
     :returns: None
     :rtype: None
@@ -204,7 +216,7 @@ def prep_for_tftp_download(placeholder_file_path):
     commands = ['touch {0}'.format(pipes.quote(placeholder_file_path)),
                 'chmod 666 {0}'.format(pipes.quote(placeholder_file_path))]
     for c in commands:
-        run_cli_command(c)
+        run_cli_command(c, sudo_password)
 
 
 def fix_tftp_filepath(file_path):
@@ -253,9 +265,11 @@ def fix_tftp_filepath(file_path):
         raise ValueError('Invalid file path.')
 
 
-def disable_tftp():
+def disable_tftp(sudo_password=None):
     """List of commands to disable the Trivial File Transfer Protocol (TFTP) Service.
 
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges.
     :returns: None
     :rtype: None
     """
@@ -263,4 +277,34 @@ def disable_tftp():
                 'firewall-cmd --zone=public --remove-service=tftp',
                 'systemctl stop tftp', ]
     for c in commands:
-        run_cli_command(c)
+        run_cli_command(c, sudo_password)
+
+
+def enable_ssh(sudo_password=None):
+    """List of commands to enable the Secure Shell (SSH) Protocol Service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges.
+    :return: None
+    :rtype: None
+    """
+    commands = ['systemctl start sshd',
+                'firewall-cmd --zone=public --add-service=ssh',
+                'firewall-cmd --zone=public --add-port=22/tcp', ]
+    for c in commands:
+        run_cli_command(c, sudo_password)
+
+
+def disable_ssh(sudo_password=None):
+    """List of commands to disable Secure Shell (SSH) Protocol Service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges.
+    :return: None
+    :rtype: None
+    """
+    commands = ['firewall-cmd --zone=public --remove-port=22/tcp',
+                'firewall-cmd --zone=public --remove-service=ssh',
+                'systemctl stop sshd', ]
+    for c in commands:
+        run_cli_command(c, sudo_password)

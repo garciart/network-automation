@@ -33,7 +33,7 @@ def main(reporter):
               telnet_port_num=5003)
     # """
 
-    # """
+    """
     switch = CiscoIOSL2(device_hostname='Switch',
                         eol='',
                         device_ip_addr='192.168.1.30',
@@ -46,9 +46,9 @@ def main(reporter):
                         config_file_path='/var/lib/tftpboot/startup-config-switch.tftp')
     switch.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
                telnet_port_num=5002)
-    # """
+    """
 
-    # """
+    """
     router = CiscoIOSXEL3(device_hostname='Router',
                           eol='',
                           device_ip_addr='192.168.1.40',
@@ -60,7 +60,7 @@ def main(reporter):
                           config_file_path='/var/lib/tftpboot/startup-config-router.tftp')
     router.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
                telnet_port_num=5004)
-    # """
+    """
 
 
 if __name__ == '__main__':
