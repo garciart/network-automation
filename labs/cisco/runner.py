@@ -3,8 +3,6 @@
 
 """
 
-from labs.cisco.c3745 import Cisco3745
-from labs.cisco.ios_l2 import CiscoIOSL2
 from labs.cisco.iosxe_l3 import CiscoIOSXEL3
 from labs.cisco.reporter import Reporter
 
@@ -19,48 +17,71 @@ def main(reporter):
     :rtype: None
     """
 
-    # """
+    """
     c3745 = Cisco3745(device_hostname='R1',
                       eol='\r',
                       device_ip_addr='192.168.1.20',
-                      pma_ip_addr='192.168.1.10',
-                      username=None,
-                      password=None,
                       ethernet_port='FastEthernet0/0',
+                      remote_ip_addr='192.168.1.10',
                       subnet_mask='255.255.255.0',
-                      config_file_path='/var/lib/tftpboot/startup-config-c3745.tftp')
+                      # username=None,
+                      # password=None,
+                      file_to_transfer='/var/lib/tftpboot/start-3745',
+                      remote_username='gns3user',
+                      remote_password='gns3user')
     c3745.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
               telnet_port_num=5003)
-    # """
+    """
+
+    """
+    switch = Cisco9500(device_hostname='Switch',
+                       eol='',
+                       device_ip_addr='192.168.1.30',
+                       vlan_name='vlan 1',
+                       ethernet_port='GigabitEthernet0/0',
+                       remote_ip_addr='192.168.1.10',
+                       subnet_mask='255.255.255.0',
+                       username=None,
+                       password=None,
+                       file_to_transfer='/var/lib/tftpboot/start-9500',
+                       remote_username='gns3user',
+                       remote_password='gns3user')
+    switch.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
+               telnet_port_num=5001)
+    """
 
     """
     switch = CiscoIOSL2(device_hostname='Switch',
                         eol='',
-                        device_ip_addr='192.168.1.30',
-                        pma_ip_addr='192.168.1.10',
+                        device_ip_addr='192.168.1.40',
+                        vlan_name='vlan 1',
+                        ethernet_port='GigabitEthernet0/0',
+                        remote_ip_addr='192.168.1.10',
+                        subnet_mask='255.255.255.0',
                         username=None,
                         password=None,
-                        vlan_name='vlan 1',
-                        vlan_port='GigabitEthernet0/0',
-                        subnet_mask='255.255.255.0',
-                        config_file_path='/var/lib/tftpboot/startup-config-switch.tftp')
+                        file_to_transfer='/var/lib/tftpboot/start-IOSvL2',
+                        remote_username='gns3user',
+                        remote_password='gns3user')
     switch.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
-               telnet_port_num=5002)
+               telnet_port_num=5001)
     """
 
-    """
+    # """
     router = CiscoIOSXEL3(device_hostname='Router',
                           eol='',
-                          device_ip_addr='192.168.1.40',
-                          pma_ip_addr='192.168.1.10',
-                          username=None,
-                          password=None,
+                          device_ip_addr='192.168.1.50',
                           ethernet_port='GigabitEthernet1',
+                          remote_ip_addr='192.168.1.10',
                           subnet_mask='255.255.255.0',
-                          config_file_path='/var/lib/tftpboot/startup-config-router.tftp')
+                          # username=None,
+                          # password=None,
+                          file_to_transfer='/var/lib/tftpboot/start-IOSv3',
+                          remote_username='gns3user',
+                          remote_password='gns3user')
     router.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
                telnet_port_num=5004)
-    """
+    # """
 
 
 if __name__ == '__main__':

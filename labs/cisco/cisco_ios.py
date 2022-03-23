@@ -45,29 +45,27 @@ class CiscoIOS(object):
         # Prepend the hostname to the standard Cisco prompt endings
         self.device_prompts = ['{0}{1}'.format(device_hostname, p) for p in self.cisco_prompts]
 
-    def connect_via_telnet(self,
-                           reporter,
+    def connect_via_telnet(self, reporter, eol,
                            telnet_ip_addr,
                            telnet_port_num=22,
-                           verbose=True,
-                           eol='',
                            username=None,
                            password=None,
-                           enable_password=None):
+                           enable_password=None,
+                           verbose=True):
         """Connect to a network device using Telnet.
 
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
         :param str telnet_ip_addr: Device's IP address for Telnet.
         :param int telnet_port_num: Port number for the connection, both standard (22) and others.
-        :param bool verbose: True (default) to echo both input and output to the screen,
-            or false to save output to a time-stamped file.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection
             and if a password is set in the device's startup-config file.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool verbose: True (default) to echo both input and output to the screen,
+            or false to save output to a time-stamped file.
 
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
@@ -83,8 +81,6 @@ class CiscoIOS(object):
         validate_ip_address(telnet_ip_addr)
         if telnet_port_num:
             validate_port_number(telnet_port_num)
-
-        if telnet_port_num:
             child = pexpect.spawn('telnet {0} {1}'.format(telnet_ip_addr, telnet_port_num))
         else:
             child = pexpect.spawn('telnet {0}'.format(telnet_ip_addr))
@@ -119,31 +115,29 @@ class CiscoIOS(object):
         reporter.success()
         return child
 
-    def connect_via_serial(self,
-                           reporter,
+    def connect_via_serial(self, reporter, eol,
                            serial_device='ttyUSB0',
                            baud_rate=9600,
                            data_bits=8,
-                           verbose=True,
-                           eol='',
                            username=None,
                            password=None,
-                           enable_password=None):
+                           enable_password=None,
+                           verbose=True):
         """Connect to the device using Minicom.
 
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection (See EOL comments below).
         :param str serial_device: PMA serial device interface name.
         :param int baud_rate: Baud rate for connection.
         :param int data_bits: Data bit size for connection.
-        :param bool verbose: True (default) to echo both input and output to the screen,
-            or false to save output to a time-stamped file.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See EOL comments below).
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection
             and if a password is set in the device's startup-config file.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool verbose: True (default) to echo both input and output to the screen,
+            or false to save output to a time-stamped file.
 
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
@@ -200,8 +194,9 @@ class CiscoIOS(object):
 
     # NOTE - Cannot reduce the code complexity of this method in Python 2.7
     # The purpose of trailing NOSONAR comment is to suppress the SonarLint warning
-    def __clear_startup_prompts(  # NOSONAR
-            self, child, reporter, eol='', username=None, password=None):
+    def __clear_startup_prompts(self, child, reporter, eol,  # NOSONAR
+                                username=None,
+                                password=None):
         """**RUN IMMEDIATELY AFTER PEXPECT.SPAWN!**
 
         This method clears common Cisco IOS startup messages and prompts until it reaches a
@@ -284,7 +279,7 @@ class CiscoIOS(object):
                     reporter.error()
                     raise pex
 
-    def __access_priv_exec_mode(self, child, eol='', enable_password=None):
+    def __access_priv_exec_mode(self, child, eol, enable_password=None):
         """This method places the pexpect cursor at a Privileged EXEC Mode prompt (e.g., switch#)
         for subsequent commands.
 
@@ -310,7 +305,7 @@ class CiscoIOS(object):
             child.sendline('end' + eol)
             child.expect_exact(self.device_prompts[1])
 
-    def __reset_pexpect_cursor(self, child, eol=''):
+    def __reset_pexpect_cursor(self, child, eol):
         """This method sends a 'tracer round' in the form of a timestamp comment to move the
         pexpect cursor forward to the last hostname prompt.
 
@@ -334,7 +329,7 @@ class CiscoIOS(object):
         #      But it needs to stop here -> R2#
         child.expect_exact(self.device_prompts)
 
-    def get_device_info(self, child, reporter, eol='', enable_password=None):
+    def get_device_info(self, child, reporter, eol, enable_password=None):
         """Get information about the network device.
 
         :param pexpect.spawn child: Connection in a child application object.
@@ -413,20 +408,20 @@ class CiscoIOS(object):
         reporter.success()
         return default_file_system, software_ver, device_name, serial_num
 
-    def format_file_system(self, child, reporter, eol, file_system):
+    def format_file_system(self, child, reporter, eol, device_file_system):
         """Format a file system (i.e., memory) on a network device.
 
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
         :param str eol: EOL sequence (LF or CLRF) used by the connection.
-        :param str file_system: File system to format.
+        :param str device_file_system: File system to format.
 
         :return: None
         :rtype: None
         """
         # Validate inputs
-        if not file_system.startswith(('bootflash', 'flash', 'slot', 'disk',)):
+        if not device_file_system.startswith(('bootflash', 'flash', 'slot', 'disk',)):
             reporter.error()
             raise ValueError('Invalid Cisco file system name.')
 
@@ -436,21 +431,25 @@ class CiscoIOS(object):
         # 'Format operation may take a while. Continue? [confirm]'
         # 'Format operation will destroy all data in 'flash:'.  Continue? [confirm]'
         # '66875392 bytes available (0 bytes used)'
-        child.sendline('format {0}:'.format(file_system) + eol)
+        child.sendline('format {0}:'.format(device_file_system) + eol)
         index = 1
         while index != 0:
             index = child.expect_exact(
                 [pexpect.TIMEOUT, 'Continue? [confirm]', 'Enter volume ID', ], timeout=5)
             if index != 0:
                 child.sendline(eol)
-        child.expect_exact('Format of {0} complete'.format(file_system), timeout=120)
-        child.sendline('show {0}'.format(file_system) + eol)
+        child.expect_exact('Format of {0} complete'.format(device_file_system), timeout=120)
+        child.sendline('show {0}'.format(device_file_system) + eol)
         child.expect_exact('(0 bytes used)')
         child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def set_switch_ip_addr(self, child, reporter, eol, vlan_name, vlan_port, new_ip_address,
-                           new_netmask, commit=True):
+    def set_switch_ip_addr(self, child, reporter, eol,
+                           vlan_name,
+                           vlan_port,
+                           new_ip_address,
+                           new_netmask,
+                           commit=True):
         """Set a switch's IP address.
 
         :param pexpect.spawn child: Connection in a child application object.
@@ -510,8 +509,11 @@ class CiscoIOS(object):
             child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def set_router_ip_addr(self, child, reporter, eol, ethernet_port, new_ip_address,
-                           new_netmask, commit=True):
+    def set_router_ip_addr(self, child, reporter, eol,
+                           ethernet_port,
+                           new_ip_address,
+                           new_netmask,
+                           commit=True):
         """Set a router's IP address.
 
         :param pexpect.spawn child: Connection in a child application object.
@@ -583,151 +585,13 @@ class CiscoIOS(object):
             raise RuntimeError('Cannot ping {0} from this device.'.format(destination_ip_addr))
         reporter.success()
 
-    def download_from_device_tftp(self, child, reporter, eol,
-                                  tftp_interface_port,
-                                  device_file_system,
-                                  remote_ip_addr,
-                                  file_to_download,
-                                  destination_filepath,
-                                  commit=True):
-        """Download a file form the device using the TFTP protocol.
-
-        Developer Notes:
-          - TFTP must be installed: i.e., sudo yum -y install tftp tftp-server.
-          - While the destination's TFTP service does not need to be running,
-            the firewall ports must allow TFTP traffic.
-          - The destination file must already exist, even if empty.
-
-        :param pexpect.spawn child: Connection in a child application object.
-        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
-          the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
-        :param str tftp_interface_port: Restrict TFTP traffic through this Ethernet interface port.
-        :param str device_file_system: File system where the file is located on the device.
-        :param str remote_ip_addr: IPv4 address of the remote host.
-        :param str file_to_download: File to download (e.g., startup-config, flash:/foo.txt, etc.)
-        :param str destination_filepath: Path and name for the downloaded file (must already exist,
-            even if empty).
-        :param bool commit: True to save changes to startup-config.
-
-        :return: None
-        :rtype: None
-        """
-        # Validate inputs
-        validate_ip_address(remote_ip_addr)
-
-        destination_filepath = fix_tftp_filepath(destination_filepath)
-        validate_filepath('/var/lib/tftpboot/{0}'.format(destination_filepath))
-        prep_for_tftp_download('/var/lib/tftpboot/{0}'.format(destination_filepath))
-
-        reporter.step('Downloading {0} from the device using TFTP...'.format(file_to_download))
-        self.__access_priv_exec_mode(child, eol)
-        child.sendline('configure terminal' + eol)
-        child.expect_exact(self.device_prompts[2])
-
-        child.sendline('ip tftp source-interface {0}'.format(tftp_interface_port) + eol)
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('end' + eol)
-        child.expect_exact(self.device_prompts[1])
-        # Save changes if True
-        if commit:
-            child.sendline('write memory' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
-
-        try:
-            enable_tftp()
-            child.sendline('copy {0}:/{1} tftp://{2}/{3}'.format(device_file_system,
-                           file_to_download, remote_ip_addr, destination_filepath) + eol)
-            child.expect_exact('Address or name of remote host')
-            child.sendline('{0}'.format(remote_ip_addr) + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('{0}'.format(destination_filepath) + eol)
-            index = 0
-            while 0 <= index <= 1:
-                index = child.expect_exact(['Error',
-                                            'Do you want to overwrite?',
-                                            'bytes copied in', ], timeout=120)
-                if index == 0:
-                    # Get error information between 'Error' and the prompt; some hints:
-                    # Timeout = Port not open or firewall may be closed
-                    # No such file or directory = Destination file may not exist
-                    # Undefined error = Destination file permissions may be
-                    child.expect_exact(self.device_prompts[1])
-                    raise RuntimeError(
-                        'Cannot download file: Error {0}'.format(child.before))
-                if index == 1:
-                    child.sendline('yes' + eol)
-        finally:
-            disable_tftp()
-        reporter.success()
-
-    def upload_to_device_tftp(self, child, reporter, eol,
-                              device_file_system,
-                              remote_ip_addr,
-                              file_to_upload,
-                              destination_filepath,
-                              commit=True):
-        """ Upload a file from the PMA to the device using TFTP.
-
-        :param pexpect.spawn child: Connection in a child application object.
-        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
-          the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
-        :param str device_file_system: File system where the file is located on the device.
-        :param str remote_ip_addr: IPv4 address of the remote host.
-        :param str file_to_upload: File to upload (e.g., /var/lib/tftpboot/file.name, etc.)
-        :param str destination_filepath: Path and name for the downloaded file (must already exist,
-            even if empty).
-        :param bool commit: True to save changes to startup-config.
-
-        :return: None
-        :rtype: None
-
-        :raise RuntimeError: If unable to enable or disable TFTP services.
-        :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
-          expected result (raised from the pexpect module).
-        """
-        reporter.step('Uploading {0} to the device using TFTP:'.format(
-            os.path.basename(file_to_upload)))
-
-        try:
-            enable_tftp()
-            # Attempt TFTP copy three times in case of connection time-outs
-            for _ in range(3):
-                child.sendline('copy tftp: {0}:'.format(device_file_system) + eol)
-                child.expect_exact('Address or name of remote host')
-                child.sendline(remote_ip_addr + eol)
-                child.expect_exact('Source filename [')
-                child.sendline(
-                    destination_filepath.lstrip('/').replace(
-                        'var/lib/tftpboot', '').lstrip('/') + eol)
-                child.expect_exact('Destination filename [')
-                child.sendline(os.path.basename(destination_filepath) + eol)
-                # Allow ten minutes for transfer (test transfer was 7205803 bytes in 97.946 secs
-                # at 73569 bytes/sec)
-                index = child.expect_exact(
-                    ['Do you want to over write? [confirm]',
-                     'bytes copied in',
-                     'Timed out',
-                     pexpect.TIMEOUT, ], timeout=600)
-                if index == 0:
-                    # child.send('\r')
-                    child.sendline(eol)
-                    index2 = child.expect_exact(
-                        ['bytes copied in', 'Timed out', pexpect.TIMEOUT, ], timeout=240)
-                    if index2 == 0:
-                        break
-                elif index == 1:
-                    break
-            child.sendline(eol)
-        finally:
-            disable_tftp()
-        child.expect_exact(self.device_prompts[1])
-        reporter.success()
-
-    def enable_ssh(self, child, reporter, eol='', label=None, modulus=1024, version=1.99,
-                   time_out=120, retries=3, commit=True):
+    def enable_ssh(self, child, reporter, eol,
+                   label=None,
+                   modulus=1024,
+                   version=1.99,
+                   time_out=120,
+                   retries=3,
+                   commit=True):
         """Enable SSH communications.
 
         :param pexpect.spawn child: Connection in a child application object.
@@ -786,9 +650,43 @@ class CiscoIOS(object):
             child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def download_from_device_scp(self, child, reporter, eol, ethernet_port, file_to_download,
-                                 destination_ip_addr, remote_username, remote_password,
-                                 destination_filepath, commit=True):
+    def set_scp_source_interface(self, child, reporter, eol, scp_interface_port, commit=True):
+        """Set the source IP address for SCP traffic. By default, the device will choose the port
+        with an IP address closest to the remote IP address. This method overrides the default
+        setting.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+          the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str scp_interface_port: Restrict SCP traffic through this Ethernet interface port.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+        """
+        reporter.step('Restricting SCP traffic to {0}'.format(scp_interface_port))
+        self.__access_priv_exec_mode(child, eol)
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip scp source-interface {0}'.format(scp_interface_port) + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact('[OK]')
+            child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def download_from_device_scp(self, child, reporter, eol,
+                                 device_file_system,
+                                 remote_ip_addr,
+                                 remote_username,
+                                 file_to_download,
+                                 destination_filepath,
+                                 remote_password):
         """Download a file form the device using the SCP protocol.
 
         Developer Notes:
@@ -800,77 +698,69 @@ class CiscoIOS(object):
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
           the status and progress of the script.
         :param str eol: EOL sequence (LF or CLRF) used by the connection.
-        :param str ethernet_port: Restrict SCP traffic through this Ethernet interface port.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str remote_username: Remote username to authenticate SCP transfers.
         :param str file_to_download: File to download
             (e.g., startup-config, flash:/foo.txt, etc.)
-        :param str destination_ip_addr: IPv4 address of the remote host.
-        :param str remote_username: Remote username to authenticate SCP transfers.
-        :param str remote_password: Remote password to authenticate SCP transfers.
         :param str destination_filepath: Name for the downloaded file.
-        :param bool commit: True to save changes to startup-config.
+        :param str remote_password: Remote password to authenticate SCP transfers.
 
         :return: None
         :rtype: None
         """
         # Validate inputs
-        validate_ip_address(destination_ip_addr)
+        validate_ip_address(remote_ip_addr)
 
         reporter.step('Downloading {0} from the device using SCP...'.format(file_to_download))
         self.__access_priv_exec_mode(child, eol)
-        child.sendline('configure terminal' + eol)
-        child.expect_exact(self.device_prompts[2])
 
-        child.sendline('ip scp source-interface {0}'.format(ethernet_port) + eol)
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('end' + eol)
-        child.expect_exact(self.device_prompts[1])
-        # Save changes if True
-        if commit:
-            child.sendline('write memory' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
-
-        child.sendline('copy {0} scp://{1}:{2}@{3}/{4}'.format(file_to_download,
-                                                               remote_username,
-                                                               remote_password,
-                                                               destination_ip_addr,
-                                                               destination_filepath) + eol)
+        # copy flash:/test1.scp scp://gns3user:gns3user@192.168.1.10/test1.cfg
+        child.sendline('copy {0}: scp:'.format(device_file_system) + eol)
         index = 0
-        while index != 5:
-            index = child.expect_exact(['Address or name of remote host',
+        while index != 6:
+            index = child.expect_exact(['Source filename',
+                                        'Address or name of remote host',
                                         'Destination username',
                                         'Destination filename',
                                         'Password:',
                                         'Do you want to over write? [confirm]',
                                         'bytes copied in', ])
             if index == 0:
-                child.sendline(destination_ip_addr + eol)
+                child.sendline(file_to_download + eol)
             elif index == 1:
-                child.sendline(remote_username + eol)
+                child.sendline(remote_ip_addr + eol)
             elif index == 2:
-                child.sendline(destination_filepath + eol)
+                child.sendline(remote_username + eol)
             elif index == 3:
-                child.sendline(remote_password + eol)
+                child.sendline(destination_filepath + eol)
             elif index == 4:
+                child.sendline(remote_password + eol)
+            elif index == 5:
                 child.sendline(eol)
         child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def upload_to_device_scp(self, child, reporter, eol, ethernet_port, file_to_upload,
-                             source_ip_addr, source_username, source_password,
-                             destination_filepath, commit=True):
+    def upload_to_device_scp(self, child, reporter, eol,
+                             device_file_system,
+                             remote_ip_addr,
+                             remote_username,
+                             file_to_upload,
+                             destination_filepath,
+                             remote_password):
         """ Upload a file from the PMA to the device using SCP.
 
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
           the status and progress of the script.
         :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str remote_username: Remote username to authenticate SCP transfers.
         :param str file_to_upload: File to upload
             (e.g., startup-config, flash:/foo.txt, etc.)
-        :param str destination_ip_addr: IPv4 address of the remote host.
-        :param str remote_username: Remote username to authenticate SCP transfers.
-        :param str remote_password: Remote password to authenticate SCP transfers.
         :param str destination_filepath: Name for the downloaded file.
+        :param str remote_password: Remote password to authenticate SCP transfers.
 
         :return: None
         :rtype: None
@@ -879,29 +769,13 @@ class CiscoIOS(object):
             os.path.basename(file_to_upload)))
 
         # Validate inputs
-        validate_ip_address(source_ip_addr)
+        validate_ip_address(remote_ip_addr)
         validate_filepath(file_to_upload)
 
         self.__access_priv_exec_mode(child, eol)
-        child.sendline('configure terminal' + eol)
-        child.expect_exact(self.device_prompts[2])
 
-        child.sendline('ip scp source-interface {0}'.format(ethernet_port) + eol)
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('end' + eol)
-        child.expect_exact(self.device_prompts[1])
-        # Save changes if True
-        if commit:
-            child.sendline('write memory' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
-
-        # copy scp://gns3user:gns3user@192.168.1.10/test1.cfg test1.scp
-        child.sendline('copy scp://{0}:{1}@{2}/{3} {4}'.format(file_to_upload,
-                                                               source_username,
-                                                               source_password,
-                                                               source_ip_addr,
-                                                               destination_filepath) + eol)
+        # copy scp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.scp
+        child.sendline('copy scp: {0}:'.format(device_file_system) + eol)
         index = 0
         while index != 6:
             index = child.expect_exact(['Address or name of remote host',
@@ -912,21 +786,181 @@ class CiscoIOS(object):
                                         'Do you want to over write? [confirm]',
                                         'bytes copied in', ])
             if index == 0:
-                child.sendline(source_ip_addr + eol)
+                child.sendline(remote_ip_addr + eol)
             elif index == 1:
-                child.sendline(source_username + eol)
+                child.sendline(remote_username + eol)
             elif index == 2:
                 child.sendline(file_to_upload + eol)
             elif index == 3:
                 child.sendline(destination_filepath + eol)
             elif index == 4:
-                child.sendline(source_password + eol)
+                child.sendline(remote_password + eol)
             elif index == 5:
                 child.sendline(eol)
         child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def set_config_for_boot(self, child, reporter, eol, file_system, boot_config_file, commit=True):
+    def set_tftp_source_interface(self, child, reporter, eol, tftp_interface_port, commit=True):
+        """Set the source IP address for TFTP traffic. By default, the device will choose the port
+        with an IP address closest to the remote IP address. This method overrides the default
+        setting.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+          the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str tftp_interface_port: Restrict TFTP traffic through this Ethernet interface port.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+        """
+        reporter.step('Restricting TFTP traffic to {0}'.format(tftp_interface_port))
+        self.__access_priv_exec_mode(child, eol)
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip tftp source-interface {0}'.format(tftp_interface_port) + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact('[OK]')
+            child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def download_from_device_tftp(self, child, reporter, eol,
+                                  device_file_system,
+                                  remote_ip_addr,
+                                  file_to_download,
+                                  destination_filepath):
+        """Download a file form the device using the TFTP protocol.
+
+        Developer Notes:
+          - TFTP must be installed: i.e., sudo yum -y install tftp tftp-server.
+          - While the destination's TFTP service does not need to be running,
+            the firewall ports must allow TFTP traffic.
+          - The destination file must already exist, even if empty.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+          the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str file_to_download: File to download (e.g., startup-config, flash:/foo.txt, etc.)
+        :param str destination_filepath: Path and name for the downloaded file (must already exist,
+            even if empty).
+
+        :return: None
+        :rtype: None
+        """
+        # Validate inputs
+        validate_ip_address(remote_ip_addr)
+
+        destination_filepath = fix_tftp_filepath(destination_filepath)
+        try:
+            validate_filepath('/var/lib/tftpboot/{0}'.format(destination_filepath))
+        except ValueError:
+            prep_for_tftp_download('/var/lib/tftpboot/{0}'.format(destination_filepath))
+
+        reporter.step('Downloading {0} from the device using TFTP...'.format(file_to_download))
+        self.__access_priv_exec_mode(child, eol)
+        try:
+            enable_tftp()
+            child.sendline('copy {0}:/{1} tftp://{2}/{3}'.format(device_file_system,
+                                                                 file_to_download, remote_ip_addr,
+                                                                 destination_filepath) + eol)
+            child.expect_exact('Address or name of remote host')
+            child.sendline('{0}'.format(remote_ip_addr) + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('{0}'.format(destination_filepath) + eol)
+            index = 0
+            while 0 <= index <= 1:
+                index = child.expect_exact(['Error',
+                                            'Do you want to overwrite?',
+                                            'bytes copied in', ], timeout=120)
+                if index == 0:
+                    # Get error information between 'Error' and the prompt; some hints:
+                    # Timeout = Port not open or firewall may be closed
+                    # No such file or directory = Destination file may not exist
+                    # Undefined error = Destination file permissions may be
+                    child.expect_exact(self.device_prompts[1])
+                    raise RuntimeError(
+                        'Cannot download file: Error {0}'.format(child.before))
+                if index == 1:
+                    child.sendline('yes' + eol)
+        finally:
+            disable_tftp()
+        reporter.success()
+
+    def upload_to_device_tftp(self, child, reporter, eol,
+                              device_file_system,
+                              remote_ip_addr,
+                              file_to_upload,
+                              destination_filepath):
+        """ Upload a file from the PMA to the device using TFTP.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+          the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str file_to_upload: File to upload (e.g., /var/lib/tftpboot/file.name, etc.)
+        :param str destination_filepath: Path and name for the downloaded file (must already exist,
+            even if empty).
+
+        :return: None
+        :rtype: None
+
+        :raise RuntimeError: If unable to enable or disable TFTP services.
+        :raise pexpect.ExceptionPexpect: If the result of a sendline command does not match the
+          expected result (raised from the pexpect module).
+        """
+        reporter.step('Uploading {0} to the device using TFTP:'.format(
+            os.path.basename(file_to_upload)))
+
+        try:
+            enable_tftp()
+            # Attempt TFTP copy three times in case of connection time-outs
+            for _ in range(3):
+                child.sendline('copy tftp: {0}:'.format(device_file_system) + eol)
+                child.expect_exact('Address or name of remote host')
+                child.sendline(remote_ip_addr + eol)
+                child.expect_exact('Source filename [')
+                child.sendline(
+                    destination_filepath.lstrip('/').replace(
+                        'var/lib/tftpboot', '').lstrip('/') + eol)
+                child.expect_exact('Destination filename [')
+                child.sendline(os.path.basename(destination_filepath) + eol)
+                # Allow ten minutes for transfer (test transfer was 7205803 bytes in 97.946 secs
+                # at 73569 bytes/sec)
+                index = child.expect_exact(
+                    ['Do you want to over write? [confirm]',
+                     'bytes copied in',
+                     'Timed out',
+                     pexpect.TIMEOUT, ], timeout=600)
+                if index == 0:
+                    # child.send('\r')
+                    child.sendline(eol)
+                    index2 = child.expect_exact(
+                        ['bytes copied in', 'Timed out', pexpect.TIMEOUT, ], timeout=240)
+                    if index2 == 0:
+                        break
+                elif index == 1:
+                    break
+            child.sendline(eol)
+        finally:
+            disable_tftp()
+        child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def set_config_for_boot(self, child, reporter, eol,
+                            device_file_system,
+                            boot_config_file,
+                            commit=True):
         """Specify the the configuration file from which the system configures itself during
         initialization (startup)
 
@@ -934,7 +968,7 @@ class CiscoIOS(object):
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
           the status and progress of the script.
         :param str eol: EOL sequence (LF or CLRF) used by the connection.
-        :param str file_system: File system where the new boot config file is located.
+        :param str device_file_system: File system where the new boot config file is located.
         :param str boot_config_file: Boot config file to use during startup.
         :param bool commit: True to save changes to startup-config.
 
@@ -946,7 +980,7 @@ class CiscoIOS(object):
         self.__access_priv_exec_mode(child, eol)
         child.sendline('configure terminal' + eol)
         child.expect_exact(self.device_prompts[2])
-        child.sendline('boot config {0}:/{1}'.format(file_system, boot_config_file) + eol)
+        child.sendline('boot config {0}:/{1}'.format(device_file_system, boot_config_file) + eol)
         child.expect_exact(self.device_prompts[2])
         child.sendline('end' + eol)
         child.expect_exact(self.device_prompts[1])
@@ -956,7 +990,9 @@ class CiscoIOS(object):
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
 
-    def reload_device(self, child, reporter, eol, username=None, password=None):
+    def reload_device(self, child, reporter, eol,
+                      username=None,
+                      password=None):
         """Reloads and reboots the device.
 
         :param pexpect.spawn child: The connection in a child application object.

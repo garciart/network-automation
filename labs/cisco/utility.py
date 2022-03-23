@@ -185,7 +185,7 @@ def enable_tftp(sudo_password=None):
     :rtype: None
     """
     commands = ['mkdir --parents --verbose /var/lib/tftpboot',
-                'chmod 755 --verbose /var/lib/tftpboot',
+                'chmod 777 --verbose /var/lib/tftpboot',
                 'systemctl start tftp',
                 'firewall-cmd --zone=public --add-service=tftp',
                 'firewall-cmd --zone=public --add-port=69/udp', ]
@@ -256,10 +256,6 @@ def fix_tftp_filepath(file_path):
             # FYI - Not taking this step caused a lot of hate and
             # discontent towards the PMA!
             file_path = file_path if file_path[0] != '/' else file_path[1:]
-
-        # Verify the source file exists (temporarily re-add the root and default
-        # dir to the file path).
-        validate_filepath('/' + default_dir_str + file_path)
         return file_path
     else:
         raise ValueError('Invalid file path.')
