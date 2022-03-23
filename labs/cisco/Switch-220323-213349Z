@@ -1,0 +1,496 @@
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+
+
+
+
+iPXE (http://ipxe.org) 00:0E.0 D480 PCI2.10 PnP PMM 2FF941A0 2FED41A0 D480[25;75HPress Ctrl-B to configure iPXE (PCI 00:0E.0)...                                                                               
+
+
+
+
+iPXE (http://ipxe.org) 00:0F.0 D580 PCI2.10 PnP PMM 2FF941A0 2FED41A0 D580
+Press Ctrl-B to configure iPXE (PCI 00:0F.0)...                                                                               
+
+
+
+
+iPXE (http://ipxe.org) 00:10.0 D680 PCI2.10 PnP PMM 2FF941A0 2FED41A0 D680[25;75HPress Ctrl-B to configure iPXE (PCI 00:10.0)...                                                                               
+
+
+
+
+iPXE (http://ipxe.org) 00:11.0 D780 PCI2.10 PnP PMM 2FF941A0 2FED41A0 D780
+Press Ctrl-B to configure iPXE (PCI 00:11.0)...                                                                               
+
+
+
+
+iPXE (http://ipxe.org) 00:12.0 D880 PCI2.10 PnP PMM 2FF941A0 2FED41A0 D880[25;75HPress Ctrl-B to configure iPXE (PCI 00:12.0)...                                                                               
+
+
+Booting from Hard Disk...
+GRUB loading.
+[0;30;47mWelcome to GRUB[H[J[H[J![01;01H[0;1m[2J[?25l[m[H[J[2;30HGNU GRUB  version 2.00
+
+[m[4;2H+--------------------------------------------------------------------------+[5;2H|[5;77H|[6;2H|[6;77H|[7;2H|[7;77H|[8;2H|[8;77H|[9;2H|[9;77H|[10;2H|[10;77H|[11;2H|[11;77H|[12;2H|[12;77H|[13;2H|[13;77H|[14;2H|[14;77H|[15;2H|[15;77H|[16;2H+--------------------------------------------------------------------------+[m[17;2H[m
+      Use the ^ and v keys to select which entry is highlighted.      
+      Press enter to boot the selected OS, `e' to edit the commands      
+      before booting or `c' for a command-line. ESC to return      
+      previous menu.      
+      [5;78H [7m[5;3HIOSv                                                                     [m [5;76H[m[m[6;3H                                                                         [m [6;76H[m[m[7;3H                                                                         [m [7;76H[m[m[8;3H                                                                         [m [8;76H[m[m[9;3H                                                                         [m [9;76H[m[m[10;3H                                                                         [m [10;76H[m[m[11;3H                                                                         [m [11;76H[m[m[12;3H                                                                         [m [12;76H[m[m[13;3H                                                                         [m [13;76H[m[m[14;3H                                                                         [m [14;76H[m[m[15;3H                                                                         [m [15;76H[m[15;78H [5;76H[2J[02;30HGNU GRUB  version 2.00[04;02H┌──────────────────────────────────────────────────────────────────────────┐[05;02H│[05;77H│[06;02H│[06;77H│[07;02H│[07;77H│[08;02H│[08;77H│[09;02H│[09;77H│[10;02H│[10;77H│[11;02H│[11;77H│[12;02H│[12;77H│[13;02H│[13;77H│[14;02H│[14;77H│[15;02H│[15;77H│[16;02H│[16;77H│[17;02H└──────────────────────────────────────────────────────────────────────────┘
+
+      Use the ↑ and ↓ keys to select which entry is highlighted.      
+      Press enter to boot the selected OS, `e' to edit the commands      
+      before booting or `c' for a command-line. ESC to return      
+      previous menu.      
+      [05;78H [05;03H[0;30;47mIOSv                                                                     [0;1m [06;03H                                                                          [07;03H                                                                          [08;03H                                                                          [09;03H                                                                          [10;03H                                                                          [11;03H                                                                          [12;03H                                                                          [13;03H                                                                          [14;03H                                                                          [15;03H                                                                          [16;03H                                                                          [16;78H 
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 5s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 5s.
+                                                                               [5;76H [05;76H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 4s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 4s.
+                                                                               [5;76H [05;76H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 3s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 3s.
+                                                                               [5;76H [05;76H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 2s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 2s.
+                                                                               [5;76H [05;76H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 1s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 1s.
+                                                                               [5;76H [05;76H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   The highlighted entry will be executed automatically in 0s.
+                                                                              [22;1H   The highlighted entry will be executed automatically in 0s.
+                                                                               [5;76H [01;01H[2J[?25h[H[J[H[J[2J   Booting `IOSv' Booting `IOSv
+
+'
+
+Booted IOSv. Boot args: [/vios_l2-adventerprisek9-m]
+
+Smart Init is enabled
+
+              Restricted Rights Legend
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subparagraph
+(c) of the Commercial Computer Software - Restricted
+Rights clause at FAR sec. 52.227-19 and subparagraph
+(c) (1) (ii) of the Rights in Technical Data and Computer
+Software clause at DFARS sec. 252.227-7013.
+
+           cisco Systems, Inc.
+           170 West Tasman Drive
+           San Jose, California 95134-1706
+
+
+
+Cisco IOS Software, vios_l2 Software (vios_l2-ADVENTERPRISEK9-M), Version 15.2(CML_NIGHTLY_20180619)FLO_DSGS7, EARLY DEPLOYMENT DEVELOPMENT BUILD, synced to  V152_6_0_81_E
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2018 by Cisco Systems, Inc.
+Compiled Tue 19-Jun-18 06:06 by mmen
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco IOSv () processor (revision 1.0) with 574833K/209920K bytes of memory.
+Processor board ID 94L5AH36FKO
+16 Gigabit Ethernet interfaces
+DRAM configuration is 72 bits wide with parity disabled.
+256K bytes of non-volatile configuration memory.
+2097152K bytes of ATA System CompactFlash 0 (Read/Write)
+0K bytes of ATA CompactFlash 1 (Read/Write)
+0K bytes of ATA CompactFlash 2 (Read/Write)
+0K bytes of ATA CompactFlash 3 (Read/Write)
+
+
+
+
+Press RETURN to get started!
+
+
+*Mar  1
+ 00:00:00.769: %ATA-6-DEV_FOUND: device 0x1F0
+*Mar  1 00:00:00.830: %NVRAM-5-CONFIG_NVRAM_NOT_FOUND: NVRAM configuration 'flash:/nvram' could not be found on disk.
+*Mar 23 21:33:44.754: %SPANTREE-5-EXTENDED_SYSID: Extended SysId enabled for type vlan
+*Mar 23 21:33:48.742: %LINK-5-CHANGED: Interface GigabitEthernet0/0, changed state to reset
+*Mar 23 21:33:48.742: %LINK-5-CHANGED: Interface GigabitEthernet0/1, changed state to reset
+*Mar 23 21:33:48.743: %LINK-5-CHANGED: Interface GigabitEthernet0/2, changed state to reset
+*Mar 23 21:33:48.743: %LINK-5-CHANGED: Interface GigabitEthernet0/3, changed state to reset
+*Mar 23 21:33:48.744: %LINK-5-CHANGED: Interface GigabitEthernet1/0, changed state to reset
+*Mar 23 21:33:48.744: %LINK-5-CHANGED: Interface GigabitEthernet1/1, changed state to reset
+*Mar 23 21:33:48.744: %LINK-5-CHANGED: Interface GigabitEthernet1/2, changed state to reset
+*Mar 23 21:33:49.798: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to up
+*Mar 23 21:33:49.798: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/1, changed state to down
+*Mar 23 21:33:49.799: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/2, changed state to down
+*Mar 23 21:33:49.799: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/3, changed state to down
+*Mar 23 21:33:49.799: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0, changed state to down
+*Mar 23 21:33:49.800: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/1, changed state to down
+*Mar 23 21:33:49.800: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/2, changed state to down
+*Mar 23 21:33:49.800: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/3, changed state to down
+*Mar 23 21:33:49.801: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet2/0, changed state to down
+*Mar 23 21:33:49.801: %LINEPROT
+**************O-5-UPDOWN: Line protocol on Interface GigabitEthernet2/1, changed state to down
+*Mar 23 21:33:50.823: %LINK-3-UPDOWN: Interface GigabitEthernet3/3, changed state to down
+*Mar 23 21:33:50.823: %LINK-3-UPDOWN: Interface GigabitEthernet3/2, changed state to down
+*Mar 23 21:33:50.824: %LINK-3-UPDOWN: Interface GigabitEthernet3/1, changed state to down
+*Mar 23 21:33:50.824: %LINK-3-UPDOWN: Interface GigabitEthernet3/0, changed state to down
+*Mar 23 21:33:50.824: %LINK-3-UPDOWN: Interface GigabitEthernet2/3, changed state to down
+*Mar 23 21:33:50.824: %LINK-3-UPDOWN: Interface GigabitEthernet2/2, changed state to down
+*Mar 23 21:33:50.824: %LINK-3-UPDOWN: Interface GigabitEthernet2/1, changed state to down
+*Mar 23 21:33:50.825: %LINK-3-UPDOWN: Interface GigabitEthernet2/0, changed state to down
+*Mar 23 21:33:50.825: %LINK-3-UPDOWN: Interface GigabitEthernet1/3, changed state to down
+*Mar 23 21:33:50.825: %LINK-3-UPDOWN: Interface GigabitEthernet1/2, changed state to down
+*Mar 23 21:33:51.029: %LINK-3-UPDOWN: Interface GigabitEthernet1/1, changed state to down
+*Mar 23 21:33:51.030: %LINK-3-UPDOWN: Interface GigabitEthernet1/0, changed state to down
+*Mar 23 21:33:51.031: %LINK-3-UPDOWN: Interface GigabitEthernet0/3, changed state to down
+*Mar 23 21:33:51.031: %LINK-3-UPDOWN: Interface GigabitEthernet0/2, changed state to down
+*Mar 23 21:33:51.032: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down
+*Mar 23 21:33:51.032: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to up
+*Mar 23 21:33:51.933: %SYS-5-RESTART: System restarted --
+Cisco IOS Software, vios_l2 Software (vios_l2-ADVENTERPRISEK9-M), Version 15.2(CML_NIGHTLY_20180619)FLO_DSGS7, EARLY DEPLOYMENT DEVELOPMENT BUILD, synced to  V152_6_0_81_E
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2018 by Cisco Systems, Inc.
+Compiled Tue 19-Jun-18 06:06 by mmen************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************
+Switch>
+Switc;1648071289
+h>
+Switch>
+*Mar 23 21:34:37.629: %PLATFORM-5-SIGNATURE_VERIFIED: Image 'flash0:/vios_l2-adventerprisek9-m' passed code signing verification;1648071289
+Switch>
+
+Switch>enable
+enable
+Switch#;1648071298
+;1648071298
+Switch#
+
+Switch#dir
+dir
+Directory of flash0:/
+
+    1  drw-           0  Jan 30 2013 00:00:00 +00:00  boot
+  264  drw-           0  Oct 14 2013 00:00:00 +00:00  config
+  266  -rw-         375  Jun 19 2018 00:00:00 +00:00  config.grub
+  267  -rw-   118944152  Jun 19 2018 00:00:00 +00:00  vios_l2-adventerprisek9-m
+  268  -rw-      524288  Mar 23 2022 21:33:52 +00:00  nvram
+
+2142715904 bytes total (2018639872 bytes free)
+Switch#;1648071311
+;1648071311
+Switch#show version | include [IOSios] [Ss]oftware
+show version | include [IOSios] [Ss]oftware
+Cisco IOS Software, vios_l2 Software (vios_l2-ADVENTERPRISEK9-M), Version 15.2(CML_NIGHTLY_20180619)FLO_DSGS7, EARLY DEPLOYMENT DEVELOPMENT BUILD, synced to  V152_6_0_81_E
+Switch#show inventory | include [Cc]hassis
+show inventory | include [Cc]hassis
+Switch#show version | include [Pp]rocessor [Bb]oard [IDid]
+show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID 94L5AH36FKO
+Switch#;1648071321
+;1648071321
+Switch#
+
+Switch#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#interface GigabitEthernet0/0
+interface GigabitEthernet0/0
+Switch(config-if)#switchport mode access
+switchport mode access
+Switch(config-if)#switchport access vlan 1
+switchport access vlan 1
+Switch(config-if)#spanning-tree portfast
+spanning-tree portfast
+%Warning: portfast should only be enabled on ports connected to a single
+ host. Connecting hubs, concentrators, switches, bridges, etc... to this
+ interface  when portfast is enabled, can cause temporary bridging loops.
+ Use with CAUTION
+
+%Portfast has been configured on GigabitEthernet0/0 but will only
+ have effect when the interface is in a non-trunking mode.
+Switch(config-if)#no shutdown
+no shutdown
+Switch(config-if)#interface vlan 1
+interface vlan 1
+Switch(config-if)#ip address 192.168.1.30 255.255.255.0
+ip address 192.168.1.30 255.255.255.0
+Switch(config-if)#no shutdown
+no shutdown
+*Mar 23 21:35:26.021: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to down
+Switch(config-if)#end
+end
+Switch#write memory
+write memory
+Building configuration...
+Compressed configuration from 3408 bytes to 1575 bytes
+*Mar 23 21:35:28.255: %SYS-5-CONFIG_I: Configured from console by console[OK]
+*Mar 23 21:35:29.139: %LINK-3-UPDOWN: Interface Vlan1, changed state to up
+*Mar 23 21:35:30.139: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan1, changed state to up
+Switch#;1648071343
+
+*Mar 23 21:35:30.499: %GRUB-5-CONFIG_WRITING: GRUB configuration is being updated on disk. Please wait...
+*Mar 23 21:35:31.151: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.;1648071343
+Switch#
+
+Switch#ping 192.168.1.10 repeat 4
+ping 192.168.1.10 repeat 4
+Type escape sequence to abort.
+Sending 4, 100-byte ICMP Echos to 192.168.1.10, timeout is 2 seconds:
+.!!!
+Success rate is 75 percent (3/4), round-trip min/avg/max = 1/1/1 ms
+Switch#;1648071356
+;1648071356
+Switch#
+
+Switch#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#crypto key zeroize rsa
+crypto key zeroize rsa
+% No Signature Keys found in configuration.
+
+Switch(config)#crypto key generate rsa general-keys label ADVENTURES modulus 1024
+crypto key generate rsa general-keys label ADVENTURES modulus $generate rsa general-keys label ADVENTURES modulus 1         024
+The name for the keys will be: ADVENTURES
+
+% The key modulus size is 1024 bits
+% Generating 1024 bit RSA keys, keys will be non-exportable...
+[OK] (elapsed time was 0 seconds)
+
+Switch(config)#ip ssh version 2
+ip ssh version 2
+Switch(config)#ip ssh time-out 120
+ip ssh time-out 120
+*Mar 23 21:35:55.308: %SSH-5-ENABLED: SSH 1.99 has been enabled
+Switch(config)#ip ssh authentication-retries 3
+ip ssh authentication-retries 3
+Switch(config)#end
+end
+Switch#write memory
+write memory
+Building configuration...
+
+*Mar 23 21:35:59.681: %SYS-5-CONFIG_I: Configured from console by consoleCompressed configuration from 3425 bytes to 1585 bytes[OK]
+Switch#;1648071375
+
+*Mar 23 21:36:02.038: %GRUB-5-CONFIG_WRITING: GRUB configuration is being updated on disk. Please wait...
+*Mar 23 21:36:02.693: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.;1648071375
+Switch#
+
+Switch#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#ip scp source-interface GigabitEthernet0/0
+ip scp source-interface GigabitEthernet0/0
+                       ^
+% Invalid input detected at '^' marker.
+
+Switch(config)#end
+end
+Switch#write memory
+write memory
+Building configuration...
+
+*Mar 23 21:36:13.071: %SYS-5-CONFIG_I: Configured from console by consoleCompressed configuration from 3425 bytes to 1585 bytes[OK]
+Switch#;1648071389
+
+*Mar 23 21:36:15.822: %GRUB-5-CONFIG_WRITING: GRUB configuration is being updated on disk. Please wait...
+*Mar 23 21:36:16.480: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.;1648071389
+Switch#
+
+Switch#copy nvram: scp:
+copy nvram: scp:
+Source filenamestartup-config
+ []? startup-config
+Address or name of remote host192.168.1.10
+ []? 192.168.1.10
+Destination username [Switch]?gns3user
+ gns3user
+Destination filename [swit/var/lib/tftpboot/start-IOSvL2.scp
+ch-confg]? /var/lib/tftpboot/start-IOSvL2.scp
+Writing /var/lib/tftpboot/start-IOSvL2.scp 
+Password: gns3user
+
+! Sink: C0644 3425 start-IOSvL2.scp
+
+3425 bytes copied in 15.328 secs (223 bytes/sec)
+Switch#;1648071417
+;1648071417
+Switch#
+
+Switch#copy scp: flash0:
+copy scp: flash0:
+Address or name of remote host192.168.1.10
+ []? 192.168.1.10
+Source username [Switch]? gns3user
+gns3user
+Source filename/var/lib/tftpboot/start-IOSvL2.scp
+ []? /var/lib/tftpboot/start-IOSvL2.scp
+Destination filename [start-Istart-IOSvL2.scp
+OSvL2.scp]? start-IOSvL2.scp
+Password: gns3user
+
+ Sending file modes: C0644 3425 start-IOSvL2.scp
+!
+3425 bytes copied in 10.673 secs (321 bytes/sec)
+Switch#;1648071440
+;1648071440
+Switch#
+
+Switch#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#ip tftp source-interface GigabitEthernet0/0
+ip tftp source-interface GigabitEthernet0/0
+Switch(config)#end
+end
+Switch#write memory
+write memory
+Building configuration...
+
+*Mar 23 21:37:17.569: %SYS-5-CONFIG_I: Configured from console by consoleCompressed configuration from 3469 bytes to 1600 bytes[OK]
+Switch#;1648071454
+
+*Mar 23 21:37:19.899: %GRUB-5-CONFIG_WRITING: GRUB configuration is being updated on disk. Please wait...
+*Mar 23 21:37:20.568: %GRUB-5-CONFIG_WRITTEN: GRUB configuration was written to disk successfully.;1648071454
+Switch#
+
+Switch#copy nvram:/startup-config tftp://192.168.1.10/start-IOSvL2.tftp
+copy nvram:/startup-config tftp://192.168.1.10/start-IOSvL2.tftp
+Address or name of remote host192.168.1.10
+ [192.168.1.10]? 192.168.1.10
+Destination filename [ststart-IOSvL2.tftp
+art-IOSvL2.tftp]? start-IOSvL2.tftp
+!!
+3469 bytes copied in 0.021 seccopy tftp: flash0:
+s (165190 bytes/sec)
+Switch#copy tftp: flash0:
+Address or name of remote host192.168.1.10
+ []? 192.168.1.10
+Source filename []? start-IOSvL2.tftp
+start-IOSvL2.tftp
+Destination filename [start-IOstart-IOSvL2.tftp
+SvL2.tftp]? start-IOSvL2.tftp
+Accessing tftp://192.168.1.10/start-IOSvL2.tftp...
+Loading start-IOSvL2.tftp from 192.168.1.10 (via Vlan1): !
+[OK - 3469 bytes]
+
+3469 bytes copied in 0.
+456 secs (7607 bytes/sec)
+Switch#
+Switch#
+telnet> q
+q
+Connection closed.

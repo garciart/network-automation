@@ -1,0 +1,222 @@
+Trying 192.168.1.1...
+Connected to 192.168.1.1.
+Escape character is '^]'.
+
+
+Router#;1648073691
+
+Router#;1648073691
+Router#
+
+Router#;1648073698
+;1648073698
+Router#
+
+Router#dir
+dir
+Directory of bootflash:/
+
+   11  drwx            16384  Sep 21 2017 14:26:24 +00:00  lost+found
+873121  drwx             4096  Sep 21 2017 14:27:06 +00:00  .super.iso.dir
+554881  drwx             4096  Sep 21 2017 14:27:01 +00:00  .installer
+   12  -rw-               31  Mar 23 2022 22:09:09 +00:00  .CsrLxc_LastInstall
+   13  -rw-               69  Mar 23 2022 22:09:09 +00:00  virtual-instance.conf
+481441  drwx             4096  Mar 23 2022 22:05:30 +00:00  core
+   15  -rw-        125696000  Sep 21 2017 14:27:06 +00:00  iosxe-remote-mgmt.16.06.01.ova
+938403  -rw-        369701848  Sep 21 2017 14:27:27 +00:00  csr1000v-mono-universalk9.16.06.01.SPA.pkg
+938404  -rw-         40067508  Sep 21 2017 14:27:35 +00:00  csr1000v-rpboot.16.06.01.SPA.pkg
+938402  -rw-             2787  Sep 21 2017 14:27:35 +00:00  packages.conf
+758881  drwx             4096  Mar 23 2022 22:05:15 +00:00  .prst_sync
+40801  drwx             4096  Mar 23 2022 22:05:31 +00:00  .rollback_timer
+791521  drwx             4096  Mar 23 2022 22:09:15 +00:00  virtual-instance
+   16  -rw-               30  Mar 23 2022 22:08:29 +00:00  throughput_monitor_params
+   17  -rw-                0  Mar 23 2022 22:08:29 +00:00  cvac.log
+   18  -rw-             1766  Mar 23 2022 22:09:19 +00:00  csrlxc-cfg.log
+   14  -rw-               35  Mar 23 2022 22:09:15 +00:00  pnp-tech-time
+ --More--         
+Router#;1648073711
+;1648073711
+Router#show version | include [IOSios] [Ss]oftware
+show version | include [IOSios] [Ss]oftware
+Cisco IOS Software [Everest], Virtual XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.6.1, RELEASE SOFTWARE (fc2)
+Router#show inventory | include [Cc]hassis
+show inventory | include [Cc]hassis
+NAME: "Chassis", DESCR: "Cisco CSR1000V Chassis"
+Router#show version | include [Pp]rocessor [Bb]oard [IDid]
+show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID 9ZSMRO9TSDR
+Router#;1648073720
+;1648073720
+Router#
+
+Router#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#interface GigabitEthernet1
+interface GigabitEthernet1
+Router(config-if)#ip address 192.168.1.50 255.255.255.0
+ip address 192.168.1.50 255.255.255.0
+Router(config-if)#no shutdown
+no shutdown
+Router(config-if)#end
+end
+Router#write memory
+write memory
+
+*Mar 23 22:15:27.375: %SYS-5-CONFIG_I: Configured from console by console
+Building configuration...
+[OK]
+Router#;1648073735
+;1648073735
+Router#
+
+Router#ping 192.168.1.10 repeat 4
+ping 192.168.1.10 repeat 4
+Type escape sequence to abort.
+Sending 4, 100-byte ICMP Echos to 192.168.1.10, timeout is 2 seconds:
+
+*Mar 23 22:15:36.959: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1, changed state to up.!!!
+Success rate is 75 percent (3/4), round-trip min/avg/max = 1/38/113 ms
+Router#;1648073748
+;1648073748
+Router#
+
+Router#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#crypto key zeroize rsa
+crypto key zeroize rsa
+% All keys will be removed.
+% All router certs issued using these keys will also be removed.
+Do you really want to remove these keys? [yes/no]: yes
+yes
+Router(config)#crypto key generate rsa general-keys label ADVENTURES modulus 1024
+crypto key generate rsa general-keys label ADVENTURES modulus $generate rsa general-keys label ADVENTURES modulus 1         024
+The name for the keys will be: ADVENTURES
+
+% The key modulus size is 1024 bits
+% Generating 1024 bit RSA keys, keys will be non-exportable...
+[OK] (elapsed time was 0 seconds)
+
+Router(config)#ip ssh version 2
+
+*Mar 23 22:15:53.353: %SSH-5-DISABLED: SSH 1.99 has been disabledip ssh version 2
+Router(config)#ip ssh time-out 120
+
+*Mar 23 22:15:54.447: %SSH-5-ENABLED: SSH 1.99 has been enabledip ssh time-out 120
+Router(config)#ip ssh authentication-retries 3
+ip ssh authentication-retries 3
+Router(config)#end
+end
+Router#write memory
+write memory
+
+*Mar 23 22:15:58.492: %SYS-5-CONFIG_I: Configured from console by console
+Building configuration...
+[OK]
+Router#;1648073766
+;1648073766
+Router#
+
+Router#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip scp source-interface GigabitEthernet1
+ip scp source-interface GigabitEthernet1
+                       ^
+% Invalid input detected at '^' marker.
+
+Router(config)#end
+end
+Router#write memory
+write memory
+Building configuration...
+
+*Mar 23 22:16:10.758: %SYS-5-CONFIG_I: Configured from console by console[OK]
+Router#;1648073778
+;1648073778
+Router#
+
+Router#copy nvram: scp:
+copy nvram: scp:
+Source filename []? startup-config
+startup-config
+Address or name of remote host []? 192.168.1.10
+192.168.1.10
+Destination username [Routergns3user
+]? gns3user
+Destination filename [router-confg]? /var/lib/tftpboot/start-IOSv3.scp
+/var/lib/tftpboot/start-IOSv3.scp
+Writing /var/lib/tftpboot/start-IOSv3.scp 
+Password: gns3user
+
+! Sink: C0644 1496 start-IOSv3.scp
+
+1496 bytes copied in 4.317 secs (347 bytes/sec)
+Router#;1648073794
+;1648073794
+Router#
+
+Router#copy scp: bootflash:
+copy scp: bootflash:
+Address or name of remote host []?192.168.1.10
+ 192.168.1.10
+Source username [Routergns3user
+]? gns3user
+Source filename []? /var/lib/tftpboot/start-IOSv3.scp
+/var/lib/tftpboot/start-IOSv3.scp
+Destination filename [start-IOSv3.scp]? start-IOSv3.scp
+start-IOSv3.scp
+Password: gns3user
+
+ Sending file modes: C0644 1496 start-IOSv3.scp
+!
+1496 bytes copied in 9.266 secs (161 bytes/sec)
+Router#;1648073816
+;1648073816
+Router#
+
+Router#configure terminal
+configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#ip tftp source-interface GigabitEthernet1
+ip tftp source-interface GigabitEthernet1
+Router(config)#end
+end
+Router#write memory
+write memory
+
+*Mar 23 22:17:00.784: %SYS-5-CONFIG_I: Configured from console by console
+Building configuration...
+[OK]
+Router#;1648073828
+;1648073828
+Router#
+
+Router#copy nvram:/startup-config tftp://192.168.1.10/start-IOSv3.tftp
+copy nvram:/startup-config tftp://192.168.1.10/start-IOSv3.tftp
+Address or name of remote host [192.168.1.10]? 192.168.1.10
+192.168.1.10
+Destination filename [start-IOSv3.tftp]? start-IOSv3.tftp
+start-IOSv3.tftp
+!!
+1538 bytes copied in 0.039 secs (39436 bytes/sec)
+Router#copy tftp: bootflash:
+copy tftp: bootflash:
+Address or name of remote host []? 192.168.1.10
+192.168.1.10
+Source filename []? start-IOSv3.tftp
+start-IOSv3.tftp
+Destination filename [start-IOSv3.tftp]? start-IOSv3.tftp
+start-IOSv3.tftp
+Accessing tftp://192.168.1.10/start-IOSv3.tftp...
+Loading start-IOSv3.tftp from 192.168.1.10 (via GigabitEthernet1): !
+[OK - 1538 bytes]
+
+1538 bytes copied in 0.025 secs (61520 by
+tes/sec)
+Router#
+Router#
+telnet> q
+q
+Connection closed.
