@@ -7,10 +7,18 @@ import pipes
 import re
 import socket
 
-__all__ = ['validate_ip_address', 'validate_subnet_mask', 'validate_port_number',
-           'validate_filepath', 'validate_username', 'validate_password',
-           'run_cli_command', 'fix_tftp_filepath', 'prep_for_tftp_download',
-           'enable_tftp', 'disable_tftp', ]
+__all__ = ('run_cli_command',
+           'enable_tftp',
+           'prep_for_tftp_download',
+           'disable_tftp',
+           'validate_ip_address',
+           'validate_port_number',
+           'validate_subnet_mask',
+           'validate_file_path',
+           'validate_switch_priority',
+           'validate_username',
+           'validate_password',
+           'fix_tftp_filepath',)
 
 import pexpect
 
@@ -90,7 +98,7 @@ def validate_subnet_mask(subnet_mask):
         raise ValueError('Invalid subnet mask: {0}.'.format(subnet_mask))
 
 
-def validate_filepath(filepath):
+def validate_file_path(filepath):
     """Check if the filepath exists. Causes an exception if invalid.
 
     :param str filepath: The filepath to check.
@@ -100,6 +108,29 @@ def validate_filepath(filepath):
     """
     if not os.path.exists(filepath):
         raise ValueError('Invalid filepath.')
+
+
+def validate_switch_priority(switch_priorities, min_priority=1, max_priority=15):
+    """Checks that the switch priority value is valid.
+
+    :param switch_priorities: The switch priority (int) or list of switch priorities to check.
+    :param int min_priority: The minimum switch priority allowed on the switch.
+    :param int max_priority: The maximum switch priority allowed on the switch.
+        Currently, no switch manufacturers allow over 15
+    :returns: None
+    :rtype: None
+
+    :raises ValueError: If the switch_priority is invalid.
+    """
+    if min_priority is None or max_priority is None or \
+            not isinstance(min_priority, int) or not isinstance(max_priority, int) \
+            or (1 > min_priority > max_priority) or min_priority < 1 or max_priority > 15:
+        raise ValueError('Invalid switch priority range.')
+    if not isinstance(switch_priorities, list):
+        switch_priorities = [switch_priorities, ]
+    for s in switch_priorities:
+        if s is None or not isinstance(s, int) or s not in range(min_priority, max_priority + 1):
+            raise ValueError('Argument contains an invalid switch priority: {0}'.format(s))
 
 
 def validate_username(usernames):

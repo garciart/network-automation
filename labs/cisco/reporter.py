@@ -12,9 +12,11 @@ class Reporter(object):
     __GRN = '\x1b[32m'
     __YLW = '\x1b[33m'
 
-    @staticmethod
-    def step(text):
+    awaiting_result = False
+
+    def step(self, text):
         print('Step: {0}'.format(text))
+        self.awaiting_result = True
 
     @staticmethod
     def note(text):
@@ -28,6 +30,8 @@ class Reporter(object):
             print(self.__RED + '[FAIL]: {0}'.format(text) + self.__CLR)
         else:
             print(self.__RED + '[FAIL]' + self.__CLR)
+        self.awaiting_result = False
 
     def success(self):
         print(self.__GRN + '[OK]' + self.__CLR)
+        self.awaiting_result = False
