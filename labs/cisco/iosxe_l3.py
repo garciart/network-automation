@@ -21,10 +21,10 @@ class CiscoIOSXEL3(object):
     def __init__(self,
                  device_hostname,
                  eol,
-                 device_ip_addr,
                  ethernet_port,
-                 remote_ip_addr,
+                 device_ip_addr,
                  subnet_mask,
+                 remote_ip_addr,
                  device_username=None,
                  device_password=None,
                  file_to_transfer=None,
@@ -33,8 +33,8 @@ class CiscoIOSXEL3(object):
 
         :param str device_hostname: Hostname of the device.
         :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
-        :param str device_ip_addr: IPv4 address of the device.
         :param str ethernet_port: Ethernet interface port name used to connect to the device.
+        :param str device_ip_addr: IPv4 address of the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str subnet_mask: Netmask to apply for communication between the host and the device.
         :param str device_username: Username for Virtual Teletype (VTY) connections when
