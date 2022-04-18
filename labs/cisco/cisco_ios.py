@@ -48,7 +48,7 @@ class CiscoIOS(object):
 
     def connect_via_telnet(self, reporter, eol,
                            telnet_ip_addr,
-                           telnet_port_num=22,
+                           telnet_port_num=23,
                            username=None,
                            password=None,
                            enable_password=None,
@@ -70,6 +70,11 @@ class CiscoIOS(object):
 
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
+
+        :raise ValueError: If an argument is invalid.
+        :raise RuntimeError: If Minicom is not installed.
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
         """
         reporter.step(
             'Connecting to {0} on port {1} via Telnet...'.format(telnet_ip_addr, telnet_port_num))
@@ -183,6 +188,90 @@ class CiscoIOS(object):
         # However, depending on:
         # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
         # - The protocol (e.g., Telnet, SSH, Reverse Telnet, etc.)
+        # - The network port (e.g., 23, 2000, 4000, etc.)
+        # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
+        # - The emulation (e.g., VT100, VT102, ANSI, etc.)
+        # The device may require a carriage return ('\r') before the line feed to create a CRLF
+        # (i.e., pexpect.sendline('text\r')).
+        # Therefore, the user must designate an EOL, based on the connection,
+        # which will be appended to each sendline.
+
+        # Get to Privileged EXEC Mode
+        self.__clear_startup_prompts(child, reporter, eol, username, password)
+        self.__access_priv_exec_mode(child, eol, enable_password)
+
+        reporter.success()
+        return child
+
+    def connect_via_ssh(self, reporter, eol,
+                        ssh_ip_addr,
+                        ssh_port_num=22,
+                        username=None,
+                        password=None,
+                        enable_password=None,
+                        verbose=False):
+        """Connect to a network device using SSH.
+
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
+        :param str ssh_ip_addr: Device's IP address for SSH.
+        :param int ssh_port_num: Port number for the connection, both standard (22) and others.
+        :param str username: Username for Virtual Teletype (VTY) connections when
+            'login local' is set in the device's startup-config file.
+        :param str password: Console, Auxiliary, or VTY password, depending on the connection
+            and if a password is set in the device's startup-config file.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool verbose: True (default) to echo both input and output to the screen,
+            or false to save output to a time-stamped file.
+
+        :return: Connection in a child application object.
+        :rtype: pexpect.spawn
+
+        :raise ValueError: If an argument is invalid.
+        :raise RuntimeError: If Minicom is not installed.
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
+        reporter.step(
+            'Connecting to {0} on port {1} via SSH...'.format(ssh_ip_addr, ssh_port_num))
+
+        _, exitstatus = pexpect.run('which ssh', withexitstatus=True)
+        if exitstatus != 0:
+            raise RuntimeError('SSH client is not installed.')
+
+        # Validate inputs
+        validate_ip_address(ssh_ip_addr)
+        if ssh_port_num:
+            validate_port_number(ssh_port_num)
+            child = pexpect.spawn('ssh {0} {1}'.format(ssh_ip_addr, ssh_port_num))
+        else:
+            child = pexpect.spawn('ssh {0}'.format(ssh_ip_addr))
+
+        # noinspection PyTypeChecker
+        index = child.expect_exact(
+            ['Are you sure you want to continue connecting',
+             'Host key verification failed.'] + pexpect.TIMEOUT)
+        if index == 0:
+            child.snedline('yes')
+        elif index == 1:
+            raise RuntimeError('Host key verification failed. Check your known hosts file.')
+
+        # Slow down commands to prevent race conditions with output
+        child.delaybeforesend = 0.5
+        if verbose:
+            # Echo both input and output to the screen
+            child.logfile = sys.stdout
+        else:
+            # Save output to file
+            output_file = open('{0}-{1}'.format(
+                self.device_hostname, datetime.utcnow().strftime('%y%m%d-%H%M%SZ')), 'wb')
+            child.logfile = output_file
+
+        # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ('\n') after the text.
+        # However, depending on:
+        # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
+        # - The protocol (e.g., SSH, SSH, Reverse SSH, etc.)
         # - The network port (e.g., 23, 2000, 4000, etc.)
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
@@ -444,6 +533,10 @@ class CiscoIOS(object):
 
         :return: None
         :rtype: None
+        
+        :raise ValueError: If an argument is invalid.
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
         """
         # Validate inputs
         if not device_file_system.startswith(('bootflash', 'flash', 'slot', 'disk',)):
@@ -467,6 +560,55 @@ class CiscoIOS(object):
         child.sendline('show {0}'.format(device_file_system) + eol)
         child.expect_exact('(0 bytes used)')
         child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def set_switch_priority(self, child, reporter, eol,
+                            switch_number=1,
+                            switch_priority=1,
+                            enable_password=None,
+                            commit=True):
+        """Set the switch priority in the stack.
+        
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param switch_number: Switch reference number in the stack
+        :param switch_priority: Switch priority in the stack; maximum is 15. The switch with the
+             largest number (e.g., 15) becomes the master switch for the stack.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+
+        :raise ValueError: If an argument is invalid.
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
+        reporter.step('Setting switch priority...')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+        # Validate inputs
+        if not 1 <= switch_number <= 9:
+            raise ValueError('Invalid switch stack member number.')
+        validate_switch_priority(switch_priority)
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('switch {0} priority {1}'.format(switch_number, switch_priority))
+        index = 0
+        while index == 0:
+            index = child.expect_exact(
+                ['Do you want to continue', 'New Priority has been set successfully', ])
+            if index == 0:
+                child.sendline(eol)
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
+
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact('[OK]')
+            child.expect_exact(self.device_prompts[1])
         reporter.success()
 
     def set_switch_ip_addr(self, child, reporter, eol,
@@ -625,35 +767,113 @@ class CiscoIOS(object):
             raise RuntimeError('Cannot ping {0} from this device.'.format(destination_ip_addr))
         reporter.success()
 
-    def set_switch_priority(self, child, reporter, eol,
-                            switch_number=1,
-                            switch_priority=1,
-                            enable_password=None,
-                            commit=True):
-        reporter.step('Setting switch priority...')
+    def secure_device(self, child, reporter, eol,
+                      vty_username=None,
+                      vty_password=None,
+                      privilege=15,
+                      console_password=None,
+                      aux_password=None,
+                      enable_password=None,
+                      commit=True):
+        """Secure the device. To skip a setting, leave out the parameter or set to None
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str vty_username: Username for a virtual teletype line connection.
+        :param str vty_password: Password for a virtual teletype line connection.
+        :param int privilege: Cisco CLI command access level: 1 = Test commands (e.g., ping) only
+            with Read-only privileges, 15 = Full access to commands with write privileges
+        :param str console_password: Password for a direct console line connection.
+        :param str aux_password: Password for a direct auxiliary line connection.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
+        reporter.step('Securing the network device...')
         self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
         # Validate inputs
-        if not 1 <= switch_number <= 9:
-            raise ValueError('Invalid switch stack member number.')
-        validate_switch_priority(switch_priority)
+        if not 1 <= privilege <= 15:
+            raise ValueError('Invalid CLI command access privilege: {0}'.format(privilege))
+
         child.sendline('configure terminal' + eol)
         child.expect_exact(self.device_prompts[2])
-        child.sendline('switch {0} priority {1}'.format(switch_number, switch_priority))
-        index = 0
-        while index == 0:
-            index = child.expect_exact(
-                ['Do you want to continue', 'New Priority has been set successfully', ])
-            if index == 0:
-                child.sendline(eol)
+
+        if vty_username and vty_password:
+            # Secure the device with a username and a password
+            # Use secret 0 to enter the plain text password; the device will determine the MD5 hash
+            # Using secret 5 requires the MD5 hash of the password
+            child.sendline('username {0} privilege {1} secret 0 {2}'.format(vty_username, privilege,
+                                                                            vty_password) + eol)
+            child.expect_exact(self.device_prompts[2])
+            # Require virtual teletype lines to ask for the device username and password
+            child.sendline('line vty 0 4' + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('login local' + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('exit' + eol)
+            child.expect_exact(self.device_prompts[2])
+
+        if console_password:
+            # Secure console port connections
+            child.sendline('line console 0' + eol)
+            child.expect_exact(self.device_prompts[4])
+            # Use password 0 enter the plain text password; we will encrypt at the end
+            # Using 7 requires the Vigenere cipher of the password
+            child.sendline('password 0 {0}'.format(console_password) + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('login' + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('exit' + eol)
+            child.expect_exact(self.device_prompts[2])
+
+        if aux_password:
+            # Secure auxiliary port connections
+            child.sendline('line aux 0' + eol)
+            child.expect_exact(self.device_prompts[4])
+            # Use password 0 enter the plain text password; we will encrypt at the end
+            # Using 7 requires the Vigenere cipher of the password
+            child.sendline('password 0 {0}'.format(aux_password) + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('login' + eol)
+            child.expect_exact(self.device_prompts[4])
+            child.sendline('exit' + eol)
+            child.expect_exact(self.device_prompts[2])
+
+        if console_password or aux_password:
+            # Encrypt the console and auxiliary port passwords with a Vigenere cipher
+            child.sendline('service password-encryption' + eol)
+            child.expect_exact(self.device_prompts[2])
+
+        if enable_password:
+            # Secure Privileged EXEC Mode
+            child.sendline('enable secret {0}'.format(enable_password) + eol)
+            child.expect_exact(self.device_prompts[2])
+            # Test security
+            child.sendline('end' + eol)
+            child.expect_exact(self.device_prompts[1])
+            child.sendline('disable' + eol)
+            child.expect_exact(self.device_prompts[0])
+            child.sendline('enable' + eol)
+            child.expect_exact('Password:')
+            child.sendline('{0}'.format(enable_password) + eol)
+            child.expect_exact(self.device_prompts[1])
+
         child.sendline('end' + eol)
         child.expect_exact(self.device_prompts[1])
 
         # Save changes if True
         if commit:
             child.sendline('write memory' + eol)
-            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
-        reporter.success()
+
+        print('Network device secured.')
 
     def enable_ssh(self, child, reporter, eol,
                    label=None,
@@ -724,6 +944,68 @@ class CiscoIOS(object):
         child.sendline('end' + eol)
         child.expect_exact(self.device_prompts[1])
 
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def set_clock(self, child, reporter, eol,
+                  time_to_set='12:00:00 Jan 1 2021',
+                  enable_password=None,
+                  commit=True):
+        reporter.step('Setting the network device\'s clock....')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
+        # Validate inputs
+        dt_format = '%H:%M:%S %b %d %Y'
+        time_to_set = datetime.strptime(time_to_set, dt_format)
+
+        child.sendline('clock set {0}'.format(time_to_set) + eol)
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def synch_clock(self, child, reporter, eol,
+                    ntp_server_ip,
+                    enable_password=None,
+                    commit=True):
+        reporter.step('Synchronizing the device\'s clock with the NTP server (~ 60 seconds)...')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
+        # Validate inputs
+        validate_ip_address(ntp_server_ip)
+
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ntp server {0}'.format(ntp_server_ip) + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline('write memory' + eol)
+            child.expect_exact(self.device_prompts[1])
+        time.sleep(60)
+        reporter.success()
+
+    def set_device_hostname(self, child, reporter, eol,
+                            device_hostname,
+                            enable_password=None,
+                            commit=True):
+        reporter.step('Changing the device\'s hostname......')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('hostname {0}'.format(device_hostname) + eol)
+        child.expect_exact('{0}(config)#'.format(device_hostname))
+        # Change instance device prompts if successful
+        self.set_device_prompts(device_hostname)
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
             child.sendline('write memory' + eol)
@@ -1004,7 +1286,7 @@ class CiscoIOS(object):
                                             'Error',
                                             'Do you want to overwrite?',
                                             'bytes copied in', ], timeout=600)
-                if index in (0, 1, ):
+                if index in (0, 1,):
                     # Get error information between 'Error' and the prompt; some hints:
                     # Timeout = Port not open or firewall may be closed
                     # No such file or directory = Destination file may not exist
@@ -1216,6 +1498,19 @@ class CiscoIOS(object):
             child.sendline('x\r')
             # Confirm request
             child.sendline('\r')
+            # While pexpect.EOF closes the child implicitly,
+            # close it explicitly as well, just in case
+            child.close()
+        reporter.success()
+
+    @staticmethod
+    def close_ssh(child, reporter):
+        reporter.step('Closing SSH session...')
+        if child:
+            # Request exit. BTW, depending on the connection, the carriage return may confirm the
+            # request, making the next step redundant. This has no adverse effect.
+            child.sendline('~.\r')
+            child.expect_exact(['Connection closed.', pexpect.EOF, ])
             # While pexpect.EOF closes the child implicitly,
             # close it explicitly as well, just in case
             child.close()
