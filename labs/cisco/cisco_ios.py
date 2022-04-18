@@ -1155,9 +1155,6 @@ class CiscoIOS(object):
 
         # Validate inputs
         validate_ip_address(remote_ip_addr)
-        # Do not validate file path if the file is in the SSHv1 Docker container
-        if remote_username != 'sshtransfer':
-            validate_file_path(file_to_upload)
 
         # copy scp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.scp
         child.sendline('copy scp: {0}:'.format(device_file_system) + eol)
