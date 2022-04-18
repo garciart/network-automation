@@ -9,7 +9,7 @@ from cisco_ios import CiscoIOS
 from labs.cisco.utility import (validate_ip_address,
                                 validate_port_number,
                                 validate_subnet_mask,
-                                validate_filepath,
+                                validate_file_path,
                                 validate_password,
                                 run_cli_command, )
 
