@@ -201,7 +201,10 @@ sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
 sudo yum -y install vsftpd
 sudo yum -y install httpd
+# Install SSH support, including ssh, scp, sftp, sshd, ssh-keygen, etc.
+sudo yum -y install openssh
 sudo yum -y install openssh-clients
+sudo yum -y install openssh-server
 sudo yum -y install mod_ssl openssl
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot

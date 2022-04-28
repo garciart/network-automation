@@ -21,9 +21,9 @@ The labs in this folder will show you how to automate simple network tasks using
 ---
 ## Set up the Host's Linux Environment 
 
-First, ensure you have installed and started GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. We recommend you follow our suggestion in the post-script to open a Linux Terminal and start GNS3 by entering ```gns3_run```. For this tutorial, we will continue to use "lab000-demo".
+First, ensure you have installed and started GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. We recommend you follow our suggestion in the post-script to open a Linux Terminal and start GNS3 by entering ```gns3_run```. For this tutorial, you will continue to use the Automation project in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
 
->**NOTE** - By the way, you will continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
+>**NOTE** - By the way, you will also continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
 Second, make sure the clients and services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial):
 
