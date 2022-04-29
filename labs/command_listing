@@ -1,43 +1,61 @@
 Opening Linux Commands:
 gns3_run
 
-which telnet
-which scp
-systemctl status ntpd
-systemctl status tftp
-systemctl status vsftpd
-systemctl status httpd
-systemctl status sshd
-sudo firewall-cmd --zone=public --add-port=20/tcp
+# Find the Ethernet interface connected to the bridge (look for br0)
+ip address show | grep '[0-9]: e[mnt]'
 
-sudo firewall-cmd --zone=public --add-port=21/tcp
-sudo firewall-cmd --zone=public --add-port=22/tcp
-sudo firewall-cmd --zone=public --add-service=ssh
-sudo firewall-cmd --zone=public --add-service=ftp
-sudo firewall-cmd --zone=public --add-port=23/tcp
-sudo firewall-cmd --zone=public --add-port=123/udp
-sudo firewall-cmd --zone=public --add-service=ntp
+# Ensure the interface has the correct IPv4 address and subnet mask
+sudo ifconfig <interface name> 192.168.1.10 netmask 255.255.255.0
+
+# Ensure firewall is on
+sudo systemctl start firewalld
+
+# Check if Telnet client is installed.
+# Since you are not running a Telnet server, there is no need to open port 23 or start telnet-server
+which telnet
+
+# Check if the TFTP service is installed and loaded
+systemctl status tftp
 sudo firewall-cmd --zone=public --add-port=69/udp
 sudo firewall-cmd --zone=public --add-service=tftp
+sudo mkdir --parents --verbose /var/lib/tftpboot
+sudo chmod 777 --verbose /var/lib/tftpboot
+sudo touch /var/lib/tftpboot/startup-config.tftp
+sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.tftp
+sudo systemctl start tftp
+
+# Check if the FTP service is installed and loaded
+systemctl status vsftpd
+sudo firewall-cmd --zone=public --add-port=20/tcp
+sudo firewall-cmd --zone=public --add-port=21/tcp
+sudo firewall-cmd --zone=public --add-service=ftp
+# If you want to check first: sudo grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
+sudo sed --in-place --expression "\$aftp_username=gns3user" /etc/vsftpd/vsftpd.conf
+# Or echo -e "ftp_username=nobody" | sudo tee -a /etc/vsftpd/vsftpd.conf
+sudo systemctl start vsftpd
+
+# Check if the SSH service is installed and loaded
+systemctl status sshd
+sudo firewall-cmd --zone=public --add-port=22/tcp
+# The SSH service may already be enabled
+sudo firewall-cmd --zone=public --add-service=ssh
+sudo systemctl start sshd
+
+# Check if the NTP service is installed and loaded
+systemctl status ntpd
+sudo firewall-cmd --zone=public --add-port=123/udp
+sudo firewall-cmd --zone=public --add-service=ntp
+# If you want to check first: sudo grep "server 127.127.1.0" /etc/ntp.conf
+sudo sed --in-place --expression "\$aserver 127.127.1.0" /etc/ntp.conf
+# Or echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
+sudo systemctl start ntpd
+
+# Check if the HTTP service is installed and loaded
+systemctl status httpd
 sudo firewall-cmd --zone=public --add-port=80/tcp
 sudo firewall-cmd --zone=public --add-service=http
 sudo firewall-cmd --zone=public --add-port=443/tcp
 sudo firewall-cmd --zone=public --add-service=https
-grep "server 127.127.1.0" /etc/ntp.conf
-
-echo -e "server 127.127.1.0" | sudo tee -a /etc/ntp.conf
-sudo systemctl start ntpd
-sudo mkdir --parents --verbose /var/lib/tftpboot
-sudo chmod 777 --verbose /var/lib/tftpboot
-sudo touch /var/lib/tftpboot/startup-config.bak
-sudo chmod 777 --verbose /var/lib/tftpboot/startup-config.bak
-sudo systemctl start tftp
-sudo grep "ftp_username=nobody" /etc/vsftpd/vsftpd.conf
-
-echo -e "ftp_username=nobody" | sudo tee -a /etc/vsftpd/vsftpd.conf
-sudo systemctl start vsftpd
-
-sudo systemctl start sshd
 
 # Generate a private key
 sudo openssl genrsa -out ca.key 2048
