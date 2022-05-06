@@ -30,8 +30,8 @@ sudo yum -y install xterm
 echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
 sudo xrdb -merge ~/.Xresources
 # Install GNS3
-sudo python3 -m pip install gns3-server
-sudo python3 -m pip install gns3-gui
+sudo python3 -m pip install gns3-server --upgrade
+sudo python3 -m pip install gns3-gui --upgrade
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu

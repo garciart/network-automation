@@ -65,7 +65,7 @@ Regardless of the hypervisor you use, make sure you:
 
 ![File location and size](img/a01.png "Settings -> File location and size")**
 
-3. Allocate **two** processors for your machine (e.g., in VirtualBox...):
+3. Allocate **two** processors for your machine and ensure that you enable Nested Intel VT-x/EPT or AMD-V/RVI (e.g., in VirtualBox...):
 
 ![Settings -> System](img/a02.png "Settings -> System")
 

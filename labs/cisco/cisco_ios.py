@@ -1057,7 +1057,7 @@ class CiscoIOS(object):
                                  destination_filepath,
                                  remote_password,
                                  enable_password=None):
-        """Download a file form the device using the SCP protocol.
+        """Download a file form the device using SCP.
 
         Developer Notes:
             - SCP must be installed: i.e., sudo yum install -y openssh-clients openssh.
@@ -1158,6 +1158,164 @@ class CiscoIOS(object):
 
         # copy scp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.scp
         child.sendline('copy scp: {0}:'.format(device_file_system) + eol)
+        index = 0
+        while index != 7:
+            # Allow 10 minutes for the transfer
+            # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
+            index = child.expect_exact(['Address or name of remote host',
+                                        'Source username',
+                                        'Source filename',
+                                        'Destination filename',
+                                        'Password:',
+                                        'Do you want to over write? [confirm]',
+                                        'Error',
+                                        'bytes copied in', ], timeout=600)
+            if index == 0:
+                child.sendline(remote_ip_addr + eol)
+            elif index == 1:
+                child.sendline(remote_username + eol)
+            elif index == 2:
+                child.sendline(file_to_upload + eol)
+            elif index == 3:
+                child.sendline(destination_filepath.lstrip('/') + eol)
+            elif index == 4:
+                child.sendline(remote_password + eol)
+            elif index == 5:
+                child.sendline(eol)
+            elif index == 6:
+                raise RuntimeError('Unable to upload file from container.')
+        child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def download_file_ftp(self, child, reporter, eol,
+                          device_file_system,
+                          remote_ip_addr,
+                          remote_username,
+                          file_to_download,
+                          destination_filepath,
+                          remote_password,
+                          enable_password=None):
+        """Download a file from a device using FTP.
+
+        Developer Notes:
+            - FTP must be installed: i.e., sudo yum install -y vsftpd.
+            - While the destination's FTP service does not need to be running,
+              the firewall ports must allow FTP traffic.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str remote_username: Remote username to authenticate FTP transfers.
+        :param str file_to_download: File to download
+            (e.g., startup-config, flash:/foo.txt, etc.)
+        :param str destination_filepath: Name for the downloaded file.
+        :param str remote_password: Remote password to authenticate FTP transfers.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        :raise RuntimeError: If unable to enable or disable FTP services.
+        """
+        reporter.step('Downloading {0} from the device using FTP...'.format(file_to_download))
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
+        # Validate inputs
+        validate_ip_address(remote_ip_addr)
+
+        # Add FTP user to running configuration; do not commit
+        child.sendline('configure terminal')
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp username {0}'.format(remote_username))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp password {0}'.format(remote_password))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end')
+        child.expect_exact(self.device_prompts[2])
+
+        # copy flash:/test1.ftp ftp://gns3user:gns3user@192.168.1.10/test1.cfg
+        child.sendline('copy {0}: ftp:'.format(device_file_system) + eol)
+        index = 0
+        while index != 7:
+            # Allow 10 minutes for the transfer
+            # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
+            index = child.expect_exact(['Source filename',
+                                        'Address or name of remote host',
+                                        'Destination username',
+                                        'Destination filename',
+                                        'Password:',
+                                        'Do you want to over write? [confirm]',
+                                        'Error',
+                                        'bytes copied in', ], timeout=600)
+            if index == 0:
+                child.sendline(file_to_download + eol)
+            elif index == 1:
+                child.sendline(remote_ip_addr + eol)
+            elif index == 2:
+                child.sendline(remote_username + eol)
+            elif index == 3:
+                child.sendline(destination_filepath.lstrip('/') + eol)
+            elif index == 4:
+                child.sendline(remote_password + eol)
+            elif index == 5:
+                child.sendline(eol)
+            elif index == 6:
+                raise RuntimeError('Unable to download file to container.')
+        child.expect_exact(self.device_prompts[1])
+        reporter.success()
+
+    def upload_file_ftp(self, child, reporter, eol,
+                        device_file_system,
+                        remote_ip_addr,
+                        remote_username,
+                        file_to_upload,
+                        destination_filepath,
+                        remote_password,
+                        enable_password=None):
+        """ Upload a file from the remote host to the device using FTP.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str device_file_system: File system where the file is located on the device.
+        :param str remote_ip_addr: IPv4 address of the remote host.
+        :param str remote_username: Remote username to authenticate FTP transfers.
+        :param str file_to_upload: File to upload
+            (e.g., startup-config, flash:/foo.txt, etc.)
+        :param str destination_filepath: Name for the downloaded file.
+        :param str remote_password: Remote password to authenticate FTP transfers.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+
+        :return: None
+        :rtype: None
+
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        :raise RuntimeError: If unable to enable or disable FTP services.
+        """
+        reporter.step('Uploading {0} to the device using FTP...'.format(
+            os.path.basename(file_to_upload)))
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
+        # Validate inputs
+        validate_ip_address(remote_ip_addr)
+
+        # Add FTP user to running configuration; do not commit
+        child.sendline('configure terminal')
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp username {0}'.format(remote_username))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp password {0}'.format(remote_password))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end')
+        child.expect_exact(self.device_prompts[2])
+
+        # copy ftp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.ftp
+        child.sendline('copy ftp: {0}:'.format(device_file_system) + eol)
         index = 0
         while index != 7:
             # Allow 10 minutes for the transfer
