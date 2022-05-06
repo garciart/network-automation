@@ -18,7 +18,9 @@ __all__ = ('run_cli_command',
            'validate_switch_priority',
            'validate_username',
            'validate_password',
-           'fix_tftp_filepath',)
+           'fix_tftp_filepath',
+           'enable_ftp',
+           'disable_ftp',)
 
 import pexpect
 
@@ -303,6 +305,43 @@ def disable_tftp(sudo_password=None):
     commands = ['firewall-cmd --zone=public --remove-port=69/udp',
                 'firewall-cmd --zone=public --remove-service=tftp',
                 'systemctl stop tftp', ]
+    for c in commands:
+        run_cli_command(c, sudo_password)
+
+
+def enable_ftp(sudo_password=None):
+    """List of commands to enable the Very Secure File Transfer Protocol Daemon (vsftpd)
+    service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges.
+    :returns: None
+    :rtype: None
+    """
+    commands = ["sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+                "sudo sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
+                "sudo systemctl start vsftpd",
+                "sudo firewall-cmd --zone=public --add-port=20/tcp",
+                "sudo firewall-cmd --zone=public --add-port=21/tcp",
+                "sudo firewall-cmd --zone=public --add-service=ftp", ]
+    for c in commands:
+        run_cli_command(c, sudo_password)
+
+
+def disable_ftp(sudo_password=None):
+    """List of commands to disable the Very Secure File Transfer Protocol Daemon (vsftpd)
+    service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges.
+    :returns: None
+    :rtype: None
+    """
+    commands = ["sudo firewall-cmd --zone=public --remove-service=ftp",
+                "sudo firewall-cmd --zone=public --remove-port=21/tcp",
+                "sudo firewall-cmd --zone=public --remove-port=20/tcp",
+                "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
+                "sudo systemctl stop vsftpd", ]
     for c in commands:
         run_cli_command(c, sudo_password)
 
