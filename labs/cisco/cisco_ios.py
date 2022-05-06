@@ -1234,7 +1234,7 @@ class CiscoIOS(object):
         child.sendline('ip ftp password {0}'.format(remote_password))
         child.expect_exact(self.device_prompts[2])
         child.sendline('end')
-        child.expect_exact(self.device_prompts[2])
+        child.expect_exact(self.device_prompts[1])
 
         # copy flash:/test1.ftp ftp://gns3user:gns3user@192.168.1.10/test1.cfg
         child.sendline('copy {0}: ftp:'.format(device_file_system) + eol)
@@ -1312,7 +1312,7 @@ class CiscoIOS(object):
         child.sendline('ip ftp password {0}'.format(remote_password))
         child.expect_exact(self.device_prompts[2])
         child.sendline('end')
-        child.expect_exact(self.device_prompts[2])
+        child.expect_exact(self.device_prompts[1])
 
         # copy ftp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.ftp
         child.sendline('copy ftp: {0}:'.format(device_file_system) + eol)
