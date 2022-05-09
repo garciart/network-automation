@@ -132,7 +132,7 @@ class CiscoIOSL2(object):
                                                   telnet_port_num=options['telnet_port_num'],
                                                   username=self._username,
                                                   password=self._password,
-                                                  verbose=False)
+                                                  verbose=True)
 
             # Get the device's information
             default_file_system, software_ver, device_name, serial_num = switch.get_device_info(
@@ -158,15 +158,26 @@ class CiscoIOSL2(object):
                                     count=4)
             reporter.note(run_cli_command('ping -c 4 {0}'.format(self._remote_ip_addr)))
 
-            # Transfer a file from and to the device using SCP
             switch.enable_ssh(child, reporter, eol=self._eol,
                               label='ADVENTURES',
                               modulus=1024,
                               version=2,
                               commit=True)
+
+            # switch.secure_device(child, reporter, eol=self._eol,
+            #                      vty_username='admin',
+            #                      vty_password='cisco',
+            #                      privilege=15,
+            #                      console_password='ciscon',
+            #                      aux_password='cisaux',
+            #                      enable_password='cisen',
+            #                      commit=True)
+
+            # Transfer a file from and to the device using SCP
             switch.set_scp_source_interface(child, reporter, eol=self._eol,
                                             scp_interface_port=self._ethernet_port,
                                             commit=True)
+
             # For startup-config or running-config, use 'nvram' instead of default_file_system
             switch.download_from_device_scp(child, reporter, eol=self._eol,
                                             device_file_system='nvram',
@@ -183,6 +194,24 @@ class CiscoIOSL2(object):
                                         destination_filepath=os.path.basename(
                                             self._file_to_transfer + '.scp'),
                                         remote_password=self._remote_password)
+
+            # Transfer a file from and to the device using FTP
+            switch.download_file_ftp(child, reporter, eol=self._eol,
+                                     device_file_system='nvram',
+                                     remote_ip_addr=self._remote_ip_addr,
+                                     remote_username=self._remote_username,
+                                     file_to_download='startup-config',
+                                     destination_filepath=self._file_to_transfer + '.ftp',
+                                     remote_password=self._remote_password)
+
+            switch.upload_file_ftp(child, reporter, eol=self._eol,
+                                   device_file_system=default_file_system,
+                                   remote_ip_addr=self._remote_ip_addr,
+                                   remote_username=self._remote_username,
+                                   file_to_upload=self._file_to_transfer + '.ftp',
+                                   destination_filepath=os.path.basename(
+                                       self._file_to_transfer + '.ftp'),
+                                   remote_password=self._remote_password)
 
             # Transfer a file from and to the device using TFTP
             switch.set_tftp_source_interface(child, reporter, eol=self._eol,

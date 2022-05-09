@@ -2,7 +2,7 @@
 """
 
 """
-
+from labs.cisco.ios_l2 import CiscoIOSL2
 from labs.cisco.iosxe_l3 import CiscoIOSXEL3
 from labs.cisco.reporter import Reporter
 
@@ -50,7 +50,7 @@ def main(reporter):
                telnet_port_num=5001)
     """
 
-    """
+    # """
     switch = CiscoIOSL2(device_hostname='Switch',
                         eol='',
                         device_ip_addr='192.168.1.40',
@@ -60,14 +60,14 @@ def main(reporter):
                         subnet_mask='255.255.255.0',
                         username=None,
                         password=None,
-                        file_to_transfer='/var/lib/tftpboot/start-IOSvL2',
+                        file_to_transfer='start-IOSvL2',
                         remote_username='gns3user',
                         remote_password='gns3user')
     switch.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
-               telnet_port_num=5001)
-    """
-
+               telnet_port_num=5003)
     # """
+
+    """
     router = CiscoIOSXEL3(device_hostname='Router',
                           eol='',
                           device_ip_addr='192.168.1.50',
@@ -81,7 +81,7 @@ def main(reporter):
                           remote_password='gns3user')
     router.run(reporter, connection_type='telnet', telnet_ip_addr='192.168.1.1',
                telnet_port_num=5004)
-    # """
+    """
 
 
 if __name__ == '__main__':

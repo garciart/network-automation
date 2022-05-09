@@ -21,6 +21,8 @@ from labs.cisco.utility import (validate_ip_address,
                                 validate_subnet_mask,
                                 validate_file_path,
                                 validate_switch_priority,
+                                enable_ftp,
+                                disable_ftp,
                                 fix_tftp_filepath,
                                 prep_for_tftp_download,
                                 enable_tftp,
@@ -332,6 +334,7 @@ class CiscoIOS(object):
                 '\x1b[33mYou may be accessing an open or uncleared virtual teletype session.\n' +
                 'Output from previous commands may cause pexpect searches to fail.\n' +
                 'To prevent this in the future, reload the device to clear any artifacts.\x1b[0m')
+            child.sendline(eol)
             self.__reset_pexpect_cursor(child, eol)
             return
 
@@ -606,7 +609,9 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
@@ -676,7 +681,9 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
@@ -723,7 +730,9 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
@@ -870,10 +879,12 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
-
-        print('Network device secured.')
+        reporter.success()
 
     def enable_ssh(self, child, reporter, eol,
                    label=None,
@@ -946,7 +957,10 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
 
@@ -965,7 +979,10 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
 
@@ -987,7 +1004,10 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         time.sleep(60)
         reporter.success()
@@ -1008,7 +1028,10 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
 
@@ -1044,7 +1067,9 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
@@ -1100,7 +1125,7 @@ class CiscoIOS(object):
                                         'Destination username',
                                         'Destination filename',
                                         'Password:',
-                                        'Do you want to over write? [confirm]',
+                                        'Do you want to over',
                                         'Error',
                                         'bytes copied in', ], timeout=600)
             if index == 0:
@@ -1167,7 +1192,7 @@ class CiscoIOS(object):
                                         'Source filename',
                                         'Destination filename',
                                         'Password:',
-                                        'Do you want to over write? [confirm]',
+                                        'Do you want to over',
                                         'Error',
                                         'bytes copied in', ], timeout=600)
             if index == 0:
@@ -1186,6 +1211,45 @@ class CiscoIOS(object):
                 raise RuntimeError('Unable to upload file from container.')
         child.expect_exact(self.device_prompts[1])
         reporter.success()
+
+    def set_ftp_credentials(self, child, reporter, eol,
+                            remote_username,
+                            remote_password,
+                            enable_password=None,
+                            commit=True):
+        """Set credentials for FTP transfers in the device.
+        
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str remote_username: Remote username to authenticate FTP transfers.
+        :param str remote_password: Remote password to authenticate FTP transfers.
+        :param bool commit: True to save changes to startup-config.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
+        reporter.note('Setting FTP credentials in the device...')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+
+        child.sendline('configure terminal')
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp username {0}'.format(remote_username))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('ip ftp password {0}'.format(remote_password))
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('end')
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
+            child.expect_exact('[OK]')
+            child.expect_exact(self.device_prompts[1])
 
     def download_file_ftp(self, child, reporter, eol,
                           device_file_system,
@@ -1226,45 +1290,41 @@ class CiscoIOS(object):
         # Validate inputs
         validate_ip_address(remote_ip_addr)
 
-        # Add FTP user to running configuration; do not commit
-        child.sendline('configure terminal')
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('ip ftp username {0}'.format(remote_username))
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('ip ftp password {0}'.format(remote_password))
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('end')
-        child.expect_exact(self.device_prompts[1])
+        self.set_ftp_credentials(child, reporter, eol, remote_username, remote_password)
 
-        # copy flash:/test1.ftp ftp://gns3user:gns3user@192.168.1.10/test1.cfg
-        child.sendline('copy {0}: ftp:'.format(device_file_system) + eol)
-        index = 0
-        while index != 7:
-            # Allow 10 minutes for the transfer
-            # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
-            index = child.expect_exact(['Source filename',
-                                        'Address or name of remote host',
-                                        'Destination username',
-                                        'Destination filename',
-                                        'Password:',
-                                        'Do you want to over write? [confirm]',
-                                        'Error',
-                                        'bytes copied in', ], timeout=600)
-            if index == 0:
-                child.sendline(file_to_download + eol)
-            elif index == 1:
-                child.sendline(remote_ip_addr + eol)
-            elif index == 2:
-                child.sendline(remote_username + eol)
-            elif index == 3:
-                child.sendline(destination_filepath.lstrip('/') + eol)
-            elif index == 4:
-                child.sendline(remote_password + eol)
-            elif index == 5:
-                child.sendline(eol)
-            elif index == 6:
-                raise RuntimeError('Unable to download file to container.')
-        child.expect_exact(self.device_prompts[1])
+        try:
+            enable_ftp()
+            # copy flash:/test1.ftp ftp://gns3user:gns3user@192.168.1.10/test1.cfg
+            child.sendline('copy {0}: ftp:'.format(device_file_system) + eol)
+            index = 0
+            while index != 7:
+                # Allow 10 minutes for the transfer
+                # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
+                index = child.expect_exact(['Source filename',
+                                            'Address or name of remote host',
+                                            'Destination username',
+                                            'Destination filename',
+                                            'Password:',
+                                            'Do you want to over',
+                                            'Error',
+                                            'bytes copied in', ], timeout=600)
+                if index == 0:
+                    child.sendline(file_to_download + eol)
+                elif index == 1:
+                    child.sendline(remote_ip_addr + eol)
+                elif index == 2:
+                    child.sendline(remote_username + eol)
+                elif index == 3:
+                    child.sendline(destination_filepath.lstrip('/') + eol)
+                elif index == 4:
+                    child.sendline(remote_password + eol)
+                elif index == 5:
+                    child.sendline(eol)
+                elif index == 6:
+                    raise RuntimeError('Unable to download file to container.')
+            child.expect_exact(self.device_prompts[1])
+        finally:
+            disable_ftp()
         reporter.success()
 
     def upload_file_ftp(self, child, reporter, eol,
@@ -1304,45 +1364,41 @@ class CiscoIOS(object):
         # Validate inputs
         validate_ip_address(remote_ip_addr)
 
-        # Add FTP user to running configuration; do not commit
-        child.sendline('configure terminal')
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('ip ftp username {0}'.format(remote_username))
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('ip ftp password {0}'.format(remote_password))
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('end')
-        child.expect_exact(self.device_prompts[1])
+        self.set_ftp_credentials(child, reporter, eol, remote_username, remote_password)
 
-        # copy ftp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.ftp
-        child.sendline('copy ftp: {0}:'.format(device_file_system) + eol)
-        index = 0
-        while index != 7:
-            # Allow 10 minutes for the transfer
-            # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
-            index = child.expect_exact(['Address or name of remote host',
-                                        'Source username',
-                                        'Source filename',
-                                        'Destination filename',
-                                        'Password:',
-                                        'Do you want to over write? [confirm]',
-                                        'Error',
-                                        'bytes copied in', ], timeout=600)
-            if index == 0:
-                child.sendline(remote_ip_addr + eol)
-            elif index == 1:
-                child.sendline(remote_username + eol)
-            elif index == 2:
-                child.sendline(file_to_upload + eol)
-            elif index == 3:
-                child.sendline(destination_filepath.lstrip('/') + eol)
-            elif index == 4:
-                child.sendline(remote_password + eol)
-            elif index == 5:
-                child.sendline(eol)
-            elif index == 6:
-                raise RuntimeError('Unable to upload file from container.')
-        child.expect_exact(self.device_prompts[1])
+        try:
+            enable_ftp()
+            # copy ftp://gns3user:gns3user@192.168.1.10/test1.cfg flash:/test1.ftp
+            child.sendline('copy ftp: {0}:'.format(device_file_system) + eol)
+            index = 0
+            while index != 7:
+                # Allow 10 minutes for the transfer
+                # Reference: 14606129 bytes copied in 166.925 secs (87501 bytes/sec)
+                index = child.expect_exact(['Address or name of remote host',
+                                            'Source username',
+                                            'Source filename',
+                                            'Destination filename',
+                                            'Password:',
+                                            'Do you want to over',
+                                            'Error',
+                                            'bytes copied in', ], timeout=600)
+                if index == 0:
+                    child.sendline(remote_ip_addr + eol)
+                elif index == 1:
+                    child.sendline(remote_username + eol)
+                elif index == 2:
+                    child.sendline(file_to_upload + eol)
+                elif index == 3:
+                    child.sendline(destination_filepath.lstrip('/') + eol)
+                elif index == 4:
+                    child.sendline(remote_password + eol)
+                elif index == 5:
+                    child.sendline(eol)
+                elif index == 6:
+                    raise RuntimeError('Unable to upload file from container.')
+            child.expect_exact(self.device_prompts[1])
+        finally:
+            disable_ftp()
         reporter.success()
 
     def set_tftp_source_interface(self, child, reporter, eol,
@@ -1377,7 +1433,9 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
         reporter.success()
@@ -1439,7 +1497,7 @@ class CiscoIOS(object):
             while 0 <= index <= 1:
                 index = child.expect_exact(['Timed out',
                                             'Error',
-                                            'Do you want to overwrite?',
+                                            'Do you want to over',
                                             'bytes copied in', ], timeout=600)
                 if index in (0, 1,):
                     # Get error information between 'Error' and the prompt; some hints:
@@ -1510,7 +1568,7 @@ class CiscoIOS(object):
                 # Allow ten minutes for transfer (test transfer was 7205803 bytes in 97.946 secs
                 # at 73569 bytes/sec)
                 index = child.expect_exact(
-                    ['Do you want to over write? [confirm]',
+                    ['Do you want to over',
                      'bytes copied in',
                      'Timed out',
                      'Error',
@@ -1564,9 +1622,12 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('write memory' + eol)
+            child.sendline('copy running-config startup-config' + eol)
+            child.expect_exact('Destination filename')
+            child.sendline('startup-config' + eol)
             child.expect_exact('[OK]')
             child.expect_exact(self.device_prompts[1])
+        reporter.success()
 
     def reload_device(self, child, reporter, eol,
                       username=None,
