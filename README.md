@@ -24,11 +24,12 @@ Automating the process using a scripting language, such as Python, is a better o
 
 However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which, with a little tweaking, allow you to test your code quickly against *multiple* network devices, in a virtual environment.
 
-This tutorial is broken down into three parts:
+This tutorial is broken down into several parts:
 
 - [What is GNS3?](#what-is-gns3 "What is GNS3?")
 - [Installing GNS3](#installing-gns3 "Installing GNS3")
-- [Setting up the environment](#setting-up-the-environment "Setting up the environment")
+- [Setting up the Environment](#setting-up-the-environment "Setting up the Environment")
+- [Adding a Device](#adding-a-device "Adding a Device")
 - [Your First Lab](#your-first-lab "Your First Lab")
 
 >**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
@@ -254,7 +255,7 @@ sudo reboot now
 
 -----
 
-## Setting up the environment
+## Setting up the Environment
 
 Before you start, here is the subnet information for the network:
 
@@ -389,6 +390,8 @@ However, before you start on the lab, you need to make some adjustments. From th
 ![Preferences](img/a11.png)
 
 ---
+
+## SAdding a device
 
 Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on which cards or modules are installed. It is an older router, but its IOS is available for download, and it is sufficient for conducting our labs. Here is some additional information:
 >
