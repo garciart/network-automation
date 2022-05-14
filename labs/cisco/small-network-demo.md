@@ -2,20 +2,25 @@
 
 This is a demonstration of how you can use GNS3 virtually to:
 
-- Develop network device configurations
-- Provision network devices
-- Test network devices and network configurations
-- Apply network automation
+- Develop network device configurations and provision network devices 
+- Add devices to a network and test connectivity
+- Apply emerging technologies, such as network automation
+
+- [Set up GNS3](#set-up-gns3 "Set up GNS3")
+- [Set up the Web Server](#set-up-the-web-server "Set up the Web Server]")
+- [Set up the Firewall](#set-up-the-firewall "Set up the Firewall")
+- [The Demo](#the-demo "The Demo")
+- [Put It All Together](#put-it-all-together "Put It All Together")
 
 >**IMPORTANT NOTE** - You will need a Cisco Learning Store Account to perform this lab.
 
 ---
 
-## Setup GNS3
+## Set up GNS3
 
 Follow the instructions at https://github.com/garciart/network-automation, up to and including [Setting up the environment](https://github.com/garciart/network-automation#setting-up-the-environment "Setting up the environment"). However, do not add a device.
 
-Download images for the following devices from https://learningnetworkstore.cisco.com/myaccount to a easily accessible location:
+Download an image for each of the following operating systems from https://learningnetworkstore.cisco.com/myaccount to an easily accessible location, such as the Downloads directory or a shared drive:
 
 - Cisco Virtual Internetwork Operating System multilayer_switch (IOSvL2)
 - Cisco Adaptive Security Virtual Appliance (ASAv) firewall
@@ -29,7 +34,7 @@ Download images for the following devices from https://learningnetworkstore.cisc
 >grep 'vboxsf' /etc/group
 >```
 >
->You should see something like the following:
+>**Output:**:
 >
 >```
 >vboxsf:x:981:gns3user
@@ -43,25 +48,14 @@ Download images for the following devices from https://learningnetworkstore.cisc
 >
 >Once the VM has rebooted, you can access the shared folder at ```/media/sf_shared-vm```.
 
-You will also need a CentOS image (CentOS-7-x86_64-GenericCloud.qcow2) from https://cloud.centos.org/centos/7/images/ to use as an HTTP server. Open a new Terminal and download the server image:
+You will also need a CentOS image from https://cloud.centos.org/centos/7/images/ to use as an HTTP server. Open a new Terminal and download the server image:
 
 ```
-cd /media/sf_shared-vm
+cd /media/sf_shared-vm/
 wget --no-clobber https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-2111.qcow2
 ```
 
-Fnally, download the GNS3 appliance files for the images and server:
-
-```
-cd /media/sf_shared-vm
-wget --no-clobber https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/cisco-iosvl2.gns3a
-wget -nc https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/cisco-asav.gns3a
-wget -nc https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/centos-cloud.gns3a
-```
-
-Follow the instructions at https://docs.gns3.com/docs/using-gns3/beginners/import-gns3-appliance/ to add the devices to GNS3.
-
->**NOTE** - Later on, you could import a unconfigured version of CentOS 7 (CentOS-7-x86_64-GenericCloud.qcow2):
+>**NOTE** - Later on, you could import an unconfigured version of CentOS 7 (CentOS-7-x86_64-GenericCloud.qcow2):
 >
 >```
 >wget --no-clobber https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
@@ -72,14 +66,29 @@ Follow the instructions at https://docs.gns3.com/docs/using-gns3/beginners/impor
 >```
 >virt-customize -a CentOS-7-x86_64-GenericCloud.qcow2 --root-password password:<enter a password of your choice>
 >```
+>
+>Now you can access the server and add users, as necessary.
+
+To speed up adding devices to GNS3, download the preconfigured appliance templates for both Cisco images and the server:
+
+```
+cd /media/sf_shared-vm/
+wget --no-clobber https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/cisco-iosvl2.gns3a
+wget -nc https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/cisco-asav.gns3a
+wget -nc https://raw.githubusercontent.com/GNS3/gns3-registry/master/appliances/centos-cloud.gns3a
+```
+
+Follow the instructions at https://docs.gns3.com/docs/using-gns3/beginners/import-gns3-appliance/ to add the devices to GNS3.
 
 ---
 
-## Setup the Web Server
+## Set up the Web Server
 
-Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but use a CentOS Cloud Guest7 (2111) appliance.
+Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CentOS Cloud Guest7 (2111)** appliance that you imported earlier. Connect the device to the cloud through Ethernet0 to tap0.
 
-When the ```login``` prompt appears enter "centos" as the user name and "centos" as the password:
+When the ```login``` prompt appears enter "centos" as the username and "centos" as the password:
+
+**Output:**
 
 ```
 CentOS Linux 7 (Core)
@@ -111,6 +120,8 @@ sudo id webmaster
 
 Log out as ```centos``` and log in as ```webmaster```. Enter the password for the ```webmaster``` if prompted for a password:
 
+**Output:**
+
 ```
 [centos@centos ~]$ logout
 
@@ -128,7 +139,7 @@ Get the name of the Ethernet port:
 ip address show | grep '[0-9]: e[mnt]'
 ```
 
-In our case, it is ```eth0```. Place the server on the same subnet as the host. If prompted, enter the webmaster's password:
+In our case, the port's name is ```eth0```. Place the server on the same subnet as the host, and, if prompted, enter the webmaster's password:
 
 ```
 sudo ifconfig eth0 192.168.1.111 netmask 255.255.255.0
@@ -140,15 +151,15 @@ Check the connection with the host:
 ping -c 4 192.168.1.10
 ```
 
-Now, open a new tab and go to the host's shared folder in the Terminal. Create a directory named "httpd":
+Now, open a new Terminal tab, and go to the host's shared folder in the Terminal. Create a directory named "httpd":
 
 ```
-cd /media/sf_shared-vm
+cd /media/sf_shared-vm/
 mkdir httpd
-cd httpd
+cd /media/sf_shared-vm/httpd/
 ```
 
-Download Apache's httpd service RPM and its dependencies into the directory, and change permissions:
+Download Apache's RPM file for HTTP services, along with its dependencies, into the directory, then combine the files into a ZIP file:
 
 ```
 wget --no-clobber http://mirror.centos.org/centos/7/os/x86_64/Packages/httpd-2.4.6-95.el7.centos.x86_64.rpm
@@ -164,11 +175,11 @@ zip -r httpd.zip httpd/*
 Transfer the file to the CentOS server:
 
 ```
-chmod 666 httpd.zip
+chmod 666 /media/sf_shared-vm/httpd.zip
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /media/sf_shared-vm/httpd.zip webmaster@192.168.1.111:/home/webmaster/httpd.zip
 ```
 
-If warned that ```The authenticity of host '192.168.1.111 (192.168.1.111)' can't be established.```, and if asked, ```Are you sure you want to continue connecting (yes/no)?```, enter "yes". Otherwise, if prompted, enter the webmaster's password. You should see output similar to the following:
+If the host warns you that ```The authenticity of host '192.168.1.111 (192.168.1.111)' can't be established.```, and if it asks, ```Are you sure you want to continue connecting (yes/no)?```, enter "yes". Otherwise, if prompted, enter the webmaster's password. You should see output similar to the following:
 
 ```
 Warning: Permanently added '192.168.1.111' (ECDSA) to the list of known hosts.
@@ -182,7 +193,13 @@ The CentOS server probably does not have the **unzip** utility, either. Get the 
 which unzip
 ```
 
-Then, transfer a copy of the **unzip** to the server. You will have to place it in the ```/home/webmaster``` directory, since the host does not have **sudo** privileges on the server If prompted, enter the webmaster's password:
+**Output:**
+
+```
+/usr/bin/unzip
+```
+
+Transfer a copy of the **unzip** utility to the server. You will have to place it in the ```/home/webmaster``` directory, since the host does not have **sudo** privileges on the server If prompted, enter the webmaster's password:
 
 ```
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /usr/bin/unzip webmaster@192.168.1.111:/home/webmaster/unzip
@@ -191,11 +208,12 @@ scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /usr/bin/unzip w
 Go back to the CentOS server's tab and unzip the file. If prompted, enter the webmaster's password:
 
 ```
-sudo mv unzip /usr/bin/unzip
-unzip httpd.zip
+cd /home/webmaster
+sudo mv /home/webmaster/unzip /usr/bin/unzip
+unzip /home/webmaster/httpd.zip
 ```
 
-You should see output similar to the following:
+**Output:**
 
 ```
 Archive:  httpd.zip
@@ -207,10 +225,10 @@ Archive:  httpd.zip
   inflating: httpd/mime.types
 ```
 
-Go to the new ```httpd``` directory and install the RPM's. Ignore any warnings, and, if prompted, enter the webmaster's password:
+Go to the new ```httpd``` directory and install the RPMs. Ignore any warnings, and, if prompted, enter the webmaster's password:
 
 ```  
-cd httpd
+cd /home/webmaster/httpd/
 sudo rpm --install --verbose --hash apr-1.4.8-7.el7.x86_64.rpm
 sudo rpm -ivh apr-util-1.5.2-6.el7.x86_64.rpm
 sudo rpm -ivh httpd-tools-2.4.6-95.el7.centos.x86_64.rpm
@@ -219,7 +237,7 @@ sudo rpm -ivh mailcap-2.1.41-2.el7.noarch.rpm
 sudo rpm -ivh httpd-2.4.6-95.el7.centos.x86_64.rpm
 ```
 
-Next, make the server's IP address permanent by appending the follwoing two lines to the configuration file of the server's Ethernet port. If prompted, enter the webmaster's password:
+Next, make the server's IP address permanent. Use the stream editor utility to append the following two lines to the configuration file of the server's Ethernet port. If prompted, enter the webmaster's password:
 
 ```
 
@@ -234,7 +252,7 @@ Check if you updated the file:
 cat /etc/sysconfig/network-scripts/ifcfg-eth0
 ```
 
-You should see output similar to the following:
+**Output:**
 
 ```
 # Created by cloud-init on instance boot automatically, do not edit.
@@ -260,6 +278,7 @@ sudo apachectl start
 Create an "index.html" file:
 
 ```
+cd /home/webmaster/httpd/
 echo '<!DOCTYPE html>' > index.html
 echo '<html>' >> index.html
 echo '<head>' >> index.html
@@ -275,7 +294,7 @@ echo '</html>' >> index.html
 Move the file to the ```/var/www/html``` directory and fix permissions. If prompted, enter the webmaster's password:
 
 ```
-sudo mv index.html /var/www/html/index.html
+sudo mv /home/webmaster/httpd/index.html /var/www/html/index.html
 chmod 755 /var/www/html/
 chmod 644 /var/www/html/index.html
 sudo restorecon -Rv /var/www/html
@@ -287,21 +306,25 @@ Reboot the server, so all the changes will be updated. If prompted, enter the we
 sudo reboot now
 ```
 
-Once the server has finished rebooting, go back to the host, open a browser, and visit http://192.168.1.111. The website should appear!
+Once the server has finished rebooting, switch back to the host, open a browser, and visit http://192.168.1.111. The website should appear!
 
 When finished, shutdown the web server and disconnect it from the cloud.
 
 ---
 
-## Setup the Firewall
+## Set up the Firewall
 
-Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but use a Cisco ASAv 9.9.2 appliance, connected to the cloud on GigabitEthernet0/0.
+Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CCisco ASAv 9.9.2 appliance** appliance that you imported earlier. Connect the device to the cloud through GigabitEthernet0/0 to tap0.
 
-Open a console and the User EXEC Mode prompt should appear (```ciscoasa>```). Enter ```enable``` to get to Privileged EXEC Mode:
+Open a console. After the device finishes booting, the User EXEC Mode prompt should appear (```ciscoasa>```). Enter "enable" to get to Privileged EXEC Mode. If prompted for a password, press <kbd>Enter</kbd>, since the device has no password yet:
 
-```enable```
+**Output:**
 
-If prompted for a password, press <kbd>Enter</kbd>. The device has no password yet, so the Privileged EXEC Mode prompt should appear (```ciscoasa#```).
+```
+ciscoasa> enable
+Password: 
+ciscoasa# 
+```
 
 Enter Global Configuration Mode and disable routing:
 
@@ -310,10 +333,13 @@ Enter Global Configuration Mode and disable routing:
 ```
 configure terminal
 firewall transparent
+end
 ```
 
+Configure the ports for external and internal communications and enable Layer 3 communications through a Bridge Virtual Interface (BVI):
 
 ```
+configure terminal
 interface GigabitEthernet0/0
 nameif outside
 security-level 100
@@ -328,10 +354,26 @@ no shutdown
 exit
 interface bvi 1
 ip address 192.168.1.123 255.255.255.0
-exit
+end
+```
+
+You will need the bridge, since the firewall does not allow packets to enter and exit through the same interface. In addition, packets can only flow from a port at a higher security level to a lower level, and ports on the same security level cannot communicate with each other. To test connectivity in this lab, allow traffic to flow between ports at the same security level: 
+
+```
+configure terminal
 same-security-traffic permit inter-interface
 end
+```
+
+Check connectivity between the firewall and the host:
+
+```
 ping 192.168.1.10
+```
+
+Save the current configuration:
+
+```
 copy running-config startup-config
 ```
 
@@ -365,7 +407,9 @@ Once you have finished checking connectivity, shutdown the firewall and the serv
 
 Drag a **cisco-iosvl2** switch onto the **Workspace**. Rename it "c3750Z-4"; increase the memory to 1024; increase the vCPUs to 2; and reduce the network adapters to 4.
 
-Open a new Terminal or a console (make sure the GNS3 terminal uses the GNOME terminal, instead of xterm, to allow cutting and pasting):
+Open a new Terminal or a console:
+
+>**NOTE** - To allow cut and pasting (to speed up demonstrations), set the GNS3 terminal to use the **GNOME** terminal instead of **xterm** (*Edit* -> *Preferences* -> *General* -> *Console applications* -> *Console settings*).
 
 ```
 telnet 192.168.1.1 5001
@@ -640,6 +684,24 @@ Once that is complete, SSH into the switch:
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null admin@192.168.1.20
 ```
 
-If asked if you want to continue connecting, enter "yes". When prompted for a password, enter "cisco".
+If you are asked if you want to continue connecting, enter "yes". When prompted for a password, enter "cisco".
 
 If all went well, the switch's prompt should appear. Look around, and, when you are finished, enter "exit" to get back to the Bash prompt.
+
+Go back to GNS3 and shut down and disconnect all the devices.
+
+---
+
+## Put It All Together
+
+Connect the devices as shown below:
+
+- Cloud ```tap0``` to ASA ```Gi0/0```
+- ASA ```Gi0/1``` to Switch ```Gi0/0```
+- Switch ```Gi0/0``` to Server ```Ethernet0```
+
+![The Network](demo-00.png)
+
+Turn on all the devices. Allow a few minutes for the devices to finish booting up (you can open a device console and check).
+
+Switch back to the host, open a browser, and visit http://192.168.1.111. The website should appear!
