@@ -698,7 +698,7 @@ Connect the devices as shown below:
 
 - Cloud ```tap0``` to ASA ```Gi0/0```
 - ASA ```Gi0/1``` to Switch ```Gi0/0```
-- Switch ```Gi0/0``` to Server ```Ethernet0```
+- Switch ```Gi0/1``` to Server ```Ethernet0```
 
 ![The Network](demo-00.png)
 
