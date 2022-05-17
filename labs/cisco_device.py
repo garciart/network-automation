@@ -49,7 +49,7 @@ class CiscoDevice(object):
         :param int port_number: Port number for the connections.
         :param bool verbose: True (default) to echo both input and output to the screen,
             or false to save output to a time-stamped file.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
+        :param str eol: EOL sequence (LF or CRLF) used by the connection (See comments below).
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection

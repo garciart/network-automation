@@ -40,7 +40,6 @@ class CiscoIOS(object):
         """Class instantiation.
 
         :param str device_hostname: Hostname of the device.
-
         :return: None
         :rtype: None
         """
@@ -59,7 +58,7 @@ class CiscoIOS(object):
 
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
+        :param str eol: EOL sequence (LF or CRLF) used by the connection (See comments below).
         :param str telnet_ip_addr: Device's IP address for Telnet.
         :param int telnet_port_num: Port number for the connection, both standard (22) and others.
         :param str username: Username for Virtual Teletype (VTY) connections when
@@ -69,10 +68,8 @@ class CiscoIOS(object):
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool verbose: True (default) to echo both input and output to the screen,
             or false to save output to a time-stamped file.
-
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
-
         :raise ValueError: If an argument is invalid.
         :raise RuntimeError: If Minicom is not installed.
         :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
@@ -135,7 +132,7 @@ class CiscoIOS(object):
 
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See EOL comments below).
+        :param str eol: EOL sequence (LF or CRLF) used by the connection (See EOL comments below).
         :param str serial_device: Remote host serial device interface name.
         :param int baud_rate: Baud rate for connection.
         :param int data_bits: Data bit size for connection.
@@ -146,10 +143,8 @@ class CiscoIOS(object):
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool verbose: True (default) to echo both input and output to the screen,
             or false to save output to a time-stamped file.
-
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
-
         :raise ValueError: If an argument is invalid.
         :raise RuntimeError: If Minicom is not installed.
         :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
@@ -210,26 +205,27 @@ class CiscoIOS(object):
                         ssh_port_num=22,
                         username=None,
                         password=None,
+                        host_key_check=True,
                         enable_password=None,
                         verbose=False):
         """Connect to a network device using SSH.
 
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
+        :param str eol: EOL sequence (LF or CRLF) used by the connection (See comments below).
         :param str ssh_ip_addr: Device's IP address for SSH.
         :param int ssh_port_num: Port number for the connection, both standard (22) and others.
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection
             and if a password is set in the device's startup-config file.
+        :param bool host_key_check: Do not check or update the known_hosts file. Warning - Only
+            disable host key checking if you are certain the network is secure.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool verbose: True (default) to echo both input and output to the screen,
             or false to save output to a time-stamped file.
-
         :return: Connection in a child application object.
         :rtype: pexpect.spawn
-
         :raise ValueError: If an argument is invalid.
         :raise RuntimeError: If Minicom is not installed.
         :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
@@ -242,28 +238,33 @@ class CiscoIOS(object):
         if exitstatus != 0:
             raise RuntimeError('SSH client is not installed.')
 
+        ssh_options = ''
+        if host_key_check:
+            ssh_options = ' -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
         # Validate inputs
         validate_ip_address(ssh_ip_addr)
-        if ssh_port_num:
-            validate_port_number(ssh_port_num)
-            child = pexpect.spawn('ssh {0} {1}'.format(ssh_ip_addr, ssh_port_num))
-        else:
-            child = pexpect.spawn('ssh {0}'.format(ssh_ip_addr))
+        validate_port_number(ssh_port_num)
+        child = pexpect.spawn('ssh{0} -p {1} {2}@{3}'.format(ssh_options,
+                                                             ssh_port_num,
+                                                             username,
+                                                             ssh_ip_addr))
 
         # noinspection PyTypeChecker
         index = child.expect_exact(
             ['Are you sure you want to continue connecting',
-             'Host key verification failed.'] + pexpect.TIMEOUT)
+             'Host key verification failed.',
+             pexpect.TIMEOUT])
         if index == 0:
-            child.snedline('yes')
+            child.sendline('yes')
         elif index == 1:
             raise RuntimeError('Host key verification failed. Check your known hosts file.')
 
         # Slow down commands to prevent race conditions with output
-        child.delaybeforesend = 0.5
+        child.delaybeforesend = 1.0
         if verbose:
             # Echo both input and output to the screen
-            child.logfile = sys.stdout
+            child.logfile_read = sys.stdout
         else:
             # Save output to file
             output_file = open('{0}-{1}'.format(
@@ -302,7 +303,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection
@@ -385,7 +386,7 @@ class CiscoIOS(object):
         for subsequent commands.
 
         :param pexpect.spawn child: Connection in a child application object.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
 
         :return: None
@@ -414,7 +415,7 @@ class CiscoIOS(object):
         pexpect cursor forward to the last hostname prompt.
 
         :param pexpect.spawn child: Connection in a child application object.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
 
         :return: None
         :rtype: None
@@ -441,7 +442,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
 
         :return: Name of the default file system; the device's IOS version; the device's  name;
@@ -531,7 +532,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system to format.
 
         :return: None
@@ -575,7 +576,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param switch_number: Switch reference number in the stack
         :param switch_priority: Switch priority in the stack; maximum is 15. The switch with the
              largest number (e.g., 15) becomes the master switch for the stack.
@@ -628,7 +629,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str vlan_name: Virtual Local Area Network (VLAN) interface to configure.
         :param str vlan_port: Ethernet interface port name to configure and connect to VLAN.
         :param str new_ip_address: New IPv4 address for the device.
@@ -698,7 +699,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str ethernet_port: Ethernet interface port name to configure.
         :param str new_ip_address: New IPv4 address for the device.
         :param str new_netmask: New netmask for the device.
@@ -746,7 +747,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str destination_ip_addr: IPv4 address of the other device.
         :param int count: Number of pings to send; limited to 32.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
@@ -789,7 +790,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str vty_username: Username for a virtual teletype line connection.
         :param str vty_password: Password for a virtual teletype line connection.
         :param int privilege: Cisco CLI command access level: 1 = Test commands (e.g., ping) only
@@ -899,7 +900,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str label: Name for the Rivest, Shamir, and Adelman (RSA) key pair.
         :param int modulus: Modulus size for the certification authority (CA) key.
         :param int version: Force SSH version 1 or 2 (Leave blank for the default of 1.99)
@@ -1046,7 +1047,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str scp_interface_port: Restrict SCP traffic through this Ethernet interface port.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool commit: True to save changes to startup-config.
@@ -1092,7 +1093,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str remote_username: Remote username to authenticate SCP transfers.
@@ -1158,7 +1159,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str remote_username: Remote username to authenticate SCP transfers.
@@ -1222,7 +1223,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str remote_username: Remote username to authenticate FTP transfers.
         :param str remote_password: Remote password to authenticate FTP transfers.
         :param bool commit: True to save changes to startup-config.
@@ -1269,7 +1270,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str remote_username: Remote username to authenticate FTP transfers.
@@ -1340,7 +1341,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str remote_username: Remote username to authenticate FTP transfers.
@@ -1412,7 +1413,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str tftp_interface_port: Restrict TFTP traffic through this Ethernet interface port.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool commit: True to save changes to startup-config.
@@ -1457,7 +1458,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str file_to_download: File to download (e.g., startup-config, flash:/foo.txt, etc.)
@@ -1524,7 +1525,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the file is located on the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
         :param str file_to_upload: File to upload (e.g., /var/lib/tftpboot/file.name, etc.)
@@ -1598,7 +1599,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str device_file_system: File system where the new boot config file is located.
         :param str boot_config_file: Boot config file to use during startup.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
@@ -1638,7 +1639,7 @@ class CiscoIOS(object):
         :param pexpect.spawn child: The connection in a child application object.
         :param mtk.gui.windows.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str username: Username for Virtual Teletype (VTY) connections when
             'login local' is set in the device's startup-config file.
         :param str password: Console, Auxiliary, or VTY password, depending on the connection
