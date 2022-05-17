@@ -32,7 +32,7 @@ class CiscoIOSXEL3(object):
         """Instantiates the device when the user opens the procedure GUI.
 
         :param str device_hostname: Hostname of the device.
-        :param str eol: EOL sequence (LF or CLRF) used by the connection (See comments below).
+        :param str eol: EOL sequence (LF or CRLF) used by the connection (See comments below).
         :param str ethernet_port: Ethernet interface port name used to connect to the device.
         :param str device_ip_addr: IPv4 address of the device.
         :param str remote_ip_addr: IPv4 address of the remote host.
