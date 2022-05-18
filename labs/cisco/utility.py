@@ -2,6 +2,7 @@
 """
 
 """
+import hashlib
 import os
 import pipes
 import re
@@ -98,6 +99,17 @@ def validate_subnet_mask(subnet_mask):
                 raise ValueError('Invalid subnet mask: {0}'.format(subnet_mask))
     else:
         raise ValueError('Invalid subnet mask: {0}.'.format(subnet_mask))
+
+
+def ping_from_host(destination_ip_addr, count=4, ):
+    """Check connectivity with another device.
+
+    :param str destination_ip_addr: IPv4 address of the other device.
+    :param int count: Number of pings to send; limited to 32.
+    :return: None
+    :rtype: None
+    """
+    run_cli_command('ping -c {0} {1}'.format(count, destination_ip_addr))
 
 
 def validate_file_path(filepath):
@@ -318,12 +330,13 @@ def enable_ftp(sudo_password=None):
     :returns: None
     :rtype: None
     """
-    commands = ["sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                "sudo sed --in-place --expression '$aftp_username=nobody' /etc/vsftpd/vsftpd.conf",
-                "sudo systemctl start vsftpd",
-                "sudo firewall-cmd --zone=public --add-port=20/tcp",
-                "sudo firewall-cmd --zone=public --add-port=21/tcp",
-                "sudo firewall-cmd --zone=public --add-service=ftp", ]
+    commands = [
+        'sudo sed --in-place \'/ftp_username=nobody/d\' /etc/vsftpd/vsftpd.conf',
+        'sudo sed --in-place --expression \'$aftp_username=nobody\' /etc/vsftpd/vsftpd.conf',
+        'sudo systemctl start vsftpd',
+        'sudo firewall-cmd --zone=public --add-port=20/tcp',
+        'sudo firewall-cmd --zone=public --add-port=21/tcp',
+        'sudo firewall-cmd --zone=public --add-service=ftp', ]
     for c in commands:
         run_cli_command(c, sudo_password)
 
@@ -337,11 +350,11 @@ def disable_ftp(sudo_password=None):
     :returns: None
     :rtype: None
     """
-    commands = ["sudo firewall-cmd --zone=public --remove-service=ftp",
-                "sudo firewall-cmd --zone=public --remove-port=21/tcp",
-                "sudo firewall-cmd --zone=public --remove-port=20/tcp",
-                "sudo sed --in-place '/ftp_username=nobody/d' /etc/vsftpd/vsftpd.conf",
-                "sudo systemctl stop vsftpd", ]
+    commands = ['sudo firewall-cmd --zone=public --remove-service=ftp',
+                'sudo firewall-cmd --zone=public --remove-port=21/tcp',
+                'sudo firewall-cmd --zone=public --remove-port=20/tcp',
+                'sudo sed --in-place \'/ftp_username=nobody/d\' /etc/vsftpd/vsftpd.conf',
+                'sudo systemctl stop vsftpd', ]
     for c in commands:
         run_cli_command(c, sudo_password)
 
@@ -374,3 +387,98 @@ def disable_ssh(sudo_password=None):
                 'systemctl stop sshd', ]
     for c in commands:
         run_cli_command(c, sudo_password)
+
+
+def set_utc_time(new_datetime, sudo_password=None):
+    """Sets the system time without a connection to the Internet. Use before enabling the
+    Network Time Protocol (NTP) Service for offline synchronization.
+
+    **Note** - For maximum compatibility with devices, the timezone will be set UTC.
+
+    :param str new_datetime: The desired UTC date and time, in 'YYYY-MM-DD HH:MM:SS' format.
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
+    :return: None
+    :rtype: None
+    :raise RuntimeError: If the desired UTC date and time are in the wrong format.
+    """
+    import datetime
+    try:
+        datetime.datetime.strptime(new_datetime, '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        raise RuntimeError('Invalid date-time format; expected \'YYYY-MM-DD HH:MM:SS\'.')
+    try:
+        commands = ['sudo timedatectl set-ntp false',
+                    'sudo timedatectl set-timezone UTC',
+                    'sudo timedatectl set-time \'{0}\''.format(new_datetime),
+                    'sudo timedatectl set-local-rtc 0', ]
+        for c in commands:
+            run_cli_command(c, sudo_password)
+    finally:
+        run_cli_command(['sudo date --set \'{0} UTC\''.format(new_datetime), ],
+                        sudo_password)
+
+
+def enable_ntp(sudo_password=None):
+    """List of commands to enable the Network Time Protocol (NTP) Service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
+    :return: None
+    :rtype: None
+    """
+    commands = ['sudo sed --in-place \'/server 127.127.1.0/d\' /etc/ntp.conf',
+                'sudo sed --in-place \'/fudge 127.127.1.0 stratum 10/d\' /etc/ntp.conf',
+                'sudo sed --in-place --expression \'$aserver 127.127.1.0\' /etc/ntp.conf',
+                'sudo sed --in-place --expression \'$afudge 127.127.1.0 stratum 10\' /etc/ntp.conf',
+                'sudo systemctl start ntpd',
+                'sudo firewall-cmd --zone=public --add-port=123/udp',
+                'sudo firewall-cmd --zone=public --add-service=ntp', ]
+    for c in commands:
+        run_cli_command(c, sudo_password)
+
+
+def disable_ntp(sudo_password=None):
+    """List of commands to disable the Network Time Protocol (NTP) Service.
+
+    :param str sudo_password: The superuser password to execute commands that require
+    elevated privileges. The user will be prompted for the password if not supplied
+    during the call to the run_cli_commands() method.
+    :return: None
+    :rtype: None
+    """
+    commands = ['sudo sed --in-place \'/fudge 127.127.1.0 stratum 10/d\' /etc/ntp.conf',
+                'sudo sed --in-place \'/server 127.127.1.0/d\' /etc/ntp.conf',
+                'sudo firewall-cmd --zone=public --remove-service=ntp',
+                'sudo firewall-cmd --zone=public --remove-port=123/udp',
+                'sudo systemctl stop ntpd', ]
+    for c in commands:
+        run_cli_command(c, sudo_password)
+
+
+def get_file_hash(filepaths):
+    """Hash a file.
+
+    :param list filepaths: The files to be hashed.
+    :return: A dictionary of hashes for the file.
+    :rtype: dict
+    :raises ValueError: if the filepath mask is invalid.
+    """
+    if not isinstance(filepaths, list):
+        filepaths = [filepaths, ]
+    file_hashes = {}
+    for f in filepaths:
+        # noinspection PyTypeChecker
+        if not os.path.exists(f):
+            raise ValueError("Invalid filepath.")
+        for a in hashlib.algorithms:
+            try:
+                h = hashlib.new(a)
+                # noinspection PyTypeChecker
+                h.update(open(f, "rb").read())
+                file_hashes.update({a: h.hexdigest()})
+            except ValueError:
+                file_hashes.update({a: False})
+    return file_hashes
