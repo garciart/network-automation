@@ -179,7 +179,7 @@ class CiscoIOS(object):
         child.delaybeforesend = 0.5
         if verbose:
             # Echo both input and output to the screen
-            child.logfile_read = sys.stdout
+            child.logfile = sys.stdout
 
         # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ('\n') after the text.
         # However, depending on:
@@ -264,7 +264,7 @@ class CiscoIOS(object):
         child.delaybeforesend = 1.0
         if verbose:
             # Echo both input and output to the screen
-            child.logfile_read = sys.stdout
+            child.logfile = sys.stdout
         else:
             # Save output to file
             output_file = open('{0}-{1}'.format(
@@ -436,6 +436,45 @@ class CiscoIOS(object):
         # But it needs to stop at the following line -> R2#
         child.expect_exact(self.device_prompts)
 
+    def set_device_hostname(self, child, reporter, eol,
+                            device_hostname,
+                            enable_password=None,
+                            commit=True):
+        reporter.step('Changing the device\'s hostname......')
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+        child.sendline('configure terminal' + eol)
+        child.expect_exact(self.device_prompts[2])
+        child.sendline('hostname {0}'.format(device_hostname) + eol)
+        child.expect_exact('{0}(config)#'.format(device_hostname))
+        # Change instance device prompts if successful
+        self.device_hostname = device_hostname
+        # Prepend the hostname to the standard Cisco prompt endings
+        self.device_prompts = ['{0}{1}'.format(device_hostname, p) for p in self.cisco_prompts]
+        child.sendline('end' + eol)
+        child.expect_exact(self.device_prompts[1])
+        # Save changes if True
+        if commit:
+            self.save_running_configuration(child, eol, enable_password=enable_password)
+        reporter.success()
+
+    def save_running_configuration(self, child, eol, enable_password=None):
+        """Save any configuration changes.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :return: None
+        :rtype: None
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
+        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
+        child.sendline('copy running-config startup-config' + eol)
+        child.expect_exact('Destination filename')
+        child.sendline('startup-config' + eol)
+        child.expect_exact('[OK]')
+        child.expect_exact(self.device_prompts[1])
+
     def get_device_info(self, child, reporter, eol, enable_password=None):
         """Get information about the network device.
 
@@ -460,6 +499,7 @@ class CiscoIOS(object):
             # Get the name of the default drive. Depending on the device, it may be bootflash,
             # flash, slot (for linear memory cards), or disk (for CompactFlash disks)
             child.sendline('dir' + eol)
+            child.expect_exact('dir')
             index = child.expect_exact(['More', self.device_prompts[1], ])
             dir_list = str(child.before)
             if index == 0:
@@ -483,6 +523,7 @@ class CiscoIOS(object):
         try:
             # Get the IOS version
             child.sendline('show version | include [IOSios] [Ss]oftware' + eol)
+            # child.expect_exact('show version | include')
             child.expect_exact(self.device_prompts[1])
             software_ver = str(child.before).split(
                 'show version | include [IOSios] [Ss]oftware\r')[1].split('\r')[0].strip()
@@ -495,6 +536,7 @@ class CiscoIOS(object):
         try:
             # Get the name of the device
             child.sendline('show inventory | include DESCR:' + eol)
+            # child.expect_exact('show inventory | include DESCR:')
             child.expect_exact(self.device_prompts[1])
             device_name = str(child.before).split(
                 'show inventory | include DESCR:\r')[1].split('\r')[0].strip()
@@ -507,6 +549,7 @@ class CiscoIOS(object):
         try:
             # Get the serial number of the device
             child.sendline('show version | include [Pp]rocessor [Bb]oard [IDid]' + eol)
+            # child.expect_exact('show version | include')
             child.expect_exact(self.device_prompts[1])
             serial_num = str(child.before).split(
                 'show version | include [Pp]rocessor [Bb]oard [IDid]\r')[1].split('\r')[0].strip()
@@ -610,11 +653,7 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def set_switch_ip_addr(self, child, reporter, eol,
@@ -682,17 +721,14 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def set_router_ip_addr(self, child, reporter, eol,
                            ethernet_port,
                            new_ip_address,
                            new_netmask,
+                           enable_password=None,
                            commit=True):
         """Set a router's IP address.
 
@@ -703,6 +739,7 @@ class CiscoIOS(object):
         :param str ethernet_port: Ethernet interface port name to configure.
         :param str new_ip_address: New IPv4 address for the device.
         :param str new_netmask: New netmask for the device.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
         :param bool commit: True to save changes to startup-config.
 
         :return: None
@@ -731,18 +768,14 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def ping_from_device(self, child, reporter, eol,
                          destination_ip_addr,
                          count=4,
                          enable_password=None):
-        """Check the connection to another device.
+        """Check connectivity with another device.
 
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
@@ -880,11 +913,7 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def enable_ssh(self, child, reporter, eol,
@@ -958,11 +987,7 @@ class CiscoIOS(object):
 
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def set_clock(self, child, reporter, eol,
@@ -980,17 +1005,29 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def synch_clock(self, child, reporter, eol,
                     ntp_server_ip,
                     enable_password=None,
                     commit=True):
+        """Synchronize the device's clock with an NTP server.
+
+        :param pexpect.spawn child: Connection in a child application object.
+        :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
+            the status and progress of the script.
+        :param str eol: EOL sequence (LF or CRLF) used by the connection.
+        :param ntp_server_ip: The IPv4 address of the NTP server.
+        :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
+        :param bool commit: True to save changes to startup-config.
+
+        :return: None
+        :rtype: None
+
+        :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
+            expected result (raised from the pexpect module).
+        """
         reporter.step('Synchronizing the device\'s clock with the NTP server (~ 60 seconds)...')
         self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
 
@@ -1005,35 +1042,8 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         time.sleep(60)
-        reporter.success()
-
-    def set_device_hostname(self, child, reporter, eol,
-                            device_hostname,
-                            enable_password=None,
-                            commit=True):
-        reporter.step('Changing the device\'s hostname......')
-        self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
-        child.sendline('configure terminal' + eol)
-        child.expect_exact(self.device_prompts[2])
-        child.sendline('hostname {0}'.format(device_hostname) + eol)
-        child.expect_exact('{0}(config)#'.format(device_hostname))
-        # Change instance device prompts if successful
-        self.set_device_prompts(device_hostname)
-        child.sendline('end' + eol)
-        child.expect_exact(self.device_prompts[1])
-        # Save changes if True
-        if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
         reporter.success()
 
     def set_scp_source_interface(self, child, reporter, eol,
@@ -1068,11 +1078,7 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def download_from_device_scp(self, child, reporter, eol,
@@ -1213,7 +1219,7 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         reporter.success()
 
-    def set_ftp_credentials(self, child, reporter, eol,
+    def set_ftp_credentials(self, child, eol,
                             remote_username,
                             remote_password,
                             enable_password=None,
@@ -1233,7 +1239,6 @@ class CiscoIOS(object):
         :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
             expected result (raised from the pexpect module).
         """
-        reporter.note('Setting FTP credentials in the device...')
         self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
 
         child.sendline('configure terminal')
@@ -1246,11 +1251,7 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
 
     def download_file_ftp(self, child, reporter, eol,
                           device_file_system,
@@ -1434,11 +1435,7 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def download_from_device_tftp(self, child, reporter, eol,
@@ -1623,11 +1620,7 @@ class CiscoIOS(object):
         child.expect_exact(self.device_prompts[1])
         # Save changes if True
         if commit:
-            child.sendline('copy running-config startup-config' + eol)
-            child.expect_exact('Destination filename')
-            child.sendline('startup-config' + eol)
-            child.expect_exact('[OK]')
-            child.expect_exact(self.device_prompts[1])
+            self.save_running_configuration(child, eol, enable_password=enable_password)
         reporter.success()
 
     def reload_device(self, child, reporter, eol,
