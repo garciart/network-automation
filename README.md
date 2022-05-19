@@ -142,8 +142,8 @@ sudo yum -y install xterm
 echo -e "! Use a truetype font and size.\nxterm*faceName: Monospace\nxterm*faceSize: 12" > ~/.Xresources
 sudo xrdb -merge ~/.Xresources
 # Install GNS3
-sudo python3 -m pip install gns3-server
-sudo python3 -m pip install gns3-gui
+sudo python3 -m pip install gns3-server --upgrade
+sudo python3 -m pip install gns3-gui --upgrade
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
 sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
@@ -188,7 +188,7 @@ sudo yum -y install ansible
 # Install Selenium for Firefox
 sudo yum -y install firefox
 sudo yum install Xvfb # virtual display driver that allows Firefox to send output to a virtual display
-pip install selenium
+python3 -m pip install selenium
 wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
@@ -391,7 +391,7 @@ However, before you start on the lab, you need to make some adjustments. From th
 
 ---
 
-## SAdding a device
+## Adding a device
 
 Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on which cards or modules are installed. It is an older router, but its IOS is available for download, and it is sufficient for conducting our labs. Here is some additional information:
 >

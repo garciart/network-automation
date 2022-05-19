@@ -700,7 +700,7 @@ Connect the devices as shown below:
 - ASA ```Gi0/1``` to Switch ```Gi0/0```
 - Switch ```Gi0/1``` to Server ```Ethernet0```
 
-![The Network](demo-00.png)
+![The Network](demo_00.png)
 
 Turn on all the devices. Allow a few minutes for the devices to finish booting up (you can open a device console and check).
 
