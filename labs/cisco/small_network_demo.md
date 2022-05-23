@@ -287,6 +287,11 @@ echo '</head>' >> index.html
 echo '<body>' >> index.html
 echo '<h1>Welcome to my GNS3 Demo!</h1>' >> index.html
 echo '<p>My name is Rob, and this is my GNS3 demo!</p>' >> index.html
+echo '<p>Current Date and Time is <span id='date-time'></span>.</p>' >> index.html
+echo '<script>' >> index.html
+echo 'var dt = new Date();' >> index.html
+echo 'document.getElementById('date-time').innerHTML=dt;' >> index.html
+echo '</script>' >> index.html
 echo '</body>' >> index.html
 echo '</html>' >> index.html
 ```
@@ -471,26 +476,12 @@ show ip interface brief
 ping 192.168.1.10
 ```
 
-Next, secure the switch for Layer 3 communications over SSH:
+Next, enable SSH communications:
 
 ```
 configure terminal
 crypto key zeroize rsa
 crypto key generate rsa general-keys label DEMO modulus 1024
-username admin privilege 15 secret cisco
-line vty 0 4
-login local
-exit
-line console 0
-password ciscon
-login
-exit
-line aux 0
-password cisaux
-login
-exit
-enable secret cisen
-service password-encryption
 end
 ```
 
@@ -510,6 +501,27 @@ IOS Keys in SECSH format(ssh-rsa, base64 encoded): DEMO
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDLQ61TadewW6SdrPQ9mXjtNVdb5USKiUgCbkXijxTQ
 1leWvyyEUanTIVkgf/8dy1MW0TfgnX0orjZxjh6VTWXWdzsivqgiLQiL7KX5WjSrjbdUNSiuHbI09wMb
 jswLLygQdqrQE0F9d07hsUEqZE5F7BbK482HXhRjKMLDeNmLpQ==
+```
+
+Next, secure the switch:
+
+```
+configure terminal
+username admin privilege 15 secret cisco
+line vty 0 4
+login local
+exit
+line console 0
+password ciscon
+login
+exit
+line aux 0
+password cisaux
+login
+exit
+enable secret cisen
+service password-encryption
+end
 ```
 
 While you are here, enable the switch's web graphical user interface (GUI):

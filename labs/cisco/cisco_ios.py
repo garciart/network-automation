@@ -932,7 +932,7 @@ class CiscoIOS(object):
         :param str eol: EOL sequence (LF or CRLF) used by the connection.
         :param str label: Name for the Rivest, Shamir, and Adelman (RSA) key pair.
         :param int modulus: Modulus size for the certification authority (CA) key.
-        :param int version: Force SSH version 1 or 2 (Leave blank for the default of 1.99)
+        :param float version: Force SSH version 1 or 2 (Leave blank for the default of 1.99)
         :param int time_out: Wait time for a response from the client before closing the connection.
         :param int retries: Number of SSH authentication retries allowed.
         :param str enable_password: Password to enable Privileged EXEC Mode from User EXEC Mode.
@@ -1648,7 +1648,6 @@ class CiscoIOS(object):
         reporter.step('Rebooting (~ 5 min):')
         self.__access_priv_exec_mode(child, eol, enable_password=enable_password)
 
-        child.expect_exact(self.device_prompts[1])
         child.sendline('reload' + eol)
         child.expect_exact('Proceed with reload? [confirm]')
         # child.send('\r')
