@@ -109,7 +109,7 @@ class CiscoIOS(object):
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
         # The device may require a carriage return ('\r') before the line feed to create a CRLF
-        # (i.e., pexpect.sendline('text\r')).
+        # combination (i.e., pexpect.sendline('text\r')).
         # Therefore, the user must designate an EOL, based on the connection,
         # which will be appended to each sendline.
 
@@ -189,7 +189,7 @@ class CiscoIOS(object):
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
         # The device may require a carriage return ('\r') before the line feed to create a CRLF
-        # (i.e., pexpect.sendline('text\r')).
+        # combination (i.e., pexpect.sendline('text\r')).
         # Therefore, the user must designate an EOL, based on the connection,
         # which will be appended to each sendline.
 
@@ -279,7 +279,7 @@ class CiscoIOS(object):
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
         # The device may require a carriage return ('\r') before the line feed to create a CRLF
-        # (i.e., pexpect.sendline('text\r')).
+        # combination (i.e., pexpect.sendline('text\r')).
         # Therefore, the user must designate an EOL, based on the connection,
         # which will be appended to each sendline.
 

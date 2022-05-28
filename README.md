@@ -590,7 +590,7 @@ Now, before we begin to code, you will perform a dry run by entering the command
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IPv4 address.
 > 
->However, GNS3 uses [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). The GNS3 server assigns all the virtual devices a port, and you can access the device through the server IPv4 address and the Console port number. However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
+>However, GNS3 uses [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). The GNS3 server assigns a port number to all the virtual devices in the **Workspace**, and you can access the device through the server IPv4 address and its Console port number. Connecting to a device using Reverse Telnet is similar to connecting to a device through its Console port (or Auxiliary port, if enabled) using a serial cable. However, you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
