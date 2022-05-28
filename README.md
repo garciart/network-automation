@@ -38,7 +38,7 @@ This tutorial is broken down into several parts:
 
 ## What is GNS3?
 
-Graphical Network Simulator-3 is a network software emulator, written in Python. It replicates the hardware and software features of real devices in a virtual environment. It was first released in 2008, and it has been downloaded over 18 million times. While it is free and open source (GNU GPL, i.e., "copyleft"), with an active community of over two million members, it is also used by companies such as Google, NASA, AT&T, and Walmart.
+Graphical Network Simulator-3 is a network software emulator, written in Python. It is a hypervisor platform that allows you to connect virtual machines, running real network device operating systems, to each other (and to real devices as well, if need be). GNS3 consists of a server, which runs the virtual devices, and a graphical user interface (GUI), which lets you build network topologies quickly (drag and drop). It was first released in 2008, and it has been downloaded over 18 million times. While it is free and open source (GNU GPL, i.e., "copyleft"), with an active community of over two million members, it is also used by companies such as Google, NASA, AT&T, and Walmart.
 
 -----
 
@@ -590,7 +590,7 @@ Now, before we begin to code, you will perform a dry run by entering the command
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
 >- Enter the necessary commands to set the IP address.
 > 
->However, GNS3 simulates this connection through the server gateway and the Console port number, similar to a [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
+>However, GNS3 uses [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). The GNS3 server assigns all the virtual devices a port, and you can access the device through the server gateway and the Console port number. However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
