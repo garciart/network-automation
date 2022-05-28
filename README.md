@@ -10,17 +10,17 @@
 
 ---
 
-***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco Internetwork Operating Systems (IOS) images, since Cisco no longer supports those devices or their IOS's. They recommend using newer images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, you will use the freely available Dynamips images instead.***
+***Disclaimer: The creators of GNS3 no longer recommend using Dynamips' Cisco Internetwork Operating Systems (IOS) images, since Cisco no longer supports those devices or their IOS's. They recommend you use newer images, such as those available through Cisco's Virtual Internet Routing Lab (VIRL). However, since this tutorial is only a general introduction to network automation using Python, you will use the freely available Dynamips images instead.***
 
 ***In addition, while Cisco Packet Tracer is an excellent tool, its ability to interact with host devices is limited, and it is not suitable for our purposes.***
 
 ## Introduction
 
-Manually configuring a network device is not a difficult process. You simply access the device's command line interface (CLI) through a console, auxiliary, or virtual (VTY) port, and enter the commands manually or run a script using a special feature, such as Cisco IOS Scripting with Tool Command Language (TCL).
+Configuring a network device for Layer 3 communications is not a difficult process. First, you connect to the device's console or auxiliary port through a serial connection from a host computer. Next, you access the device's command line interface (CLI) using PuTTY or Minicom, and then enter the commands to set the device's IPv4 address manually. Once you have enabled Layer 3 communications on the device, you can further provision it over Ethernet by uploading a pre-built configuration, or using tools such as Ansible or Puppet.
 
-However, imagine how long it would take to configure or update dozens, or even hundreds of devices. In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
+However, imagine how long it would take to provision or update dozens, or even hundreds of devices. In addition, chances are that you will make a few mistakes along the way, such as accidentally skipping a step or entering a wrong IP address, making the process more difficult and time-consuming.
 
-Automating the process using a scripting language, such as Python, is a better option. The bad news is that each time you want to test your code, you would need to "spin-up" a physical device, which may take time or require you to take the device (and possibly the network) offline.  
+Automating the process using a scripting language, such as Python, is a better option. The bad news is that each time you want to test your code, you would need to "spin-up" a physical device, which may take time or require you to take the device or the network offline.  
 
 However, there are some great tools, like Graphical Network Simulator-3 (GNS3), which, with a little tweaking, allow you to test your code quickly against *multiple* network devices, in a virtual environment.
 
@@ -38,7 +38,7 @@ This tutorial is broken down into several parts:
 
 ## What is GNS3?
 
-Graphical Network Simulator-3 is a network software emulator, written in Python. It is a hypervisor platform that allows you to connect virtual machines, running real network device operating systems, to each other (and to real devices as well, if need be). GNS3 consists of a server, which runs the virtual devices, and a graphical user interface (GUI), which lets you build network topologies quickly (drag and drop). It was first released in 2008, and it has been downloaded over 18 million times. While it is free and open source (GNU GPL, i.e., "copyleft"), with an active community of over two million members, it is also used by companies such as Google, NASA, AT&T, and Walmart.
+Graphical Network Simulator-3 is a network software emulator, written in Python. It is a hypervisor platform that allows you to run and connect virtual network devices to each other, and, if needed, to real devices as well. GNS3 consists of a server, which runs the virtual devices, and a graphical user interface (GUI), which lets you build network topologies quickly. It was first released in 2008, and it has been downloaded over 18 million times. While it is free and open source (GNU GPL, i.e., "copyleft"), with an active community of over two million members, it is also used by companies such as Google, NASA, AT&T, and Walmart.
 
 -----
 
@@ -261,20 +261,20 @@ Before you start, here is the subnet information for the network:
 
 ```
 - Network Address: 192.168.1.0/24
-- IP Class and Type: C (Private)
+- IPv4 Class and Type: C (Private)
 - Subnet Mask: 255.255.255.0 (ff:ff:ff:00)
-- Gateway IP Address: 192.168.1.1
+- GNS3 Server IPv4 Address: 192.168.1.1
 - Broadcast Address: 192.168.1.255
-- Usable IP Range: 192.168.1.2 - 192.168.1.254
+- Usable IPv4 Range: 192.168.1.2 - 192.168.1.254
 - Number of Available Hosts: 254
-- Host Device IP Address: 192.168.1.10
-- GNS3 Device Starting IP: 192.168.1.20
+- Host Device IPv4 Address: 192.168.1.10
+- GNS3 Device Starting IPv4: 192.168.1.20
 ```
 
 Writing and debugging Bash and Python scripts in GNS3 is cumbersome and limited. Our host machine is much more capable, with its Terminal and IDEs. Therefore, to code on our host machine and test against GNS3, you will connect the host machine to the GNS3 server by:
 
 - Creating a virtual network bridge.
-- Binding the GNS3 local server's gateway to the bridge.
+- Binding the GNS3 local server's IPv4 address to the bridge.
 - Connecting the host's isolated network interface to the bridge.
 - Creating Layer 2 TAP interfaces and connecting the TAPs to the bridge.
 - Connecting devices to the host through the TAPs on the bridge.
@@ -298,14 +298,14 @@ $ ip addr show label e*
     link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
 ```
 
-Look for the interface that does not have an IP address (i.e., no ```inet``` information). In this case, the isolated interface is named ```enp0s8```. 
+Look for the interface that does not have an IPv4 address (i.e., no ```inet``` information). In this case, the isolated interface is named ```enp0s8```. 
 
 You will now attach the host machine and the GNS3 server using a "bridge":
 
 ```
 # Configure the bridge
 sudo ip link add br0 type bridge # Create the bridge
-sudo ip address add 192.168.1.1/24 dev br0 # Set the gateway IP address
+sudo ip address add 192.168.1.1/24 dev br0 # Set the bridge IPv4 address
 sudo ip link set br0 up # Enable the bridge
 
 # Configure the tap
@@ -351,7 +351,7 @@ Start GNS3:
 
 ```gns3```
 
->**NOTE** - If you run into any errors, exit GNS3 and check your IP addresses.
+>**NOTE** - If you run into any errors, exit GNS3 and check your IPv4 addresses.
 
 >***NOTE - All the above commands are contained in an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable"). I highly recommend that from this point forward, you use the script to run GNS3.***
 
@@ -363,7 +363,7 @@ A Setup wizard will appear. Select **Run appliances on my local computer** and c
 
 >**NOTE** - If a **Project** window appears instead, click on **Cancel** and scroll down to the :eyes: <a id="eyes">below</a>.
 
-In **Local sever configuration**, under **Host binding**, select the bridge's IP address (```192.168.1.1```):
+In **Local sever configuration**, under **Host binding**, select the bridge's IPv4 address (```192.168.1.1```):
 
 ![Local sever configuration](img/a06.png)
 
@@ -568,7 +568,7 @@ You will see that all the nodes are now green, both in the Workspace and the **T
 
 ![All Devices Started](img/a32.png)
 
-By the way, note the console information for **R1** in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IP address yet, you can connect to **R1** using Telnet through the Console port on the back of the 3745 using port 5001.
+By the way, note the console information for **R1** in the **Topology Summary** in the top left-hand corner. It tells us that, even though the device does not have an IPv4 address yet, you can connect to **R1** using Telnet through the Console port on the back of the 3745 using port 5001.
 
 However, your port number may be different. If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the **R1** node and selecting **Show node information**:
 
@@ -584,13 +584,13 @@ The pop-up dialog has a lot of good information, including which port number the
 
 Now, before we begin to code, you will perform a dry run by entering the commands directly in a console terminal, as you would do with a real device.
 
->**NOTE** - Normally, you cannot Telnet into a device until you assign the device an IP address. To do solve this chicken-or-egg problem, you would:
+>**NOTE** - Normally, you cannot Telnet into a device until you assign the device an IPv4 address. To do solve this chicken-or-egg problem, you would:
 >
 >- Connect an RS232 Port to RJ45 Ethernet cable from the host to the device's Console port.
 >- Open a terminal emulator, such as PuTTY or minicom, and connect to the device through the host's serial port 0 (e.g., ```/dev/ttyS0```, ```/dev/ttyACM0```, etc.) at 9600 baud, 8 data bits, no parity, and 1 stop bit (9600 8N1).
->- Enter the necessary commands to set the IP address.
+>- Enter the necessary commands to set the IPv4 address.
 > 
->However, GNS3 uses [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). The GNS3 server assigns all the virtual devices a port, and you can access the device through the server gateway and the Console port number. However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
+>However, GNS3 uses [*reverse Telnet*](https://en.wikipedia.org/wiki/Reverse_telnet "Reverse Telnet"). The GNS3 server assigns all the virtual devices a port, and you can access the device through the server IPv4 address and the Console port number. However, this is for Telnet only; you will not be able to open a Secure Shell (SSH) connection using this method.
 
 Open a new Terminal and Telnet into the device by inputting the following command:
 
