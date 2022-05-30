@@ -190,7 +190,7 @@ end
 Once you enter ```end```, no message should appear. But if you look at the log, you will see that the message was stored:
 
 ```
-show log
+show logging
 ```
 
 **Output:**
@@ -253,7 +253,7 @@ Router1(config)#end
 Router1#
 ```
 
->**NOTE** - You may see a "Configured from console by console" message appear. That is OK; it is a console logging message. You could turn this off by entering ```no logging console``` in Global Configuration mode, but, for now, we appreciate the feedback.
+>**NOTE** - If you see a "Configured from console by console" message appear, review the [Set up the device's logging process](#set-up-the-devices-logging-process "Set up the device's logging process") exercise.
 
 However, we like ```R1```, so change it back:
 
@@ -286,7 +286,7 @@ child.expect_exact('R2#')
 
 ## Save the device's running configuration as the startup configuration.
 
-When we make changes to the device, such as changing the hostname, we are making changes to the ***running configuration***; everything will return to its default values after the device reboots. To make the changes permanent, you must copy the running configuration to the device's ***startup configuration***.
+When we make changes to the device, such as changing the hostname, we are making changes to the ***running configuration***; everything will return to its default values when the device reloads. To make the changes permanent, you must copy the running configuration to the device's ***startup configuration***.
 
 Even though we rolled-back our changes, go back to your Telnet Terminal and make the current configuration the default configuration:
 
@@ -402,7 +402,7 @@ show diag | include FRU
 show tech-support | include FRU
 ```
 
-**Output:***
+**Output:**
 
 ```
 R1#show diag | include FRU
@@ -442,7 +442,7 @@ show version | include [Pp]rocessor [Bb]oard [IDid]
 show tech-support | include [Pp]rocessor [Bb]oard [IDid]
 ```
 
-**Output:***
+**Output:**
 
 ```
 R1#show version | include [Pp]rocessor [Bb]oard [IDid]
@@ -482,7 +482,7 @@ show version | include [IOSios] [Ss]oftware
 show tech-support | include [IOSios] [Ss]oftware
 ```
 
-**Output:***
+**Output:**
 
 ```
 R1#show version | include [IOSios] [Ss]oftware
@@ -519,9 +519,9 @@ Go back to your Telnet Terminal and look at your log:
 show logging
 ```
 
-You should see an entry, similar to the following:
-
 >**NOTE** - After entering the ```show logging``` command, you may see ```--More--``` appear at the bottom of the listing, which means that there is more text to follow. Press <kbd>Space</kbd> to continue reading the log until the ```R1#``` prompt appears again. By the way, pressing <kbd>Enter</kbd> will only advance the log one entry at a time.
+
+You should see an entry, similar to the following:
 
 ```
 *Mar  1 00:00:05.239: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
@@ -529,7 +529,7 @@ You should see an entry, similar to the following:
 
 This entry tells you that the router's default file system is not formatted, which means that you will be unable to save file on the device.
 
-Fix that now by entering the following command. You will need the name of the default file system (e.g., ```flash```, etc.):
+Earlier, you looked up the name of the default file system (i.e., ```flash```). Format the drive, using the following command, and press <kbd>Enter</kbd> when asked to ```confirm```:
 
 ```
 format flash:
@@ -806,4 +806,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 ## Congratulations!
 
-Nicely done! You should now have a good idea on how to perform common networking tasks through the Cisco command-line interface (CLI), and how to automate the commands in Python using Pexpect.
+Nicely done! You should now have a good idea on how to perform common networking tasks through the Cisco command-line interface (CLI), and how to automate those tasks in Python using Pexpect.
