@@ -10,7 +10,7 @@ However, add another **Cisco 3745** router to the Workspace, and make sure it is
 
 ![All Devices Started](../../img/b00.png)
 
->**NOTE** - If your port numbers in the **Topology Summary** (on the right) are not ```5001``` and ```5002```, that is OK. For the exercises, replace ```5001``` with the port number that the GNS3 server assigned to **R1** (e.g., ```192.168.1.1 5XXX```, etc) and replace ```5002``` with the port number that the GNS3 server assigned to **R2**.
+>**NOTE** - If your port numbers in the **Topology Summary** (on the right) are not ```5001``` and ```5002```, that is OK. For the exercises, replace ```5001``` with the port number that the GNS3 server assigned to **R1** (e.g., ```192.168.1.1 5011```, etc) and replace ```5002``` with the port number that the GNS3 server assigned to **R2**.
 
 You will run commands directly in the console on **R1**, and you will run Python scripts on **R2**. This will prevent errors due to executing commands twice on the same device.
 
@@ -18,7 +18,7 @@ You will run commands directly in the console on **R1**, and you will run Python
 
 >**NOTE** - In the code snippets, a semicolon (```;```) or pound sign (```#```) after a command or a line is a comment indicator, in which I may explain what is going on. They are optional, and you do not have to add the indicator or the comments.
 
->**NOTE** - While I included error-handling in the Cisco IOS class and static Utility module, for the sake of brevity, I did not do so for these exercises. I expect that, if you followed the instructions and created your topology correctly, all the commands will work, if executed sequentially.
+>**NOTE** - While I included error-handling in the [Cisco IOS class](cisco_ios.py "Cisco IOS class") and the static Utility module [static Utility module](utility.py "static Utility module"), for the sake of brevity, I did not do so for these exercises. I expect that, if you followed the instructions and created your topology correctly, all the commands will work, if executed sequentially.
 
 1. [Connect to the device from the host via Telnet](#connect-to-the-device-from-the-host-via-telnet "Connect to the device from the host via Telnet")
 2. [Access the device's Privileged EXEC mode](#access-the-devices-privileged-exec-mode "Access the device's Privileged EXEC mode")
@@ -153,7 +153,7 @@ A ```0``` should appear after you enter the last line, which indicates that the 
 
 ## Set up the device's logging process
 
-Go back to your Telnet Terminal, then enter and exit Global Configuration Mode:
+Go back to your Telnet Terminal, then enter and exit **Global Configuration Mode**:
 
 ```
 configure terminal
@@ -171,7 +171,7 @@ By default, Cisco devices display system messages on the console. However, somet
 There are several ways to solve this problem:
 
 1. You can disable console logging by entering ```no logging console```. However, doing this will hide important messages, such as error messages about software or hardware malfunctions.
-2. You can change the console logging level from  **7 (debugging)** to **4 (warnings)**. Doing this will not hide error messages, but debugging messages, informational messages, and notifications will "disappear", since the device does not store them.
+2. You can change the console logging level from a severity of **7 (Debug)** to **4 (Warning)**. Doing this will not hide error messages, but debugging messages, informational messages, and notifications will "disappear", since the device does not store them.
 3. You can store messages in a buffer instead.
 
 We will go with choices 2 and 3 for now. Once the device is configured, you can save the messages to a file or forward them to a syslog server.
@@ -180,8 +180,8 @@ Go back to your Telnet Terminal and set up the logging process:
 
 ```
 configure terminal
-logging console 4
-logging buffered 16384
+logging console 4 ; Sets the logging level to 4 (warning)
+logging buffered 16384 ; Sets the log buffer to 16 KiB
 end
 ```
 
@@ -212,6 +212,19 @@ No active filter modules.
 Log Buffer (16384 bytes):
 
 *Mar  1 00:00:48.355: %SYS-5-CONFIG_I: Configured from console by console
+```
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+child.sendline('configure terminal\r')
+child.expect_exact('R2(config)#')
+child.sendline('logging console 4\r')
+child.expect_exact('R2(config)#')
+child.sendline('logging buffered 16384\r')
+child.expect_exact('R2(config)#')
+child.sendline('end\r')
+child.expect_exact('R2#')
 ```
 
 -----
