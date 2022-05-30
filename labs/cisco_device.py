@@ -90,7 +90,7 @@ class CiscoDevice(object):
         # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ("\n") after the text.
         # However, depending on:
         # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
-        # - The protocol (e.g., Telnet, SSH, Reverse Telnet, etc.)
+        # - The protocol (e.g., Telnet, SSH, etc.)
         # - The network port (e.g., 23, 2000, 4000, etc.)
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)

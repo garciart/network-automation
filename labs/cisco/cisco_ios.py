@@ -104,7 +104,7 @@ class CiscoIOS(object):
         # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ('\n') after the text.
         # However, depending on:
         # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
-        # - The protocol (e.g., Telnet, SSH, Reverse Telnet, etc.)
+        # - The protocol (e.g., Telnet, SSH, etc.)
         # - The network port (e.g., 23, 2000, 4000, etc.)
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
@@ -184,7 +184,7 @@ class CiscoIOS(object):
         # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ('\n') after the text.
         # However, depending on:
         # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
-        # - The protocol (e.g., Telnet, SSH, Reverse Telnet, etc.)
+        # - The protocol (e.g., Telnet, SSH, etc.)
         # - The network port (e.g., 23, 2000, 4000, etc.)
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
@@ -274,7 +274,7 @@ class CiscoIOS(object):
         # End-of-line (EOL) issues: pexpect.sendline() sends a line feed ('\n') after the text.
         # However, depending on:
         # - The physical port used to connect to the device (e.g., VTY, Console, etc.)
-        # - The protocol (e.g., SSH, SSH, Reverse SSH, etc.)
+        # - The protocol (e.g., Telnet, SSH, etc.)
         # - The network port (e.g., 23, 2000, 4000, etc.)
         # - The terminal emulator (e.g., PuTTY, Minicom, etc.)
         # - The emulation (e.g., VT100, VT102, ANSI, etc.)
@@ -503,7 +503,7 @@ class CiscoIOS(object):
             index = child.expect_exact(['More', self.device_prompts[1], ])
             dir_list = str(child.before)
             if index == 0:
-                # No need to get the whole dir listing; break the printout of the listing
+                # No need to get the whole directory listing, so break out
                 child.sendcontrol('c')
                 child.expect_exact(self.device_prompts[1])
             default_file_system = dir_list.split(

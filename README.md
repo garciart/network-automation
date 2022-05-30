@@ -678,9 +678,18 @@ After a few seconds, you will see the following output:
 
 Pexpect will move its "cursor" to the end of the last match and begin subsequent searches from that point. This prevents Pexpect from continuing to match the same string, over and over again. 
 
-Right now, do what the prompt asks, by sending a carriage return (pexpect.sendline adds the line feed (`\n`) to complete the CRLF sequence):
+Right now, do what the prompt asks, by sending a carriage return:
 
 ```>>> child.sendline("\r")```
+
+>**NOTE - End-of-line (EOL) issues:** Pexpect's ```sendline()``` sends a line feed (```\n```) after the text. However, depending on:
+>- The physical port used to connect to the device (e.g., VTY, Console, etc.)
+>- The protocol (e.g., Telnet, SSH, etc.)
+>- The network port (e.g., 23, 2000, 4000, etc.)
+>- The terminal emulator (e.g., PuTTY, Minicom, etc.)
+>- The emulation (e.g., VT100, VT102, ANSI, etc.)
+>
+>The device may require a carriage return (```\r```) before the line feed to create a CRLF combination (i.e., ```child.sendline('text\r')```, based on the connection. For example, when using Telnet with GNS3 and the Cisco 3745 router, you must append a carriage return to the text in each ```sendline()```.
 
 After a few seconds, you will see the following output:
 
