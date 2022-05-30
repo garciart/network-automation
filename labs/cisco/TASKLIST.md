@@ -18,7 +18,7 @@ You will run commands directly in the console on **R1**, and you will run Python
 
 >**NOTE** - In the code snippets, a semicolon (```;```) or pound sign (```#```) after a command or a line is a comment indicator, in which I may explain what is going on. They are optional, and you do not have to add the indicator or the comments.
 
->**NOTE** - While I included error-handling in the [Cisco IOS class](cisco_ios.py "Cisco IOS class") and the static Utility module [static Utility module](utility.py "static Utility module"), for the sake of brevity, I did not do so for these exercises. I expect that, if you followed the instructions and created your topology correctly, all the commands will work, if executed sequentially.
+>**NOTE** - While I included error-handling in the [Cisco IOS class](cisco_ios.py "Cisco IOS class") and the [static Utility module](utility.py "static Utility module"), for the sake of brevity, I did not do so for these exercises. I expect that, if you followed the instructions and created your topology correctly, all the commands will work, if executed sequentially.
 
 1. [Connect to the device from the host via Telnet](#connect-to-the-device-from-the-host-via-telnet "Connect to the device from the host via Telnet")
 2. [Access the device's Privileged EXEC mode](#access-the-devices-privileged-exec-mode "Access the device's Privileged EXEC mode")
@@ -30,44 +30,42 @@ You will run commands directly in the console on **R1**, and you will run Python
 8. [Get the serial number of the device](#get-the-serial-number-of-the-device "Get the serial number of the device")
 9. [Get the operating system's name and version of the device](#get-the-operating-systems-name-and-version-of-the-device "Get the operating system's name and version of the device")
 10. [Format a filesystem on the device](#format-a-filesystem-on-the-device "Format a filesystem on the device")
-11. [Set the switch's priority](#set-the-switchs-priority "Set the switch's priority")
-12. [Assign the switch an IPv4 address](#assign-the-switch-an-ipv4-address "Assign the switch an IPv4 address")
-13. [Assign the router an IPv4 address](#assign-the-router-an-ipv4-address "Assign the router an IPv4 address")
-14. [Test connectivity from the device to the host](#test-connectivity-from-the-device-to-the-host "Test connectivity from the device to the host")
-15. [Test connectivity from the host to the device](#test-connectivity-from-the-host-to-the-device "Test connectivity from the host to the device")
-16. [Secure the device's virtual teletype (VTY) lines](#secure-the-devices-virtual-teletype-vty-lines "Secure the device's virtual teletype (VTY) lines")
-17. [Secure the device's Console port](#secure-the-devices-console-port "Secure the device's Console port")
-18. [Secure the device's Auxiliary port](#secure-the-devices-auxiliary-port "Secure the device's Auxiliary port")
-19. [Secure the device's Privileged EXEC Mode](#secure-the-devices-privileged-exec-mode "Secure the device's Privileged EXEC Mode")
-20. [Set the device's clock manually](#set-the-devices-clock-manually "Set the device's clock manually")
-21. [Enable the NTP server on the host](#enable-the-ntp-server-on-the-host "Enable the NTP server on the host")
-22. [Update the device's clock using the host's NTP server](#update-the-devices-clock-using-the-hosts-ntp-server "Update the device's clock using the host's NTP server")
-23. [Enable SSH on the device](#enable-ssh-on-the-device "Enable SSH on the device")
-24. [Connect to the device from the host via Secure Shell (SSH)](#connect-to-the-device-from-the-host-via-secure-shell-ssh "Connect to the device from the host via Secure Shell (SSH)")
-25. [Enable the TFTP server on the host](#enable-the-tftp-server-on-the-host "Enable the TFTP server on the host")
-26. [Download the device's startup configuration to the host via TFTP](#download-the-devices-startup-configuration-to-the-host-via-tftp "Download the device's startup configuration to the host via TFTP")
-27. [Determine and display a file's hash value](#determine-and-display-a-files-hash-value "Determine and display a file's hash value")
-28. [Upload a non-existing file from the host to the device via TFTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-tftp "Upload a non-existing file from the host to the device via TFTP")
-29. [Download a non-existing file from the host to the device via TFTP](#download-a-non-existing-file-from-the-host-to-the-device-via-tftp "Download a non-existing file from the host to the device via TFTP")
-30. [Upload an existing file from the host to the device via TFTP](#upload-an-existing-file-from-the-host-to-the-device-via-tftp "Upload an existing file from the host to the device via TFTP")
-31. [Download an existing file from the host to the device via TFTP](#download-an-existing-file-from-the-host-to-the-device-via-tftp "Download an existing file from the host to the device via TFTP")
-32. [Enable the FTP server on the host](#enable-the-ftp-server-on-the-host "Enable the FTP server on the host")
-33. [Download the device's startup configuration to the host via FTP](#download-the-devices-startup-configuration-to-the-host-via-ftp "Download the device's startup configuration to the host via FTP")
-34. [Upload a non-existing file from the host to the device via FTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-ftp "Upload a non-existing file from the host to the device via FTP")
-35. [Download a non-existing file from the host to the device via FTP](#download-a-non-existing-file-from-the-host-to-the-device-via-ftp "Download a non-existing file from the host to the device via FTP")
-36. [Upload an existing file from the host to the device via FTP](#upload-an-existing-file-from-the-host-to-the-device-via-ftp "Upload an existing file from the host to the device via FTP")
-37. [Download an existing file from the host to the device via FTP](#download-an-existing-file-from-the-host-to-the-device-via-ftp "Download an existing file from the host to the device via FTP")
-38. [Enable the SCP server on the host](#enable-the-scp-server-on-the-host "Enable the SCP server on the host")
-39. [Download the device's startup configuration to the host via SCP](#download-the-devices-startup-configuration-to-the-host-via-scp "Download the device's startup configuration to the host via SCP")
-40. [Upload a non-existing file from the host to the device via SCP](#upload-a-non-existing-file-from-the-host-to-the-device-via-scp "Upload a non-existing file from the host to the device via SCP")
-41. [Download a non-existing file from the host to the device via SCP](#download-a-non-existing-file-from-the-host-to-the-device-via-scp "Download a non-existing file from the host to the device via SCP")
-42. [Upload an existing file from the host to the device via SCP](#upload-an-existing-file-from-the-host-to-the-device-via-scp "Upload an existing file from the host to the device via SCP")
-43. [Download an existing file from the host to the device via SCP](#download-an-existing-file-from-the-host-to-the-device-via-scp "Download an existing file from the host to the device via SCP")
-44. [Reload the device](#reload-the-device "Reload the device")
-45. [Disable the TFTP service on the host](#disable-the-tftp-service-on-the-host "Disable the TFTP service on the host")
-46. [Disable the FTP service on the host](#disable-the-ftp-service-on-the-host "Disable the FTP service on the host")
-47. [Disable the NTP service on the host](#disable-the-ntp-service-on-the-host "Disable the NTP service on the host")
-48. [Disable the SCP service on the host (optional)](#disable-the-scp-service-on-the-host-optional "Disable the SCP service on the host (optional)")
+11. [Assign the router an IPv4 address](#assign-the-router-an-ipv4-address "Assign the router an IPv4 address")
+12. [Test connectivity from the device to the host](#test-connectivity-from-the-device-to-the-host "Test connectivity from the device to the host")
+13. [Test connectivity from the host to the device](#test-connectivity-from-the-host-to-the-device "Test connectivity from the host to the device")
+14. [Secure the device's virtual teletype (VTY) lines](#secure-the-devices-virtual-teletype-vty-lines "Secure the device's virtual teletype (VTY) lines")
+15. [Secure the device's Console port](#secure-the-devices-console-port "Secure the device's Console port")
+16. [Secure the device's Auxiliary port](#secure-the-devices-auxiliary-port "Secure the device's Auxiliary port")
+17. [Secure the device's Privileged EXEC Mode](#secure-the-devices-privileged-exec-mode "Secure the device's Privileged EXEC Mode")
+18. [Set the device's clock manually](#set-the-devices-clock-manually "Set the device's clock manually")
+19. [Enable the NTP server on the host](#enable-the-ntp-server-on-the-host "Enable the NTP server on the host")
+20. [Update the device's clock using the host's NTP server](#update-the-devices-clock-using-the-hosts-ntp-server "Update the device's clock using the host's NTP server")
+21. [Enable SSH on the device](#enable-ssh-on-the-device "Enable SSH on the device")
+22. [Connect to the device from the host via Secure Shell (SSH)](#connect-to-the-device-from-the-host-via-secure-shell-ssh "Connect to the device from the host via Secure Shell (SSH)")
+23. [Enable the TFTP server on the host](#enable-the-tftp-server-on-the-host "Enable the TFTP server on the host")
+24. [Download the device's startup configuration to the host via TFTP](#download-the-devices-startup-configuration-to-the-host-via-tftp "Download the device's startup configuration to the host via TFTP")
+25. [Determine and display a file's hash value](#determine-and-display-a-files-hash-value "Determine and display a file's hash value")
+26. [Upload a non-existing file from the host to the device via TFTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-tftp "Upload a non-existing file from the host to the device via TFTP")
+27. [Download a non-existing file from the host to the device via TFTP](#download-a-non-existing-file-from-the-host-to-the-device-via-tftp "Download a non-existing file from the host to the device via TFTP")
+28. [Upload an existing file from the host to the device via TFTP](#upload-an-existing-file-from-the-host-to-the-device-via-tftp "Upload an existing file from the host to the device via TFTP")
+29. [Download an existing file from the host to the device via TFTP](#download-an-existing-file-from-the-host-to-the-device-via-tftp "Download an existing file from the host to the device via TFTP")
+30. [Enable the FTP server on the host](#enable-the-ftp-server-on-the-host "Enable the FTP server on the host")
+31. [Download the device's startup configuration to the host via FTP](#download-the-devices-startup-configuration-to-the-host-via-ftp "Download the device's startup configuration to the host via FTP")
+32. [Upload a non-existing file from the host to the device via FTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-ftp "Upload a non-existing file from the host to the device via FTP")
+33. [Download a non-existing file from the host to the device via FTP](#download-a-non-existing-file-from-the-host-to-the-device-via-ftp "Download a non-existing file from the host to the device via FTP")
+34. [Upload an existing file from the host to the device via FTP](#upload-an-existing-file-from-the-host-to-the-device-via-ftp "Upload an existing file from the host to the device via FTP")
+35. [Download an existing file from the host to the device via FTP](#download-an-existing-file-from-the-host-to-the-device-via-ftp "Download an existing file from the host to the device via FTP")
+36. [Enable the SCP server on the host](#enable-the-scp-server-on-the-host "Enable the SCP server on the host")
+37. [Download the device's startup configuration to the host via SCP](#download-the-devices-startup-configuration-to-the-host-via-scp "Download the device's startup configuration to the host via SCP")
+38. [Upload a non-existing file from the host to the device via SCP](#upload-a-non-existing-file-from-the-host-to-the-device-via-scp "Upload a non-existing file from the host to the device via SCP")
+39. [Download a non-existing file from the host to the device via SCP](#download-a-non-existing-file-from-the-host-to-the-device-via-scp "Download a non-existing file from the host to the device via SCP")
+40. [Upload an existing file from the host to the device via SCP](#upload-an-existing-file-from-the-host-to-the-device-via-scp "Upload an existing file from the host to the device via SCP")
+41. [Download an existing file from the host to the device via SCP](#download-an-existing-file-from-the-host-to-the-device-via-scp "Download an existing file from the host to the device via SCP")
+42. [Reload the device](#reload-the-device "Reload the device")
+43. [Disable the TFTP service on the host](#disable-the-tftp-service-on-the-host "Disable the TFTP service on the host")
+44. [Disable the FTP service on the host](#disable-the-ftp-service-on-the-host "Disable the FTP service on the host")
+45. [Disable the NTP service on the host](#disable-the-ntp-service-on-the-host "Disable the NTP service on the host")
+46. [Disable the SCP service on the host (optional)](#disable-the-scp-service-on-the-host-optional "Disable the SCP service on the host (optional)")
 
 ---
 
@@ -134,7 +132,7 @@ if index <= 1:
     child.sendline('enable\r')  # OK for R2> and R2# (no effect if already in Privileged EXEC Mode)
 else:
     child.sendline('end\r')  # After this line, press Enter again to exit if-else mode
-    
+
 child.expect_exact(device_prompts[1])
 ```
 
@@ -156,22 +154,26 @@ A ```0``` should appear after you enter the last line, which indicates that the 
 Go back to your Telnet Terminal, then enter and exit **Global Configuration Mode**:
 
 ```
-configure terminal
+configure terminal ; or conf t
 end
 ```
 
-Once you enter ```end```, a message, similar to the following, may appear: 
+**Output:**: 
 
 ```
+R1#configure terminal
+R1(config)#end
+R1#
 *Mar  1 00:00:19.347: %SYS-5-CONFIG_I: Configured from console by console
+R1#
 ```
 
-By default, Cisco devices display system messages on the console. However, sometimes these messages cause a new prompt. When configuring a device using Python, this may cause the Pexpect cursor to stop at the wrong prompt, and look for a search string in the wrong place.
+Notice the message that appeared? By default, Cisco devices display system messages on the console. However, sometimes these messages cause a new prompt, as shown above. When configuring a device using Python, this may cause the Pexpect cursor to stop at the wrong prompt, and look for a search string in the wrong place.
 
 There are several ways to solve this problem:
 
 1. You can disable console logging by entering ```no logging console```. However, doing this will hide important messages, such as error messages about software or hardware malfunctions.
-2. You can change the console logging level from a severity of **7 (Debug)** to **4 (Warning)**. Doing this will not hide error messages, but debugging messages, informational messages, and notifications will "disappear", since the device does not store them.
+2. You can change the console logging level from a severity of ***7 (Debug)*** to ***4 (Warning)***. Doing this will not hide error messages, but Level ***7 (Debug)***, ***6 (Informational)***, and ***5 (Notice)*** messages will "disappear", since the device does not store them.
 3. You can store messages in a buffer instead.
 
 We will go with choices 2 and 3 for now. Once the device is configured, you can save the messages to a file or forward them to a syslog server.
@@ -256,7 +258,7 @@ Router1#
 However, we like ```R1```, so change it back:
 
 ```
-configure terminal ; or conf t
+configure terminal
 hostname R1
 end
 ```
@@ -313,7 +315,6 @@ if index == 0:
     child.sendline('startup-config\r')
     child.expect_exact('[OK]')
     child.expect_exact('R2#')  # After this line, press Enter again to exit if-else mode
-
 ```
 
 -----
@@ -343,7 +344,7 @@ The asterisk (```*```) indicates the current file system, while the ```Prefixes`
 Verify the name of the default file system and look at its contents:
 
 ```
-R1#dir
+dir
 ```
 
 **Output:**
@@ -383,45 +384,207 @@ if not default_file_system.startswith(('bootflash', 'flash', 'slot', 'disk',)):
 
 # If the drive is not formatted, a warning will appear, followed by another prompt.
 # Wait for it to pass, and get to the correct prompt
-child.expect_exact(['before an image can be booted from this device', pexpect.TIMEOUT, ], timeout=5)
-child.expect_exact('R2#')
+index = child.expect_exact(['before an image can be booted from this device', pexpect.TIMEOUT, ], timeout=5)
+if index == 0:
+    child.expect_exact('R2#')  # After this line, press Enter again to exit if-else mode
 ```
 
 -----
 
 ## Get the name of the device. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+There are several ways to get the name of a Cisco device, but for the Cisco 3745 router, the best way is to look for the first field replaceable unit (FRU) product number.
+
+Go back to your Telnet Terminal and enter the following commands:
+
+```
+show diag | include FRU
+show tech-support | include FRU
+```
+
+**Output:***
+
+```
+R1#show diag | include FRU
+	Product (FRU) Number     : C3745-2FE
+R1#show tech-support | include FRU
+	Product (FRU) Number     : C3745-2FE
+```
+
+The second command takes longer, since it includes a lot of additional information about the device (e.g., the startup configuration, the status of the ports, etc.) 
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+import re
+try:
+    child.sendline('show diag | include FRU\r')
+    child.expect_exact('R2#')
+    device_name = str(child.before).split('show diag | include FRU\r')[1].split('\r')[0].strip()
+    if not re.compile(r'Product \(FRU\) Number').search(device_name):
+        raise RuntimeError('Cannot get the device\'s name.')
+except (RuntimeError, IndexError) as ex:
+    device_name = None  # After this line, press Enter again to exit try-expect mode
+
+print(device_name)
+```
 
 -----
 
 ## Get the serial number of the device. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+There are several ways to get the serial number of a Cisco device, but for the Cisco 3745 router, the best way is to look for identification number of the processor board.
+
+Go back to your Telnet Terminal and enter the following commands:
+
+```
+show version | include [Pp]rocessor [Bb]oard [IDid]
+show tech-support | include [Pp]rocessor [Bb]oard [IDid]
+```
+
+**Output:***
+
+```
+R1#show version | include [Pp]rocessor [Bb]oard [IDid]
+Processor board ID FTX0945W0MY
+R1#show tech-support | include [Pp]rocessor [Bb]oard [IDid]   
+Processor board ID FTX0945W0MY
+```
+
+The second command takes longer, since it includes a lot of additional information about the device (e.g., the startup configuration, the status of the ports, etc.) 
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+import re
+try:
+    child.sendline('show version | include [Pp]rocessor [Bb]oard [IDid]\r')
+    child.expect_exact('R2#')
+    serial_num = str(child.before).split('show version | include [Pp]rocessor [Bb]oard [IDid]\r')[1].split('\r')[0].strip()
+    if not re.compile(r'[Pp]rocessor [Bb]oard [IDid]').search(serial_num):
+        raise RuntimeError('Cannot get the device\'s serial number.')
+except (RuntimeError, IndexError) as ex:
+    serial_num = None  # After this line, press Enter again to exit try-expect mode
+
+print(serial_num)
+```
 
 -----
 
 ## Get the operating system's name and version of the device. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+There are several ways to get the operating system's name and version of a Cisco device.
+
+Go back to your Telnet Terminal and enter the following commands:
+
+```
+show version | include [IOSios] [Ss]oftware
+show tech-support | include [IOSios] [Ss]oftware
+```
+
+**Output:***
+
+```
+R1#show version | include [IOSios] [Ss]oftware
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+R1#show tech-support | include [IOSios] [Ss]oftware
+Cisco IOS Software, 3700 Software (C3745-ADVENTERPRISEK9-M), Version 12.4(25d), RELEASE SOFTWARE (fc1)
+```
+
+The second command takes longer, since it includes a lot of additional information about the device (e.g., the startup configuration, the status of the ports, etc.) 
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+import re
+try:
+    child.sendline('show version | include [IOSios] [Ss]oftware\r')
+    child.expect_exact('R2#')
+    software_ver = str(child.before).split('show version | include [IOSios] [Ss]oftware\r')[1].split('\r')[0].strip()
+    if not re.compile(r'[IOSios] [Ss]oftware').search(software_ver):
+        raise RuntimeError('Cannot get the device\'s software version.')
+except (RuntimeError, IndexError) as ex:
+    software_ver = None  # After this line, press Enter again to exit try-expect mode
+
+print(software_ver)
+```
 
 -----
 
 ## Format a filesystem on the device. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Go back to your Telnet Terminal and look at your log:
 
------
+```
+show logging
+```
 
-## Set the switch's priority. 
+You should see an entry, similar to the following:
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+>**NOTE** - After entering the ```show logging``` command, you may see ```--More--``` appear at the bottom of the listing, which means that there is more text to follow. Press <kbd>Space</kbd> to continue reading the log until the ```R1#``` prompt appears again. By the way, pressing <kbd>Enter</kbd> will only advance the log one entry at a time.
 
------
+```
+*Mar  1 00:00:05.239: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
+```
 
-## Assign the switch an IPv4 address. 
+This entry tells you that the router's default file system is not formatted, which means that you will be unable to save file on the device.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Fix that now by entering the following command. You will need the name of the default file system (e.g., ```flash```, etc.):
+
+```
+format flash:
+```
+
+**Output:**
+
+```
+R1#format flash:
+Format operation may take a while. Continue? [confirm]
+Format operation will destroy all data in "flash:".  Continue? [confirm]
+Format: Drive communication & 1st Sector Write OK...
+Writing Monlib sectors.
+.........................................................................................................................
+Monlib write complete 
+
+Format: All system sectors written. OK...
+
+Format: Total sectors in formatted partition: 130911
+Format: Total bytes in formatted partition: 67026432
+Format: Operation completed successfully.
+
+Format of flash complete
+```
+
+If you look at the contents of the ```flash``` file system, you will see it is empty and that all its memory is available for storage:
+
+```
+show flash:
+```
+
+**Output:**
+
+```
+R1#show flash:
+No files on device
+
+66875392 bytes available (0 bytes used)
+```
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+child.sendline('format flash:\r')
+index = 1
+while index != 0:
+    index = child.expect_exact([pexpect.TIMEOUT, 'Continue? [confirm]', 'Enter volume ID', ], timeout=5)
+    if index != 0:
+        child.sendline('\r')  # After this line, press Enter again to exit while mode
+
+child.expect_exact('Format of flash complete', timeout=120)
+child.sendline('show flash:\r')
+child.expect_exact('(0 bytes used)')
+child.expect_exact('R2#')
+```
 
 -----
 

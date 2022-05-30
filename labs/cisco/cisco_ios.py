@@ -512,9 +512,10 @@ class CiscoIOS(object):
                 raise RuntimeError('Cannot get the device\'s working drive.')
             # If the drive is not formatted, a warning will appear, followed by another prompt.
             # Wait for it to pass, and get to the correct prompt
-            child.expect_exact(
+            index = child.expect_exact(
                 ['before an image can be booted from this device', pexpect.TIMEOUT, ], timeout=5)
-            self.__reset_pexpect_cursor(child, eol)
+            if index == 0:
+                child.expect_exact(self.device_prompts[1])
         except (RuntimeError, IndexError) as ex:
             # RuntimeError = explicit, while IndexError = implicit if split index is out of range
             reporter.warn(ex.message)
