@@ -79,7 +79,7 @@ R1#
 
 Press <kbd>Ctrl</kbd>+<kbd>]</kbd> to leave R1 and input "q" to exit Telnet. Go back to the GNS3 GUI, but this time, right click on R1, and click on Reload:
 
-![Reload](../../img/a34.png)
+![Reload](../../../../img/a34.png)
 
 Normally, when you reload a device, it will load the default settings, erasing any changes you made. However, since you transferred the running configuration to the startup configuration in the NVRAM, the router will now remember your settings.
 

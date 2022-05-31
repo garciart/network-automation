@@ -12,18 +12,14 @@ Requirements:
 from __future__ import print_function
 
 import sys
-import time
 import traceback
 from datetime import datetime
 from getpass import getpass
 
 import pexpect
 
-import labs.lab01_telnet
 import labs.lab02_exec_mode
-import labs.lab03_format
 import labs.lab04_info
-import labs.lab05_enable_layer3
 import labs.lab06_secure_device
 import labs.lab07_clock
 from labs.utility import enable_ntp
@@ -60,7 +56,7 @@ def main():
         # Include a console port password in case the device is secured.
         # The default console port password for the labs is "ciscon"
         console_password = "ciscon"
-        child = labs.lab01_telnet.connect(
+        child = old.reconcile.lab01_telnet.connect(
             device_hostname, gateway_ip_addr, device_console_port, password=console_password)
 
         print("Lab 2: Access a network device's Privileged EXEC Mode")
@@ -85,30 +81,30 @@ def main():
         print("Lab 3: Format a network device's memory")
         # For the Cisco 3745, the disk_name is the default value of "flash",
         # while for the Cisco 7206, the disk_name is "disk0"
-        labs.lab03_format.run(child, device_hostname, disk_name=disk_name)
+        old.reconcile.lab03_format.run(child, device_hostname, disk_name=disk_name)
 
         print("Lab 4: Get information about a network device")
         labs.lab04_info.run(child, device_hostname)
 
         print("Lab 5: Enable Layer 3 communications to and from a network device")
         # Part 1: Enable Layer 3 communications
-        labs.lab05_enable_layer3.run(child, device_hostname, device_ip_addr, new_netmask=device_netmask, commit=True)
+        old.reconcile.lab05_enable_layer3.run(child, device_hostname, device_ip_addr, new_netmask=device_netmask, commit=True)
         # Part 2: Ping the host from the device
-        labs.lab05_enable_layer3.ping_from_device(child, host_ip_addr)
+        old.reconcile.lab05_enable_layer3.ping_from_device(child, host_ip_addr)
         # Part 3: Ping the device from the host
-        labs.lab05_enable_layer3.ping_device(device_ip_addr)
+        old.reconcile.lab05_enable_layer3.ping_device(device_ip_addr)
         # Part 4: Attempt to connect via Telnet over Ethernet without first setting a password
-        labs.lab01_telnet.disconnect(child)
+        old.reconcile.lab01_telnet.disconnect(child)
         child.close()
         try:
             print("Attempt to connect via Telnet over Ethernet without first setting a password...")
-            child = labs.lab01_telnet.connect(device_hostname, device_ip_addr)
+            child = old.reconcile.lab01_telnet.connect(device_hostname, device_ip_addr)
         except pexpect.EOF:
             # EOF errors implicitly close the child; no need to close it explicitly
             print("Attempt to connect failed as expected.")
 
         print("Lab 6: Secure a network device")
-        child = labs.lab01_telnet.connect(
+        child = old.reconcile.lab01_telnet.connect(
             device_hostname, gateway_ip_addr, device_console_port, password=console_password)
         labs.lab06_secure_device.run(child,
                                      device_hostname,
@@ -121,17 +117,17 @@ def main():
                                      commit=True)
 
         # Telnet to the new IP address and repeat Labs 1, 3, 4, and part of 5
-        labs.lab01_telnet.disconnect(child)
+        old.reconcile.lab01_telnet.disconnect(child)
         child.close()
         # VTY line connections do not need a carriage return!
-        child = labs.lab01_telnet.connect(
+        child = old.reconcile.lab01_telnet.connect(
             device_hostname, device_ip_addr, username="admin", password="cisco", eol="")
         labs.lab02_exec_mode.run(child, device_hostname, enable_password, eol="")
         labs.lab04_info.run(child, device_hostname, eol="")
         # Ping the host from the device
-        labs.lab05_enable_layer3.ping_from_device(child, host_ip_addr, eol="")
+        old.reconcile.lab05_enable_layer3.ping_from_device(child, host_ip_addr, eol="")
         # Ping the device from the host
-        labs.lab05_enable_layer3.ping_device(device_ip_addr)
+        old.reconcile.lab05_enable_layer3.ping_device(device_ip_addr)
 
         print("Lab 7: Set a network device's clock")
         sudo_password = getpass("Enter the sudo password: ")

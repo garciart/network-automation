@@ -30,7 +30,7 @@ import time
 
 import pexpect
 
-from labs.old import CiscoRouter  # Super class!
+from labs import CiscoRouter  # Super class!
 
 # Enable error and exception logging
 logging.Formatter.converter = time.gmtime

@@ -15,7 +15,7 @@ the **Project** window should appear).
 A pop-up dialog will appear, asking you to create a new project. Enter ```lab003``` in the ***Name*** textbox and click
 the **OK** button.
 
-![Project Dialog](../../img/a10.png)
+![Project Dialog](../../../../img/a10.png)
 
 Complete the steps in [Lab 2 (Ping)](lab002-ping.md "Lab 2 (Ping)"), and Telnet back into the device by opening a Terminal and inputting the following
 command. Using the instructions in [lab001-telnet](lab001-telnet.md "Lab 1 (Telnet)"), make sure your use the right console port:

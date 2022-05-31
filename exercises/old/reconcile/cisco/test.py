@@ -2,9 +2,9 @@ import sys
 
 import pexpect
 
-from cisco_ios import CiscoIOS
-from labs.cisco.reporter import Reporter
-from labs.cisco.utility import (enable_ftp, disable_ftp, )
+from exercises.cisco_ios import CiscoIOS
+from labs import Reporter
+from labs import (enable_ftp, disable_ftp, )
 
 switch = CiscoIOS('Switch')
 reporter = Reporter()

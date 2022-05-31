@@ -9,7 +9,7 @@ Requirements:
 """
 import unittest
 
-from labs.old import lab_utils
+from labs import lab_utils
 
 # Module metadata dunders
 __author__ = "Rob Garcia"

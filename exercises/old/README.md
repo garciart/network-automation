@@ -1,6 +1,6 @@
 # Welcome to the Labs!
 
-![All Devices Started](../img/adventures-automation.gif)
+![All Devices Started](../../img/adventures-automation.gif)
 
 The labs in this folder will show you how to automate simple network tasks using Python. However, before starting the labs, run these commands through the Cisco command-line interface (CLI), as you would do with a real network device. This will give you an idea of what to look for and what to expect from each lab.
 
@@ -21,11 +21,11 @@ The labs in this folder will show you how to automate simple network tasks using
 ---
 ## Set up the Host's Linux Environment 
 
-First, ensure you have installed and started GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial. We recommend you follow our suggestion in the post-script to open a Linux Terminal and start GNS3 by entering ```gns3_run```. For this tutorial, you will continue to use the Automation project in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+First, ensure you have installed and started GNS3 per the instructions in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial. We recommend you follow our suggestion in the post-script to open a Linux Terminal and start GNS3 by entering ```gns3_run```. For this tutorial, you will continue to use the Automation project in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial.
 
 >**NOTE** - By the way, you will also continue to use the Cisco 3745 Multi-Service Access Router for the labs, so no further configuration is needed. All you will have to do from the GNS3 GUI is start the device; occasionally get some info or reload the device; and stop the device before exiting. 
 
-Second, make sure the clients and services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../README.md "Adventures in Automation") tutorial):
+Second, make sure the clients and services required for the labs exist and are enabled on the host (they should have been installed during the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial):
 
 1. **Teletype Network (Telnet) Client** - Telnet is a protocol that allows devices to communicate over a network. It uses the Transmission Control Protocol (TCP) to ensure a reliable session, but it neither authenticates users nor encrypts any data transmitted, so it is not secure. You will use Telnet to configure the device to switch to the Secure Shell (SSH) Protocol.
 2. **Network Time Protocol (NTP) Service** - Some network devices may not have a battery-supported system clock, which means that they do not retain the correct time and date after they are powered off, reloaded, or restarted. However, several tasks, such as logging or synchronization, depend on an up-to-date clock. You will use NTP to update the device's clock using the host's clock.
@@ -50,7 +50,7 @@ After a few seconds, you will see the following output:
 /usr/bin/scp
 ```
 
->**NOTE** - If you see ```/usr/bin/which: no telnet``` or ```/usr/bin/which: no scp```, the program is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>**NOTE** - If you see ```/usr/bin/which: no telnet``` or ```/usr/bin/which: no scp```, the program is not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial.
 
 Check the status of the services by entering the following commands:
 
@@ -96,7 +96,7 @@ After a few seconds, you will see the following output:
 
 You see that ntpd, tftp, and vsftpd are present, but disabled, while the sshd service is running.
 
->**NOTE** - If you see ```Unit (ntpd, tftp, vsftpd, or sshd).service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>**NOTE** - If you see ```Unit (ntpd, tftp, vsftpd, or sshd).service could not be found.```, the services are not installed or loaded. Make sure you installed GNS3 per the instructions in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial.
 
 Change your firewall settings by entering the following commands. If prompted, enter your sudo password:
 
@@ -127,7 +127,7 @@ The first three commands allow FTP client and server communications through port
 > 
 >However, you can run this command if you like; it will not affect the system.
 
->**NOTE** - If you run into any errors, make sure you installed GNS3 per the instructions in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>**NOTE** - If you run into any errors, make sure you installed GNS3 per the instructions in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial.
 >- Do not reload the firewall daemon. For security purposes, these changes are temporary and the ports will close if the system crashes or reboots.
 >- Do not install a Telnet service. You will only need the Telnet client, which you installed during the GNS3 setup. 
 
@@ -182,13 +182,13 @@ Finally, start the FTP service:
 
 Now that you have set up the host system, you can run the commands in a Console port session. First, get the gateway IP address and Console port's number from the **Topology Summary** in the top left-hand corner.:
 
-![Topology Summary](../img/a32.png)
+![Topology Summary](../../img/a32.png)
 
 If the Console port number is difficult to see, you can get the information by expanding the dock or right-clicking on the R1 node and selecting **Show node information**:
 
-![Show Node Information](../img/a35.png)
+![Show Node Information](../../img/a35.png)
 
-![Node Information](../img/a36.png)
+![Node Information](../../img/a36.png)
 
 Connect to the device using Telnet. In your case, the Console port number is ```5001```:
 
@@ -219,7 +219,7 @@ If the device reloaded correctly, this line will appear near the end of the boot
 
 >**NOTE** - Unfortunately, entering the ```reload``` command in GNS3 will cause the Console terminal to "hang", so if you do see a prompt, exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 >
->![Reload the Device](../img/b01.png)
+>![Reload the Device](../../img/b01.png)
 
 If you do not see a prompt, press <kbd>Enter</kbd> now. 
 
@@ -235,7 +235,7 @@ If you do not see a prompt, press <kbd>Enter</kbd> now.
 >
 >Unfortunately, there is no easy way to reset the device to its factory settings in GNS3; you will have to delete the device in the GNS3 workspace, and replace it with a new device.
 >
->***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open virtual teletype session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life, when configuring an actual device for Layer 3 communications.***
+>***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open virtual teletype session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life, when configuring an actual device for Layer 3 communications.***
 
 If you are greeted with a simple ```R1#```, you are good to go. You are in **Privileged EXEC Mode**, the default startup mode for Cisco devices in GNS3.
 
@@ -277,7 +277,7 @@ Format operation may take a while. Continue? [confirm]
 Format operation will destroy all data in "flash:".  Continue? [confirm]
 ```
 
-If the device's memory and disks were configured correctly in [Adventures in Automation](../README.md "Adventures in Automation"), you should see the following output:
+If the device's memory and disks were configured correctly in [Adventures in Automation](../../README.md "Adventures in Automation"), you should see the following output:
 
 ```
 Format: Drive communication & 1st Sector Write OK...
@@ -365,7 +365,7 @@ R1#
 >
 >```ip address show | grep '[0-9]: e[mnt]'```
 >
->Note the name of the isolated interface from the [Adventures in Automation](../README.md "Adventures in Automation") tutorial (e.g., ```enp0s8```, etc.):
+>Note the name of the isolated interface from the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial (e.g., ```enp0s8```, etc.):
 >
 >```
 >2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
@@ -376,7 +376,7 @@ R1#
 >
 >```sudo ip address replace 192.168.1.10/24 dev enp0s8```
 >
->Go back to the Telnet terminal and attempt to ping the host from the device again. If the success rate is still zero, go back and review the steps in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial.
+>Go back to the Telnet terminal and attempt to ping the host from the device again. If the success rate is still zero, go back and review the steps in the [Adventures in Automation](../../README.md "Adventures in Automation") tutorial.
 
 Before continuing, make that change to the interface permanent by updating the device's **startup configuration**; otherwise, the device will shutdown the interface after each reload or reboot:
 
@@ -399,7 +399,7 @@ R1#
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
-![Reload the Device](../img/b01.png)
+![Reload the Device](../../img/b01.png)
 
 Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
@@ -416,7 +416,7 @@ Password required, but none set
 Connection closed by foreign host.
 ```
 
-![What???](../img/whaat-huh.gif "What???")
+![What???](../../img/whaat-huh.gif "What???")
 
 What happened? Well, when you made your changes permanent, the current running configuration added this line to the end of the device's startup configuration, stored in the device's nonvolatile random-access memory (NVRAM):
 
@@ -643,7 +643,7 @@ line aux 0
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
-![Reload the Device](../img/b01.png)
+![Reload the Device](../../img/b01.png)
 
 Go back to the Linux Terminal and attempt to Telnet into the device using the IP address:
 
@@ -985,7 +985,7 @@ To see the keys, enter the following command:
 
 Exit Telnet by pressing <kbd>Ctrl</kbd>+<kbd>]</kbd>, and inputting <kbd>q</kbd>. Once you have exited Telnet, go to the GNS3 GUI and reload the device:
 
-![Reload the Device](../img/b01.png)
+![Reload the Device](../../img/b01.png)
 
 Go back to the Linux Terminal and attempt to SSH into the device using the username and the IP address:
 

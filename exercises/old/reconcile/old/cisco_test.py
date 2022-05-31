@@ -5,7 +5,7 @@ import sys
 import pexpect
 
 from cisco import Cisco
-from labs.old import lab_utils
+from labs import lab_utils
 
 
 def main():

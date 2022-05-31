@@ -1,5 +1,4 @@
-from labs.cisco_class import Cisco
-from labs.utility import enable_ntp, disable_ntp
+from exercises.old.reconcile.old import Cisco
 
 # Device connect to tap0
 c = Cisco("Router", eol="")

@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
+"""Bash Utility Module
+Contains Bash command sequences needed to support the Cisco device classes
 
+Project: Automation
+
+Requirements:
+* Python 2.7+
+* pexpect
+* GNS3
 """
 import hashlib
 import os

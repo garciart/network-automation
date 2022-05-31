@@ -4,12 +4,12 @@
 import os.path
 import sys
 
-from cisco_ios import CiscoIOS
-from labs.cisco.utility import (validate_ip_address,
-                                validate_port_number,
-                                validate_subnet_mask,
-                                validate_password,
-                                run_cli_command, )
+from exercises.cisco_ios import CiscoIOS
+from labs import (validate_ip_address,
+                  validate_port_number,
+                  validate_subnet_mask,
+                  validate_password,
+                  run_cli_command, )
 
 __all__ = ['CiscoIOSL2', ]
 

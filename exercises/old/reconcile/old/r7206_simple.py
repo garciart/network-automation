@@ -28,7 +28,7 @@ import time
 
 import pexpect
 
-from labs.old import CiscoRouter  # Super class!
+from labs import CiscoRouter  # Super class!
 
 
 class Ramon7206(CiscoRouter):

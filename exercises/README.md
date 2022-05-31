@@ -8,7 +8,7 @@ First, ensure you have installed and started GNS3 per the instructions on the la
 
 However, add another **Cisco 3745** router to the Workspace, and make sure it is named "R2". Connect the ```tap1``` interface in **Cloud1** to the ```F0/0``` interface in **R2**. Start all the devices, and you should end up with a topology that looks like the following:
 
-![All Devices Started](../../img/b00.png)
+![All Devices Started](../img/b00.png)
 
 >**NOTE** - If your port numbers in the **Topology Summary** (on the right) are not ```5001``` and ```5002```, that is OK. For the exercises, replace ```5001``` with the port number that the GNS3 server assigned to **R1** (e.g., ```192.168.1.1 5011```, etc) and replace ```5002``` with the port number that the GNS3 server assigned to **R2**.
 
@@ -1017,7 +1017,7 @@ Password required, but none set
 Connection closed by foreign host.
 ```
 
-![What???](../../img/whaat-huh.gif "What???")
+![What???](../img/whaat-huh.gif "What???")
 
 What happened? Well, when you made your changes permanent, the device added this line to the end of its startup configuration:
 

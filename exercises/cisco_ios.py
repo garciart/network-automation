@@ -16,17 +16,17 @@ from datetime import datetime
 
 import pexpect
 
-from labs.cisco.utility import (validate_ip_address,
-                                validate_port_number,
-                                validate_subnet_mask,
-                                validate_file_path,
-                                validate_switch_priority,
-                                enable_ftp,
-                                disable_ftp,
-                                fix_tftp_filepath,
-                                prep_for_tftp_download,
-                                enable_tftp,
-                                disable_tftp, )
+from utility import (validate_ip_address,
+                     validate_port_number,
+                     validate_subnet_mask,
+                     validate_file_path,
+                     validate_switch_priority,
+                     enable_ftp,
+                     disable_ftp,
+                     fix_tftp_filepath,
+                     prep_for_tftp_download,
+                     enable_tftp,
+                     disable_tftp, )
 
 __all__ = ['CiscoIOS', ]
 
@@ -581,7 +581,7 @@ class CiscoIOS(object):
 
         :return: None
         :rtype: None
-        
+
         :raise ValueError: If an argument is invalid.
         :raise pexpect.ExceptionPexpect: If the result of a send command does not match the
             expected result (raised from the pexpect module).
@@ -616,7 +616,7 @@ class CiscoIOS(object):
                             enable_password=None,
                             commit=True):
         """Set the switch priority in the stack.
-        
+
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.
@@ -1226,7 +1226,7 @@ class CiscoIOS(object):
                             enable_password=None,
                             commit=True):
         """Set credentials for FTP transfers in the device.
-        
+
         :param pexpect.spawn child: Connection in a child application object.
         :param labs.cisco.Reporter reporter: A reference to the popup GUI window that reports
             the status and progress of the script.

@@ -1,5 +1,10 @@
-from cisco_ios import CiscoIOS
-from labs.cisco.reporter import Reporter
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""For the Small Network Demo
+"""
+
+from exercises.reporter import Reporter
+from exercises.cisco_ios import CiscoIOS
 
 reporter = Reporter()
 switch = CiscoIOS('Switch')

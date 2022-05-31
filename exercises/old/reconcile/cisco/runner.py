@@ -2,9 +2,8 @@
 """
 
 """
-from labs.cisco.ios_l2 import CiscoIOSL2
-from labs.cisco.iosxe_l3 import CiscoIOSXEL3
-from labs.cisco.reporter import Reporter
+from labs import CiscoIOSL2
+from labs import Reporter
 
 
 def main(reporter):
