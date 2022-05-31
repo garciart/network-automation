@@ -770,7 +770,7 @@ While not setting a session time limit is dangerous, the last two lines, ```priv
 
 The ```no login``` line means that the device requires no username or password for connections through the console or auxiliary port. While this setting makes it easy for network engineers to troubleshoot a device, it also makes it easy for bad actors to hack the device, if they could access either port.
 
->**NOTE** - The ```no login``` line may not appear. However, both case have the same effect: ```no login``` explicitly states that no password is required, while a missing line does so implicitly. 
+>**NOTE** - The ```no login``` line may not appear. However, both cases have the same effect: ```no login``` explicitly states that no password is required, while a missing line does so implicitly. 
 
 Secure both ports by entering the following commands:
 
@@ -812,7 +812,7 @@ Password:
 
 Enter your password (```ciscon```). The Privileged EXEC mode prompt (```R1#```) should appear.
 
-Before continuing to the Python script, look at the console or auxiliary port passwords in ```startup-config```:
+Before continuing to the Python script, look at the console and auxiliary port passwords in ```startup-config```:
 
 ```
 show startup-config | include [Pp]assword
@@ -839,7 +839,7 @@ end
 
 Make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
 
-Look at the console or auxiliary port passwords in ```startup-config``` again:
+Look at the console and auxiliary port passwords in ```startup-config``` again:
 
 ```
 show startup-config | include [Pp]assword
@@ -855,6 +855,13 @@ service password-encryption
 ```
 
 Great! The passwords are no longer in plain text.
+
+>**NOTE** - The ```7``` after ```password``` indicates how the following text was encrypted. Here are all the codes:
+>- ```0``` - No encryption
+>- ```4``` - Secure Hash Algorithm-256 (SHA-256) without salting
+>- ```5``` - Message Digest 5 (MD5) hashing algorithm with salting
+>- ```7``` - Vigenère cipher
+>- ```8``` - Password-Based Key Derivation Function 2 (PBKDF2) with salting (only available for IOS 15.3+)
 
 Go back to your Python Terminal and enter the following commands:
 
@@ -883,23 +890,24 @@ child.expect_exact('R2#')
 
 Once again, make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
 
-Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet. Once you have exited Telnet, go to the GNS3 GUI. Right-click on the device, and select **Stop**, then **Reload**.
+Next, close the connection to the device:
+
+```
+child.close()
+```
+
+Go to the GNS3 GUI. Right-click on the device, and select **Stop**, then **Reload**.
 
 Reconnect to the device through Telnet:
 
-```telnet 192.168.1.1 5001```
-
->**NOTE** - If the router asks you to ```Press RETURN to get started!```, press <kbd>Enter</kbd> to continue. 
-
-**Output:**
-
 ```
-User Access Verification
-
-Password:
+child = pexpect.spawn('telnet 192.168.1.30')
+child.sendline('\r')
+# Increase the timeout to allow the device to boot up
+child.expect_exact('Password:', timeout=300)
+child.sendline('ciscon\r')
+child.expect_exact('R2#')
 ```
-
-Enter your password (```ciscon```). The Privileged EXEC mode prompt (```R1#```) should appear.
 
 -----
 
@@ -910,6 +918,14 @@ Go back to your Console Terminal and exit and re-enter Privileged EXEC Mode:
 ```
 disable
 enable
+```
+
+**Output:**
+
+```
+R1#disable
+R1>enable
+R1#
 ```
 
 The device did not ask you for a password. This means that anyone can elevate from User EXEC Mode and basic access (Privilege Level 0) to Privileged EXEC Mode and full access (Privilege Level 15), without authentication.
