@@ -34,39 +34,38 @@ You will run commands directly in the console on **R1**, and you will run Python
 12. [Test connectivity from the device to the host](#test-connectivity-from-the-device-to-the-host "Test connectivity from the device to the host")
 13. [Test connectivity from the host to the device](#test-connectivity-from-the-host-to-the-device "Test connectivity from the host to the device")
 14. [Secure the device's virtual teletype (VTY) lines](#secure-the-devices-virtual-teletype-vty-lines "Secure the device's virtual teletype (VTY) lines")
-15. [Secure the device's Console port](#secure-the-devices-console-port "Secure the device's Console port")
-16. [Secure the device's Auxiliary port](#secure-the-devices-auxiliary-port "Secure the device's Auxiliary port")
-17. [Secure the device's Privileged EXEC Mode](#secure-the-devices-privileged-exec-mode "Secure the device's Privileged EXEC Mode")
-18. [Set the device's clock manually](#set-the-devices-clock-manually "Set the device's clock manually")
-19. [Enable the NTP server on the host](#enable-the-ntp-server-on-the-host "Enable the NTP server on the host")
-20. [Update the device's clock using the host's NTP server](#update-the-devices-clock-using-the-hosts-ntp-server "Update the device's clock using the host's NTP server")
-21. [Enable SSH on the device](#enable-ssh-on-the-device "Enable SSH on the device")
-22. [Connect to the device from the host via Secure Shell (SSH)](#connect-to-the-device-from-the-host-via-secure-shell-ssh "Connect to the device from the host via Secure Shell (SSH)")
-23. [Enable the TFTP server on the host](#enable-the-tftp-server-on-the-host "Enable the TFTP server on the host")
-24. [Download the device's startup configuration to the host via TFTP](#download-the-devices-startup-configuration-to-the-host-via-tftp "Download the device's startup configuration to the host via TFTP")
-25. [Determine and display a file's hash value](#determine-and-display-a-files-hash-value "Determine and display a file's hash value")
-26. [Upload a non-existing file from the host to the device via TFTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-tftp "Upload a non-existing file from the host to the device via TFTP")
-27. [Download a non-existing file from the host to the device via TFTP](#download-a-non-existing-file-from-the-host-to-the-device-via-tftp "Download a non-existing file from the host to the device via TFTP")
-28. [Upload an existing file from the host to the device via TFTP](#upload-an-existing-file-from-the-host-to-the-device-via-tftp "Upload an existing file from the host to the device via TFTP")
-29. [Download an existing file from the host to the device via TFTP](#download-an-existing-file-from-the-host-to-the-device-via-tftp "Download an existing file from the host to the device via TFTP")
-30. [Enable the FTP server on the host](#enable-the-ftp-server-on-the-host "Enable the FTP server on the host")
-31. [Prepare the device for FTP transfers](#prepare-the-device-for-ftp-transfers "Prepare the device for FTP transfers")
-32. [Download the device's startup configuration to the host via FTP](#download-the-devices-startup-configuration-to-the-host-via-ftp "Download the device's startup configuration to the host via FTP")
-33. [Upload a non-existing file from the host to the device via FTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-ftp "Upload a non-existing file from the host to the device via FTP")
-34. [Download a non-existing file from the host to the device via FTP](#download-a-non-existing-file-from-the-host-to-the-device-via-ftp "Download a non-existing file from the host to the device via FTP")
-35. [Upload an existing file from the host to the device via FTP](#upload-an-existing-file-from-the-host-to-the-device-via-ftp "Upload an existing file from the host to the device via FTP")
-36. [Download an existing file from the host to the device via FTP](#download-an-existing-file-from-the-host-to-the-device-via-ftp "Download an existing file from the host to the device via FTP")
-37. [Enable the SCP server on the host](#enable-the-scp-server-on-the-host "Enable the SCP server on the host")
-38. [Download the device's startup configuration to the host via SCP](#download-the-devices-startup-configuration-to-the-host-via-scp "Download the device's startup configuration to the host via SCP")
-39. [Upload a non-existing file from the host to the device via SCP](#upload-a-non-existing-file-from-the-host-to-the-device-via-scp "Upload a non-existing file from the host to the device via SCP")
-40. [Download a non-existing file from the host to the device via SCP](#download-a-non-existing-file-from-the-host-to-the-device-via-scp "Download a non-existing file from the host to the device via SCP")
-41. [Upload an existing file from the host to the device via SCP](#upload-an-existing-file-from-the-host-to-the-device-via-scp "Upload an existing file from the host to the device via SCP")
-42. [Download an existing file from the host to the device via SCP](#download-an-existing-file-from-the-host-to-the-device-via-scp "Download an existing file from the host to the device via SCP")
-43. [Reload the device](#reload-the-device "Reload the device")
-44. [Disable the TFTP service on the host](#disable-the-tftp-service-on-the-host "Disable the TFTP service on the host")
-45. [Disable the FTP service on the host](#disable-the-ftp-service-on-the-host "Disable the FTP service on the host")
-46. [Disable the NTP service on the host](#disable-the-ntp-service-on-the-host "Disable the NTP service on the host")
-47. [Disable the SCP service on the host (optional)](#disable-the-scp-service-on-the-host-optional "Disable the SCP service on the host (optional)")
+15. [Secure the device's Console and Auxiliary ports](#secure-the-devices-console-and-auxiliary-ports "Secure the device's Console ports")
+16. [Secure the device's Privileged EXEC Mode](#secure-the-devices-privileged-exec-mode "Secure the device's Privileged EXEC Mode")
+17. [Set the device's clock manually](#set-the-devices-clock-manually "Set the device's clock manually")
+18. [Enable the NTP server on the host](#enable-the-ntp-server-on-the-host "Enable the NTP server on the host")
+19. [Update the device's clock using the host's NTP server](#update-the-devices-clock-using-the-hosts-ntp-server "Update the device's clock using the host's NTP server")
+20. [Enable SSH on the device](#enable-ssh-on-the-device "Enable SSH on the device")
+21. [Connect to the device from the host via Secure Shell (SSH)](#connect-to-the-device-from-the-host-via-secure-shell-ssh "Connect to the device from the host via Secure Shell (SSH)")
+22. [Enable the TFTP server on the host](#enable-the-tftp-server-on-the-host "Enable the TFTP server on the host")
+23. [Download the device's startup configuration to the host via TFTP](#download-the-devices-startup-configuration-to-the-host-via-tftp "Download the device's startup configuration to the host via TFTP")
+24. [Determine and display a file's hash value](#determine-and-display-a-files-hash-value "Determine and display a file's hash value")
+25. [Upload a non-existing file from the host to the device via TFTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-tftp "Upload a non-existing file from the host to the device via TFTP")
+26. [Download a non-existing file from the host to the device via TFTP](#download-a-non-existing-file-from-the-host-to-the-device-via-tftp "Download a non-existing file from the host to the device via TFTP")
+27. [Upload an existing file from the host to the device via TFTP](#upload-an-existing-file-from-the-host-to-the-device-via-tftp "Upload an existing file from the host to the device via TFTP")
+28. [Download an existing file from the host to the device via TFTP](#download-an-existing-file-from-the-host-to-the-device-via-tftp "Download an existing file from the host to the device via TFTP")
+29. [Enable the FTP server on the host](#enable-the-ftp-server-on-the-host "Enable the FTP server on the host")
+30. [Prepare the device for FTP transfers](#prepare-the-device-for-ftp-transfers "Prepare the device for FTP transfers")
+31. [Download the device's startup configuration to the host via FTP](#download-the-devices-startup-configuration-to-the-host-via-ftp "Download the device's startup configuration to the host via FTP")
+32. [Upload a non-existing file from the host to the device via FTP](#upload-a-non-existing-file-from-the-host-to-the-device-via-ftp "Upload a non-existing file from the host to the device via FTP")
+33. [Download a non-existing file from the host to the device via FTP](#download-a-non-existing-file-from-the-host-to-the-device-via-ftp "Download a non-existing file from the host to the device via FTP")
+34. [Upload an existing file from the host to the device via FTP](#upload-an-existing-file-from-the-host-to-the-device-via-ftp "Upload an existing file from the host to the device via FTP")
+35. [Download an existing file from the host to the device via FTP](#download-an-existing-file-from-the-host-to-the-device-via-ftp "Download an existing file from the host to the device via FTP")
+36. [Enable the SCP server on the host](#enable-the-scp-server-on-the-host "Enable the SCP server on the host")
+37. [Download the device's startup configuration to the host via SCP](#download-the-devices-startup-configuration-to-the-host-via-scp "Download the device's startup configuration to the host via SCP")
+38. [Upload a non-existing file from the host to the device via SCP](#upload-a-non-existing-file-from-the-host-to-the-device-via-scp "Upload a non-existing file from the host to the device via SCP")
+39. [Download a non-existing file from the host to the device via SCP](#download-a-non-existing-file-from-the-host-to-the-device-via-scp "Download a non-existing file from the host to the device via SCP")
+40. [Upload an existing file from the host to the device via SCP](#upload-an-existing-file-from-the-host-to-the-device-via-scp "Upload an existing file from the host to the device via SCP")
+41. [Download an existing file from the host to the device via SCP](#download-an-existing-file-from-the-host-to-the-device-via-scp "Download an existing file from the host to the device via SCP")
+42. [Reload the device](#reload-the-device "Reload the device")
+43. [Disable the TFTP service on the host](#disable-the-tftp-service-on-the-host "Disable the TFTP service on the host")
+44. [Disable the FTP service on the host](#disable-the-ftp-service-on-the-host "Disable the FTP service on the host")
+45. [Disable the NTP service on the host](#disable-the-ntp-service-on-the-host "Disable the NTP service on the host")
+46. [Disable the SCP service on the host (optional)](#disable-the-scp-service-on-the-host-optional "Disable the SCP service on the host (optional)")
 
 ---
 
@@ -82,7 +81,7 @@ telnet 192.168.1.1 5001
 
 >**NOTE** - If you see an error message that states, ```Connection refused```, make sure you started all the devices in the GNS3 client.
 
-After a few minutes, the router will request that you ```Press RETURN to get started```. Press <kbd>Enter</kbd>, and one of the following prompts should appear:
+After a few minutes, the router will ask you to ```Press RETURN to get started```. Press <kbd>Enter</kbd>, and one of the following prompts should appear:
 
 - ```R1>``` - You are in User EXEC Mode. In this mode, you can only perform basic tasks, like pinging or "show"-ing basic information.
 - ```R1#``` - You are in Privileged EXEC Mode. In this mode, you can perform advanced tasks, like debugging, and you can as access the device's global configuration settings.
@@ -430,7 +429,7 @@ import re
 try:
     child.sendline('show diag | include FRU\r')
     child.expect_exact('R2#')
-    device_name = str(child.before).split('show diag | include FRU\r')[1].split('\r')[0].strip()
+    device_name = str(child.before).split('show diag | include FRU\r')[1].splitlines()[1].strip()
     if not re.compile(r'Product \(FRU\) Number').search(device_name):
         raise RuntimeError('Cannot get the device\'s name.')
 except (RuntimeError, IndexError) as ex:
@@ -470,7 +469,7 @@ import re
 try:
     child.sendline('show version | include [Pp]rocessor [Bb]oard [IDid]\r')
     child.expect_exact('R2#')
-    serial_num = str(child.before).split('show version | include [Pp]rocessor [Bb]oard [IDid]\r')[1].split('\r')[0].strip()
+    serial_num = str(child.before).split('show version | include [Pp]rocessor [Bb]oard [IDid]\r')[1].splitlines()[1].strip()
     if not re.compile(r'[Pp]rocessor [Bb]oard [IDid]').search(serial_num):
         raise RuntimeError('Cannot get the device\'s serial number.')
 except (RuntimeError, IndexError) as ex:
@@ -510,7 +509,7 @@ import re
 try:
     child.sendline('show version | include [IOSios] [Ss]oftware\r')
     child.expect_exact('R2#')
-    software_ver = str(child.before).split('show version | include [IOSios] [Ss]oftware\r')[1].split('\r')[0].strip()
+    software_ver = str(child.before).split('show version | include [IOSios] [Ss]oftware\r')[1].splitlines()[1].strip()
     if not re.compile(r'[IOSios] [Ss]oftware').search(software_ver):
         raise RuntimeError('Cannot get the device\'s software version.')
 except (RuntimeError, IndexError) as ex:
@@ -734,6 +733,246 @@ print(command_output)
 
 -----
 
+## Secure the device's Console and Auxiliary ports. 
+
+Go back to your Console Terminal and look at your startup configuration:
+
+```show startup-config```
+
+Near the end, you should see the following lines:
+
+**Output:**
+
+```
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login
+line aux 0
+ exec-timeout 0 0
+ logging synchronous
+ privilege level 15
+ no login 
+```
+
+The ```exec-timeout 0 0``` line means that connections over the console and auxiliary ports will not time out and close. The ```logging synchronous``` line means that console messages will not suddenly appear in the middle of a command. Instead, console messages will end with a new prompt (which you corrected in the [Set up the device's logging process](#set-up-the-devices-logging-process "Set up the device's logging process") exercise).
+
+While not setting a session time limit is dangerous, the last two lines, ```privilege level 15``` and ```no login```, can cause even worse problems. The ```privilege level 15``` line means that whoever connects to the device through the console and auxiliary ports will have full access to the device's commands, including reading and writing configuration files.
+
+>**NOTE** - Cisco devices have 16 privilege levels (0 through 15). 13 are customizable, while three are set by the IOS:
+> 
+>- 0 - No privileges
+>- 1 - Read-only and access to the ping command
+>- 15 - Full access, including reading and writing configuration files
+> 
+>To see your privilege level, enter ```show privilege``` at the prompt.
+
+The ```no login``` line means that the device requires no username or password for connections through the console or auxiliary port. While this setting makes it easy for network engineers to troubleshoot a device, it also makes it easy for bad actors to hack the device, if they could access either port.
+
+>**NOTE** - The ```no login``` line may not appear. However, both case have the same effect: ```no login``` explicitly states that no password is required, while a missing line does so implicitly. 
+
+Secure both ports by entering the following commands:
+
+```
+configure terminal ; Enter Global Configuration Mode
+line console 0 ; Enter Line Configuration Mode for the Console port
+password ciscon
+login ; Require a password when connecting to the Console port
+exit ; Return to Global Configuration Mode
+line aux 0 ; Enter Line Configuration Mode for the Auxiliary port
+password cisaux
+login ; Require a password when connecting to Auxiliary port
+end
+```
+
+>**NOTE:** 
+>- In real life, make sure you use better passwords.
+>- The maximum length for a Cisco password is **64** characters.
+>- Never add comments after a Cisco password; they will be included in the password.
+>- Check out [xkcd's take on passwords](https://xkcd.com/936/ "xkcd:Password Strength").
+
+Make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
+
+Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet. Once you have exited Telnet, go to the GNS3 GUI. Right-click on the device, and select **Stop**, then **Reload**.
+
+Reconnect to the device through Telnet:
+
+```telnet 192.168.1.1 5001```
+
+>**NOTE** - If the router asks you to ```Press RETURN to get started!```, press <kbd>Enter</kbd> to continue. 
+
+**Output:**
+
+```
+User Access Verification
+
+Password:
+```
+
+Enter your password (```ciscon```). The Privileged EXEC mode prompt (```R1#```) should appear.
+
+Before continuing to the Python script, look at the console or auxiliary port passwords in ```startup-config```:
+
+```
+show startup-config | include [Pp]assword
+```
+
+**Output:**
+
+```
+R1#show startup-config | include [Pp]assword
+no service password-encryption
+ password ciscon
+ password cisaux
+```
+
+The passwords are in plain text! The good news is that Cisco has a built-in password encryption service that uses a reversible Vigenère cipher, which generates a 14-character alphanumeric string. While this is not as secure as using a one-way hashing algorithm, it will protect the passwords from prying eyes. 
+
+Encrypt the passwords by enabling the password encryption service:
+
+```
+configure terminal
+service password-encryption
+end
+```
+
+Make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
+
+Look at the console or auxiliary port passwords in ```startup-config``` again:
+
+```
+show startup-config | include [Pp]assword
+```
+
+**Output:**
+
+```
+R1#show startup-config | include [Pp]assword
+service password-encryption
+ password 7 104D000A06181C
+ password 7 104D000A04020A
+```
+
+Great! The passwords are no longer in plain text.
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+child.sendline('configure terminal\r')
+child.expect_exact('R2(config)#')
+child.sendline('service password-encryption\r')
+child.expect_exact('R2(config)#')
+child.sendline('line console 0\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('password ciscon\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('login\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('exit\r')
+child.expect_exact('R2(config)#')
+child.sendline('line aux 0\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('password cisaux\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('login\r')
+child.expect_exact('R2(config-line)#')
+child.sendline('end\r')
+child.expect_exact('R2#')
+```
+
+Once again, make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
+
+Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet. Once you have exited Telnet, go to the GNS3 GUI. Right-click on the device, and select **Stop**, then **Reload**.
+
+Reconnect to the device through Telnet:
+
+```telnet 192.168.1.1 5001```
+
+>**NOTE** - If the router asks you to ```Press RETURN to get started!```, press <kbd>Enter</kbd> to continue. 
+
+**Output:**
+
+```
+User Access Verification
+
+Password:
+```
+
+Enter your password (```ciscon```). The Privileged EXEC mode prompt (```R1#```) should appear.
+
+-----
+
+## Secure the device's Privileged EXEC Mode. 
+
+Go back to your Console Terminal and exit and re-enter Privileged EXEC Mode:
+
+```
+disable
+enable
+```
+
+The device did not ask you for a password. This means that anyone can elevate from User EXEC Mode and basic access (Privilege Level 0) to Privileged EXEC Mode and full access (Privilege Level 15), without authentication.
+
+This is not good. Secure the device's Privileged EXEC Mode:
+
+```
+configure terminal
+enable password cisen
+end ; Secure and return to Privileged EXEC Mode
+```
+
+>**NOTE:** 
+>- In real life, make sure you use better passwords.
+>- The maximum length for a Cisco password is **64** characters.
+>- Never add comments after a Cisco password; they will be included in the password.
+>- Check out [xkcd's take on passwords](https://xkcd.com/936/ "xkcd:Password Strength").
+
+Make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
+
+Now, try to exit and re-enter Privileged EXEC Mode:
+
+**Output:**
+
+```
+R1#disable
+R1>enable
+Password:
+```
+
+Enter your password (```cisen```). The Privileged EXEC mode prompt (```R1#```) should appear.
+
+Before continuing to the Python script, look at the Privileged EXEC mode password in ```startup-config```:
+
+```
+show startup-config | include [Ee]nable
+```
+
+**Output:**
+
+```
+R1#show startup-config | include [Ee]nable  
+enable password 7 05080F1C2442
+```
+
+Great! The Privileged EXEC mode password uses the same Vigenère cipher encryption service as the console and auxiliary passwords. Since you already enabled the service, the password is encrypted.
+
+Go back to your Python Terminal and enter the following commands:
+
+```
+child.sendline('configure terminal\r')
+child.expect_exact('R2(config)#')
+child.sendline('service password-encryption\r')
+child.expect_exact('R2(config)#')
+child.sendline('enable password cisen\r')
+child.sendline('end\r')
+child.expect_exact('R2#')
+```
+
+Once again, make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
+
+-----
+
 ## Secure the device's virtual teletype (VTY) lines. 
 
 Go back to your Console Terminal. Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet.
@@ -785,14 +1024,6 @@ Telnet back into the device through the Console port:
 
 Now you will secure the VTY line. Set the username to ```admin```, the privilege level to "15", and the password to ```cisco```:
 
->**NOTE** - Cisco devices have 16 privilege levels (0 through 15). 13 are customizable, while three are set by the IOS:
-> 
->- 0 - No privileges
->- 1 - Read-only and access to the ping command
->- 15 - Full access, including reading and writing configuration files
-> 
->To see your privilege level, enter ```show privilege``` at the prompt.
-
 ```
 configure terminal
 ; Secure the VTY lines and return to Global Configuration Mode
@@ -836,20 +1067,19 @@ Enter your username (```admin```). When prompted, enter your password (```cisco`
 Before continuing to the Python script, look at the password in ```startup-config```:
 
 ```
-show startup-config | include [pP]assword
+show startup-config | include [Uu]sername
 ```
 
 **Output:**
 
 ```
-R1#show startup-config | include [pP]assword
-no service password-encryption
-username admin privilege 15 password 0 cisco
+R1#show startup-config | include username   
+username admin privilege 15 password 7 02050D480809
 ```
 
-The password is in plain text! The good news is that Cisco has its own MD5 hash generator, which also "salts" the text, resulting in a 30-character string.
+While the password is not in plain text, it uses the reversible Vigenère cipher encryption service you enabled earlier. The good news is that Cisco has its own MD5 hash generator, which also "salts" the text, resulting in a 30-character string.
 
-Fix the VTY password by removing the plain text and replacing it with a hashed password:
+Fix the VTY password by removing the cipher text and replacing it with a hashed password:
 
 ```
 configure terminal
@@ -860,21 +1090,29 @@ end
 
 Make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
 
-Look at the password in ```startup-config``` again, but also look for a ```secret```:
+Look at the password in ```startup-config``` again:
 
 ```
-show startup-config | include [pP]assword|[sS]ecret 
+show startup-config | include [Uu]sername
 ```
 
 **Output:**
 
 ```
-R1#show startup-config | include [pP]assword|[sS]ecret  
-no service password-encryption
-username admin privilege 15 secret 5 $1$jhnV$.1ymFuKgm/dYi677J9hOe1
+R1#show startup-config | include [Uu]sername 
+username admin privilege 15 secret 5 $1$x5XQ$hk/6IMVA./RsstlqrA/iu/
 ```
 
-Great! The password is no longer in plain text.
+Great! The remote password is hashed. If you would like to verify everything is secured:
+
+```
+R1#show startup-config | include [Pp]assword|[Ss]ecret  
+service password-encryption
+enable password 7 05080F1C2442
+username admin privilege 15 secret 5 $1$x5XQ$hk/6IMVA./RsstlqrA/iu/
+ password 7 104D000A06181C
+ password 7 104D000A04020A
+```
 
 Go back to your Python Terminal and enter the following commands:
 
@@ -895,7 +1133,9 @@ child.expect_exact('R2#')
 # Close the console port connection and Telnet through FastEthernet0/0
 child.close()
 child = pexpect.spawn('telnet 192.168.1.30')
-child.expect_exact('Username:')
+# Increase the timeout to allow the device to boot up
+child.expect_exact('Username:', timeout=300)
+# DO NOT ADD A CARRIAGE RETURN FOR THE USERNAME AND PASSWORD
 child.sendline('admin')
 child.expect_exact('Password:')
 child.sendline('cisco')
@@ -904,23 +1144,33 @@ child.expect_exact('R2#')
 
 Once again, make this change permanent, by copying the running configuration to the device's startup configuration, as described in [Save the device's running configuration as the startup configuration](#save-the-devices-running-configuration-as-the-startup-configuration "Save the device's running configuration as the startup configuration").
 
------
+>**NOTE** - ***IMPORTANT!** Do not append a carriage return (```\r```) to commands when connected through a VTY line! Review the EOL explanation in [Access the device's Privileged EXEC mode](#access-the-devices-privileged-exec-mode "Access the device's Privileged EXEC mode")*
 
-## Secure the device's Console port. 
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
------
-
-## Secure the device's Auxiliary port. 
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
------
-
-## Secure the device's Privileged EXEC Mode. 
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+>**NOTE** - The Console port connection you have been using does not time out. However, by default, connections to the VTY lines will time out after 10 minutes. This means that, bewteen exercise, you may see this message:
+> 
+>```Connection closed by foreign host.```
+> 
+>If you like, you can change the timeout value. For example, if you want to change it to 1 hour and 30 seconds:
+> 
+>```
+>configure terminal
+>line vty 0 4
+>exec-timeout 60 30
+>end
+>```
+>
+>The Python code is as follows:
+> 
+>```
+>child.sendline('configure terminal\r')
+>child.expect_exact('R2(config)#')
+>child.sendline('line vty 0 4\r')
+>child.expect_exact('R2(config-line)#')
+>child.sendline('exec-timeout 60 30\r')
+>child.expect_exact('R2(config-line)#')
+>child.sendline('end\r')
+>child.expect_exact('R2#')
+>```
 
 -----
 
