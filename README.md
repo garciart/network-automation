@@ -30,7 +30,7 @@ This tutorial is broken down into several parts:
 - [Installing GNS3](#installing-gns3 "Installing GNS3")
 - [Setting up the Environment](#setting-up-the-environment "Setting up the Environment")
 - [Adding a Device](#adding-a-device "Adding a Device")
-- [Your First Lab](#your-first-lab "Your First Lab")
+- [Your First Exercise](#your-first-exercise "Your First Exercise")
 
 >**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
 
@@ -516,7 +516,7 @@ Once you return to the template details window, make sure the memory for **PCMCI
 
 ![Preferences](img/a25.png)
 
-## Your First Lab
+## Your First Exercise
 
 ### Part 1: Create the Network
 

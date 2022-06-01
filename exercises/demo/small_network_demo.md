@@ -84,7 +84,7 @@ Follow the instructions at https://docs.gns3.com/docs/using-gns3/beginners/impor
 
 ## Set up the Web Server
 
-Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CentOS Cloud Guest7 (2111)** appliance that you imported earlier. Connect the device to the cloud through Ethernet0 to tap0.
+Follow the instructions for **Your First Exercise** at https://github.com/garciart/network-automation#your-first-exercise, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CentOS Cloud Guest7 (2111)** appliance that you imported earlier. Connect the device to the cloud through Ethernet0 to tap0.
 
 When the ```login``` prompt appears enter "centos" as the username and "centos" as the password:
 
@@ -319,7 +319,7 @@ When finished, shutdown the web server and disconnect it from the cloud.
 
 ## Set up the Firewall
 
-Follow the instructions for **Your First Lab** at https://github.com/garciart/network-automation#your-first-lab, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CCisco ASAv 9.9.2 appliance** appliance that you imported earlier. Connect the device to the cloud through GigabitEthernet0/0 to tap0.
+Follow the instructions for **Your First Exercise** at https://github.com/garciart/network-automation#your-first-exercise, both [Part 1](https://github.com/garciart/network-automation#part-1-create-the-network "Create the Network") and [Part 2](https://github.com/garciart/network-automation#part-2-dry-run-through-the-console-port "Dry Run through the Console Port"), but replace the router with the **CCisco ASAv 9.9.2 appliance** appliance that you imported earlier. Connect the device to the cloud through GigabitEthernet0/0 to tap0.
 
 Open a console. After the device finishes booting, the User EXEC Mode prompt should appear (```ciscoasa>```). Enter "enable" to get to Privileged EXEC Mode. If prompted for a password, press <kbd>Enter</kbd>, since the device has no password yet:
 
