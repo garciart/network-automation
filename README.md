@@ -32,8 +32,6 @@ This tutorial is broken down into several parts:
 - [Adding a Device](#adding-a-device "Adding a Device")
 - [Your First Exercise](#your-first-exercise "Your First Exercise")
 
->**NOTE** - Thanks to [David Bombal](https://davidbombal.com/), [Paul Browning](https://www.amazon.com/101-Labs-CompTIA-Paul-Browning/dp/1726841294 "101 Labs"), and many other incredible network gurus and coders (you know who you are :thumbsup: ).
-
 -----
 
 ## What is GNS3?
@@ -44,7 +42,7 @@ Graphical Network Simulator-3 is a network software emulator, written in Python.
 
 ## Installing GNS3
 
-Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, you will be using CentOS 7.9 for the labs and demos in this repository, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
+Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installation/windows/ "GNS3 Windows Install") or certain Linux operating systems, such as [Ubuntu or Debian](https://docs.gns3.com/docs/getting-started/installation/linux "GNS3 Linux Install"), is pretty straight forward. However, you will be using CentOS 7.9 for the demo, and GNS3 does not work straight-out-of-the-box with Fedora, Red Hat Linux (RHEL), or CentOS.
 
 >**NOTE** - I picked CentOS for this tutorial because I use Red Hat Linux (RHEL) and CentOS quite a bit, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS. It was fun, and the process helped me learn GNS3's dependencies. In addition, many companies and government agencies, such as Northrup Grumman and NASA, use RHEL, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
@@ -196,7 +194,7 @@ wget -P ~/ https://raw.githubusercontent.com/garciart/network-automation/master/
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_run
 sudo mv ~/gns3_run /usr/bin/
-# Required for the labs
+# Required for the demos
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
@@ -326,7 +324,7 @@ sleep 3 # Allow time to make the connection
 sudo ip address add 192.168.1.10/24 dev enp0s8 # Set the adapter IP address
 ```
 
->**NOTE** - Why do you need a TAP? Why not just connect a device directly to the bridge? Yes, for a simple network, like our example, you can connect a device directly to the host through the bridge. However, in other labs, you will connect multiple devices to the host through Layer 2 TAP interfaces (e.g., tap1, tap2, etc.), so just get into the habit of connecting to a TAP instead of directly to the bridge.
+>**NOTE** - Why do you need a TAP? Why not just connect a device directly to the bridge? Yes, for a simple network, like our example, you can connect a device directly to the host through the bridge. However, you may need to connect multiple devices to the host through Layer 2 TAP interfaces (e.g., tap1, tap2, etc.), so just get into the habit of connecting to a TAP instead of directly to the bridge.
 
 Check the configuration and the bridge by inputting ```ip addr show dev br0``` and ```brctl show br0```:
 
@@ -381,7 +379,7 @@ At the **Summary** pop-up dialog, click **Finish**:
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-However, before you start on the lab, you need to make some adjustments. From the GNS3 Toolbar at the top of the GUI, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that:
+However, before you start the exercise, you need to make some adjustments. From the GNS3 Toolbar at the top of the GUI, select **Edit** -> **Preferences**, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Select **Server** and make sure that:
 
 - **Enable local server** is checked.
 - **Host binding** is set to ```192.168.1.1```.
@@ -393,7 +391,7 @@ However, before you start on the lab, you need to make some adjustments. From th
 
 ## Adding a device
 
-Now you need to add a device. For our initial labs, you will use the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on which cards or modules are installed. It is an older router, but its IOS is available for download, and it is sufficient for conducting our labs. Here is some additional information:
+Now you need to add a device. For the exercise, you will use the Cisco 3745 Multi-Service Access Router, with Advanced Enterprise Services. The Cisco 3745 is a customizable router, capable of supporting different network configurations, based on which cards or modules are installed. It is an older router, but its IOS is available for download, and it is sufficient for conducting the exercise. Here is some additional information:
 >
 >- **Cisco 3745 Multi-Service Access Router:**
 >   * IOS version 12.4.25d (Mainline):
@@ -522,7 +520,7 @@ Once you return to the template details window, make sure the memory for **PCMCI
 
 >**Note** - If you like, check out [https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui](https://docs.gns3.com/docs/using-gns3/beginners/the-gns3-gui "The GNS3 GUI") to learn the different parts of the GNS3 Graphical User Interface (GUI).
 
-Now that you have finished setting up your lab environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal.
+Now that you have finished setting up the exercise environment, click on **File** ->  **New blank project**, or press  <kbd>Ctrl</kbd>+<kbd>N</kbd>, to create a new project. If GNS3 is not running, enter ```gns3_run``` in a Terminal.
 
 The **Project** pop-up dialog will appear, asking you to create a new project. Enter ```Automation``` in the ***Name*** textbox and click the **OK** button.
 
@@ -532,7 +530,7 @@ From the GNS3 Toolbar, click **View** -> **Docks** -> **All templates** (or **Al
 
 ![All devices](img/a26.png)
 
-All the devices you can use in your lab will appear in a docked window next to the Devices Toolbar on the right.
+All the devices you can use in the exercise will appear in a docked window next to the Devices Toolbar on the right.
 
 >**NOTE** - In the **View** dropdown menu, there are several options that will make your life easier. I recommend both **Snap to grid**, which will keep your Workspace orderly, and **Show/Hide interface labels**, which will allow you to see your connection points at a glance.
 
@@ -857,7 +855,7 @@ Like I stated earlier, running this set of commands is easy to do for one device
 
 Project: network-automation
 
-To run this lab:
+To run this exercise:
 
 * Start GNS3 by executing "gn3_run" in a Terminal window.
 * Add a Cloud and a C3745 router
@@ -981,7 +979,7 @@ Script complete. Have a nice day.
 
 ---
 
-**Congratulations!** You have automated a common networking task using Python. You can explore the other labs in the **labs** folder, or you can exit GNS3. Remember to shut down the bridge and its connections when you are finished; enter your password if prompted. If you like, you may also restart the network:
+**Congratulations!** You have automated a common networking task using Python. Remember to shut down the bridge and its connections after you exit GNS3; enter your password if prompted. If you like, you may also restart the network:
 
 ```
 sudo ip link set enp0s8 down # Disable the network adpater

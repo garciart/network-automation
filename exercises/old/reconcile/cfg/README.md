@@ -1,1 +1,0 @@
-Startup and Running Configuration Files for Cisco 3745 Multi-Service Access Router
