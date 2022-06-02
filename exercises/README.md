@@ -14,9 +14,9 @@ However, add another **Cisco 3745** router to the Workspace, and make sure it is
 
 You will run commands directly in the console on **R1**, and you will run Python scripts on **R2**. This will prevent errors due to repeating commands on the same device.
 
-## Exercises:
+## Exercises
 
->**NOTE** - In the code snippets, a semicolon (```;```) or pound sign (```#```) after a command or a line is a comment indicator, in which I may explain what is going on. They are optional, and you do not have to add the indicator or the comments.
+>**NOTE** - In the code snippets, a semicolon (```;```) or pound sign (```#```), after a command or between lines of code, is a comment indicator, in which I may explain what is going on. They are optional, and you do not have to add the indicator or the comments.
 
 >**NOTE** - While I included error-handling in the [Cisco IOS class](cisco_ios.py "Cisco IOS class") and the [static Utility module](utility.py "static Utility module"), for the sake of brevity, I did not do so for these exercises. I expect that, if you followed the instructions and created your topology correctly, all the commands will work, if executed sequentially.
 
@@ -81,7 +81,7 @@ telnet 192.168.1.1 5001
 
 >**NOTE** - If you see an error message that states, ```Connection refused```, make sure you started all the devices in the GNS3 client.
 
-After a few minutes, the router will ask you to ```Press RETURN to get started```; it may appear in the middle of the startup messages:
+After a few minutes, the device will ask you to ```Press RETURN to get started```; it may appear in the middle of the startup messages:
 
 ```
 SETUP: new interface FastEthernet0/0 placed in "shutdown" state
@@ -96,37 +96,37 @@ sslinit fn
 *Mar  1 00:00:04.087: %SYS-5-RESTART: System restarted --
 ```
 
->**NOTE** - If you are greeted with a request for a username or password, that means that the device was already configured by someone else. There is nothing wrong with that, but for these exercises, you will need to use an unconfigured device.
+>**NOTE** - If you are greeted with a request for a username or password, that means that the device was already configured by someone else. There is nothing wrong with that, as long as you have permission and the proper credentials. However, for these exercises, you will need to use an unsecured and unconfigured device.
 >
->Unfortunately, there is no easy way to reset a Dynamips image to its factory settings in GNS3; you will have to delete the device in the GNS3 GUI, and replace it with a new device.
+>Unfortunately, there is no easy way to reset a Dynamips image to its factory settings in GNS3; you will have to delete **R1** in the GNS3 GUI, and replace it with a new device.
 
 Press <kbd>Enter</kbd>, and one of the following prompts should appear:
 
 - ```R1>``` - You are in User EXEC Mode. In this mode, you can only perform basic tasks, like pinging or "show"-ing basic information.
-- ```R1#``` - You are in Privileged EXEC Mode. In this mode, you can perform advanced tasks, like debugging, and you can access the device's global configuration settings.
-- ```R1(config)#``` - You are in Global Configuration Mode. In this mode, you can view and change settings that affect all interfaces, ports, and protocols of the device, and you can access their configuration settings.
-- ```R1(config-if)``` - You are in Interface Configuration Mode. In this mode, you can manage network interface settings, such as setting an IPv4 address.
-- ```R1(config-line)#``` - You are in Line Command Mode. In this mode, you can manage port settings, such as setting a password.
-- ```R1(config-router)#``` - You are in Router Command Mode. In this mode, you can manage routing protocols, such as Routing Information Protocol (RIP), Open Shortest Path First (OSPF), etc.
+  - ```R1#``` - You are in Privileged EXEC Mode. In this mode, you can perform advanced tasks, like debugging, and you can access the device's global configuration settings.
+  - ```R1(config)#``` - You are in Global Configuration Mode. In this mode, you can view and change settings that affect all interfaces, ports, and protocols of the device, and you can access their configuration settings.
+  - ```R1(config-if)``` - You are in Interface Configuration Mode. In this mode, you can manage network interface settings, such as setting an IPv4 address.
+  - ```R1(config-line)#``` - You are in Line Command Mode. In this mode, you can manage port settings, such as setting a password.
+  - ```R1(config-router)#``` - You are in Router Command Mode. In this mode, you can manage routing protocols, such as Routing Information Protocol (RIP), Open Shortest Path First (OSPF), etc.
 
 >**NOTE** - If you did not press <kbd>Enter</kbd>, but a prompt (e.g., ```R1#```, etc.) appeared anyway, that means that the device was not properly reloaded, and you may be using an open session. This is dangerous for many reasons, since you may be eavesdropping on another user's session or creating a race condition by simultaneously entering commands at the same time as another user.
-> 
+>
 >Unfortunately, entering the ```reload``` command when using older Dynamips images, as in this case, will cause the device to "hang".
 >
 >Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet. Once you have exited Telnet, go back to the GNS3 GUI. Right-click on the device, and select **Stop**, then **Reload**.
 
->***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life.***
+***If this is the first time you are using GNS3, other than in the [Adventures in Automation](../README.md "Adventures in Automation") tutorial, you should not run into an improperly reloaded device, an open session, or a previously configured device. We only cover these potentially dangerous situations to allow you to recognize them in real life.***
 
-In these exercises, the base mode for interacting with the router is **Privileged EXEC Mode** (```R1#```). If you are not in Privileged EXEC Mode, that is OK; I'll show you how to get to Privileged EXEC Mode from any mode after this exercise.
+In these exercises, the base mode for interacting with the device is **Privileged EXEC Mode** (```R1#```). If you are not in Privileged EXEC Mode, that is OK; I'll show you how to get to Privileged EXEC Mode from any mode after this exercise.
 
 >**NOTE** - A real, brand-new device would not boot into any mode, but would ask you one or both of the following questions:
-> 
+>
 >```Would you like to terminate autoinstall? [yes]:```
 >
 >or
-> 
+>
 >```Would you like to enter the initial configuration dialog? [yes/no]:```
-> 
+>
 >If you answer ```yes``` to the first question, then ```no``` to the second, a mode prompt would then appear. 
 
 Right now, open another Terminal (or another tab in the current Terminal), and access the Python interpreter; this will be your **Python Terminal**:
@@ -152,7 +152,7 @@ Wow, nothing happened; how anti-climactic. Do not worry, you will start interact
 
 ## Access the Privileged EXEC mode of the device
 
-As I said, the base mode for interacting with the router is **Privileged EXEC Mode**. Go back to your **Console Terminal** and determine which mode you are in:
+As I said, the base mode for interacting with the device is **Privileged EXEC Mode**. Go back to your **Console Terminal** and determine which mode you are in:
 
 - If the prompt is ```R1>```, enter ```enable``` to get to Privileged EXEC Mode.
 - If the prompt is not ```R1>``` or ```R1#```, enter ```end``` to get to Privileged EXEC Mode.
@@ -336,7 +336,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Update the startup configuration of the device.
+## Update the startup configuration of the device
 
 When we make changes to the device, such as changing the hostname, we are making changes to the ***running configuration***; everything will return to its default values when the device reloads. To make the changes permanent, you must copy the running configuration, held in the device's volatile random-access memory (RAM), to the device's ***startup configuration***, stored in its nonvolatile RAM (NVRAM).
 
@@ -373,9 +373,9 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Identify the default file system of the device. 
+## Identify the default file system of the device
 
-Cisco devices have default file systems, where files are read and copied to and from. However, depending on the device, the name of the default file system may be ```flash```, ```flash0```, ```bootflash```, ```slot0```, etc. Knowing the name of the default file system is important; you do not want to copy files to the wrong directory!
+Cisco devices have default file systems, where files are read and copied to and from, if no other file system is identified. They also store system images, configuration files, and more. However, depending on the device, the name of the default file system may be ```flash```, ```flash0```, ```bootflash```, ```slot0```, etc. Knowing the name of the default file system is important; you do not want to copy files to the wrong directory!
 
 Go back to your **Console Terminal** and get a list of the device's file systems:
 
@@ -447,7 +447,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Get the name of the device. 
+## Get the name of the device
 
 There are several ways to get the name of a Cisco device, but for the Cisco 3745 router, the best way is to look for the product number of the first field replaceable unit (FRU).
 
@@ -489,7 +489,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Get the serial number of the device. 
+## Get the serial number of the device
 
 There are several ways to get the serial number of a Cisco device, but for the Cisco 3745 router, the best way is to look for identification number of the processor board.
 
@@ -531,7 +531,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Get the operating system version of the device. 
+## Get the operating system version of the device
 
 There are several ways to get the operating system's name and version of a Cisco device.
 
@@ -573,7 +573,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Format a file system on the device. 
+## Format a file system on the device
 
 Go back to your **Console Terminal** and look at your log:
 
@@ -589,9 +589,9 @@ You should see an entry, similar to the following:
 *Mar  1 00:00:05.239: %PCMCIAFS-5-DIBERR: PCMCIA disk 0 is formatted from a different router or PC. A format in this router is required before an image can be booted from this device
 ```
 
-This entry tells you that the router's default file system is not formatted, which means that you will be unable to save files on the device. While it is unusual for a new device to ship without a formatted default file system, it can occur, and you may also have to format replacement drives and cards.
+This entry tells you that the device's default file system is not formatted, which means that you will be unable to save files on the device. While it is unusual for a new device to ship without a formatted default file system, it can occur, and you may also have to format replacement drives and cards.
 
-Earlier, you looked up the name of the default file system (i.e., ```flash```). Format the drive, using the following command, and press <kbd>Enter</kbd> when asked to ```confirm```:
+Earlier, you looked up the name of the default file system (i.e., ```flash```). Format the drive, using the following command, and press <kbd>Enter</kbd> each time you are asked to ```confirm```:
 
 ```
 format flash:
@@ -652,7 +652,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Assign the router an IPv4 address. 
+## Assign the router an IPv4 address
 
 Go back to your **Console Terminal** and look at the configuration of your network interfaces:
 
@@ -669,7 +669,7 @@ FastEthernet0/0            unassigned      YES NVRAM  administratively down down
 FastEthernet0/1            unassigned      YES NVRAM  administratively down down    
 ```
 
-While your router is a Layer 3 device, none of its interfaces have an IPv4 or IPv6 address. Without an IP address, you cannot perform tasks over Ethernet, such as using Secure Shell (SSH) or uploading a configuration. Of course, you can transfer files through the console port, using an [XMODEM](https://en.wikipedia.org/wiki/XMODEM "XMODEM") protocol utility, but, trust me, uploading and downloading files through an Ethernet port is much faster and easier.
+While your device is a Layer 3 device, none of its interfaces have an IPv4 or IPv6 address. Without an IP address, you cannot perform tasks over Ethernet, such as using Secure Shell (SSH) or uploading a configuration. Of course, you can transfer files through the console port, using an [XMODEM](https://en.wikipedia.org/wiki/XMODEM "XMODEM") protocol utility, but, trust me, uploading and downloading files through an Ethernet port is much faster and easier.
 
 Assign the first built-in Ethernet port, ```FastEthernet0/0```, an IPv4 address:
 
@@ -717,7 +717,7 @@ Once again, Make the changes permanent by following the instructions in the [Upd
 
 -----
 
-## Test connectivity from the device to the host. 
+## Test connectivity from the device to the host
 
 Before performing any tasks over Ethernet, such as using Secure Shell (SSH) or uploading a configuration, you should check the connection to your source or destination. The Cisco IOS has a version of the [ping utility](https://en.wikipedia.org/wiki/Ping_(networking_utility) "Ping (networking utility)") that you can use to check your connections.
 
@@ -755,7 +755,7 @@ Check your output for errors. You should see results similar to the manual metho
 
 -----
 
-## Test connectivity from the host to the device. 
+## Test connectivity from the host to the device
 
 Up to this point, you have only used CentOS' Bourne-again Shell (Bash) to either connect to a device using Telnet or to open a Python interpreter. To perform tasks over Ethernet, such as using Secure Shell (SSH) or uploading a configuration, you will have to start and stop Linux services, run Linux utilities, etc., on the host device using Bash.
 
@@ -794,7 +794,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Secure the console and auxiliary ports. 
+## Secure the console and auxiliary ports
 
 Go back to your **Console Terminal** and look at your startup configuration:
 
@@ -822,11 +822,11 @@ The ```exec-timeout 0 0``` line means that connections over the console and auxi
 While not setting a session time limit is dangerous, the last two lines, ```privilege level 15``` and ```no login```, can cause even worse problems. The ```privilege level 15``` line means that whoever connects to the device through the console or auxiliary ports will have full access to the device's commands, including reading and writing configuration files.
 
 >**NOTE** - Cisco devices have 16 privilege levels (0 through 15). 13 are customizable, while three are set by the IOS:
-> 
+>
 >- 0 - No privileges
 >- 1 - Read-only and access to the ping command
 >- 15 - Full access, including reading and writing configuration files
-> 
+>
 >To see your privilege level, enter ```show privilege``` at the prompt.
 
 The ```no login``` line means that the device requires no username or password for connections through the console or auxiliary port. While this setting makes it easy for network engineers to troubleshoot a device, it also makes it easy for bad actors to hack the device, if they could access either port.
@@ -863,7 +863,7 @@ Reconnect to the device through Telnet:
 
 ```telnet 192.168.1.1 5001```
 
->**NOTE** - If the router asks you to ```Press RETURN to get started!```, press <kbd>Enter</kbd> to continue. 
+>**NOTE** - If the device asks you to ```Press RETURN to get started!```, press <kbd>Enter</kbd> to continue. 
 
 **Output:**
 
@@ -978,7 +978,7 @@ Check your output for errors. A ```0``` should appear after you enter the last l
 
 -----
 
-## Secure the Privileged EXEC Mode. 
+## Secure the Privileged EXEC Mode
 
 Go back to your **Console Terminal** and exit and re-enter Privileged EXEC Mode:
 
@@ -1058,7 +1058,7 @@ Once again, make the changes permanent by following the instructions in the [Upd
 
 -----
 
-## Secure the virtual teletype (VTY) lines. 
+## Secure the virtual teletype (VTY) lines
 
 Go back to your **Console Terminal**. Press <kbd>Ctrl</kbd> + <kbd>]</kbd>, then enter "q" at the ```telnet>``` prompt, to exit Telnet.
 
@@ -1099,7 +1099,7 @@ The Cisco 3745 router has five virtual teletype (VTY) lines (0 through 5). As a 
 
 You have several options. 
 
-1. One way is to continue connecting through the console port, but our goal is to automate tasks, such as IOS updates and reconfigurations, and perform them remotely. In addition, imagine you had to update the routers in each cabinet for a data center with 100+ cabinets, all through the console port; it would take a long time. 
+1. One way is to continue connecting through the console port, but our goal is to automate tasks, such as IOS updates and reconfigurations, and perform them remotely. In addition, imagine you had to update the devices in each cabinet for a data center with 100+ cabinets, all through the console port; it would take a long time. 
 2. Another way is to change the configuration, by replacing ```login``` with ```no login```, removing the authentication requirement.
 3. However, the best option is to secure the lines; whenever you can, "err" on the side of security.
 
@@ -1234,11 +1234,11 @@ Once again, make the changes permanent by following the instructions in the [Upd
 >**NOTE** - ***IMPORTANT!** Do not append a carriage return (```\r```) to commands when connected through a VTY line! Review the EOL explanation in the [Access the Privileged EXEC mode of the device](#access-the-privileged-exec-mode-of-the-device "Access the Privileged EXEC mode of the device")* exercise.
 
 >**NOTE** - By default, connections to the VTY lines will time out after 10 minutes. This means that, between exercises, you may see this message:
-> 
+>
 >```Connection closed by foreign host.```
-> 
+>
 >If you like, you can change the timeout value. For example, if you want to change it to 1 hour and 15 seconds:
-> 
+>
 >```
 >configure terminal
 >line vty 0 4
@@ -1247,7 +1247,7 @@ Once again, make the changes permanent by following the instructions in the [Upd
 >```
 >
 >The Python code is as follows:
-> 
+>
 >```
 >child.sendline('configure terminal\r')
 >child.expect_exact('R2(config)#')
@@ -1261,181 +1261,181 @@ Once again, make the changes permanent by following the instructions in the [Upd
 
 -----
 
-## Set the device clock manually. 
+## Set the device clock manually
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Enable the NTP server on the host. 
+## Enable the NTP server on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Update the device clock using the host NTP server. 
+## Update the device clock using the host NTP server
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Enable secure communications with the device. 
+## Enable secure communications with the device
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Connect to the device from the host via Secure Shell (SSH). 
+## Connect to the device from the host via Secure Shell (SSH)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Enable the TFTP server on the host. 
+## Enable the TFTP server on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download the device startup configuration to the host via TFTP. 
+## Download the device startup configuration to the host via TFTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Determine and display the hash value of a file. 
+## Determine and display the hash value of a file
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload a non-existing file from the host to the device via TFTP. 
+## Upload a non-existing file from the host to the device via TFTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download a non-existing file from the host to the device via TFTP. 
+## Download a non-existing file from the host to the device via TFTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload an existing file from the host to the device via TFTP. 
+## Upload an existing file from the host to the device via TFTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download an existing file from the host to the device via TFTP. 
+## Download an existing file from the host to the device via TFTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Enable the FTP server on the host. 
+## Enable the FTP server on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Prepare the device for FTP transfers.
+## Prepare the device for FTP transfers
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download the device startup configuration to the host via FTP. 
+## Download the device startup configuration to the host via FTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload a non-existing file from the host to the device via FTP. 
+## Upload a non-existing file from the host to the device via FTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download a non-existing file from the host to the device via FTP. 
+## Download a non-existing file from the host to the device via FTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload an existing file from the host to the device via FTP. 
+## Upload an existing file from the host to the device via FTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download an existing file from the host to the device via FTP. 
+## Download an existing file from the host to the device via FTP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Enable the SCP server on the host. 
+## Enable the SCP server on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download the device startup configuration to the host via SCP. 
+## Download the device startup configuration to the host via SCP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload a non-existing file from the host to the device via SCP. 
+## Upload a non-existing file from the host to the device via SCP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download a non-existing file from the host to the device via SCP. 
+## Download a non-existing file from the host to the device via SCP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Upload an existing file from the host to the device via SCP. 
+## Upload an existing file from the host to the device via SCP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Download an existing file from the host to the device via SCP. 
+## Download an existing file from the host to the device via SCP
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Reload the device. 
+## Reload the device
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Disable the TFTP service on the host. 
+## Disable the TFTP service on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Disable the FTP service on the host. 
+## Disable the FTP service on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Disable the NTP service on the host. 
+## Disable the NTP service on the host
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 -----
 
-## Disable the SCP service on the host (optional). 
+## Disable the SCP service on the host (optional)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
