@@ -1,8 +1,10 @@
 #!/usr/bin/bash
 echo -e "Setting up GNS3..."
 echo -e "Using:"
-cat /etc/centos-release
-echo -e "Updating CentOS"
+cat /etc/rocky-release
+echo -e "Updating Rocky"
+sudo yum -y install epel-release # Needed to install PuTTY and qemu
+sudo yum config-manager --set-enabled powertools # Needed for glibc-static and others
 sudo yum -y update
 # Install Python 3 and pip
 sudo yum -y install python3 # Also installs python3-setuptools
@@ -17,6 +19,7 @@ sudo yum -y install git
 # Install GNS3 dependencies
 sudo yum -y groupinstall "Development Tools" # Only need gcc to run GNS3, but we will need the other tools later
 sudo yum -y install elfutils-libelf-devel # For Dynamips
+sudo yum makecache --refresh # For Dynamips
 sudo yum -y install libpcap-devel # For Dynamips
 sudo yum -y install cmake # For Dynamips, VCPS, and ubridge
 sudo yum -y install glibc-static # For VCPS
@@ -34,18 +37,17 @@ sudo python3 -m pip install gns3-server --upgrade
 sudo python3 -m pip install gns3-gui --upgrade
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
-sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
 # KVM: A Linux kernel module that interacts with the virtualization features of the processor.
 # QEMU: Virtualization software that emulates virtual processors and peripherals.
 # QEMU-KVM: Type 1 hypervisor that runs in kernel space and QEMU: type 2 hypervisor that runs in user space
-sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.org/wiki/How_to_use_qemu
+# sudo yum -y install qemu # Replaced by qemu-kvm in /usr/libexec
 # Install the Dynamips Cisco Emulator
 cd /tmp || exit
 git clone https://github.com/GNS3/dynamips.git
-cd dynamips || exit
+cd /tmp/dynamips || exit
 mkdir build
-cd build/ || exit
+cd /tmp/dynamips/build/ || exit
 cmake .. -DDYNAMIPS_CODE=stable
 make
 sudo make install
@@ -53,16 +55,19 @@ sudo make install
 cd /tmp || exit
 sudo yum -y install svn
 svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
-cd vpcs/src || exit
+cd /tmp/vpcs/src || exit
+# https://github.com/GNS3/vpcs/issues/13
+rgetopt='int getopt(int argc, char *const *argv, const char *optstr);'
+sed -i "s/^int getopt.*/$rgetopt/" getopt.h
 ./mk.sh 64
 sudo install -m 755 vpcs /usr/local/bin
 # Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
 cd /tmp || exit
 git clone https://github.com/GNS3/ubridge.git
-cd ubridge || exit
+cd /tmp/ubridge || exit
 make
 sudo make install
-cd ~ || exit
+cd ~/ || exit
 # Get router image and configuration file
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
 wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
@@ -80,14 +85,15 @@ python3 -m pip install selenium
 wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
-wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
+wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_rocky8_run
 # Make the start-up script executable and place it in /usr/bin
-sudo chmod 755 ~/gns3_run
-sudo mv ~/gns3_run /usr/bin/
+sudo chmod 755 ~/gns3_rocky8_run
+sudo mv ~/gns3_rocky8_run /usr/bin/
 # Required for the labs
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
-sudo yum -y install ntp
+# The ntp package is not supported in Rocky Linux; use chrony instead
+sudo yum -y install chrony
 sudo yum -y install vsftpd
 sudo yum -y install httpd
 # Install SSH support, including ssh, scp, sftp, sshd, ssh-keygen, etc.
