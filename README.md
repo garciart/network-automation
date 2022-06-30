@@ -1035,4 +1035,8 @@ By the way, do not run the script as ```sudo```, or GNS3 will incorrectly attemp
 
 ![GNS3 server start error](img/ps-error3.png)
 
+## Post-Post Script:
+
+Using RHEL 8 or Rocky? Check out ["gns3_setup_rocky8"](gns3_setup_rocky8 "Automated GNS3 setup for Rocky OS") and ["gns3_rocky8_run"](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")!
+
 Good luck!
