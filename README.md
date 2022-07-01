@@ -70,6 +70,16 @@ Regardless of the hypervisor you use, make sure you:
 
 4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
 
+>**NOTE** - If your operating system supports it, you can create a "dummy" interface instead. Open a Terminal, and enter the following commands to create an Ethernet network interface named **eth2**:
+> 
+>```
+>sudo -S modprobe dummy
+>sudo ip link add eth2 type dummy
+># Ensure fake MAC address starts with an even octet
+>sudo ifconfig eth2 hw ether 12:FE:34:DC:56:BA
+>sudo ip link set dev eth2 up
+>```
+
 ![Network Settings](img/a03.png "Settings -> Network")
 
 In VMWare, you can make all the above changes to your VM in **Settings**:
@@ -113,6 +123,7 @@ Now for the setup: There are a few good posts and articles on how to install GNS
 >![GNS3 root error](img/ps-error1.png)
 
 ```
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y update
 # Install Python 3 and pip
 sudo yum -y install python3 # Also installs python3-setuptools
@@ -121,7 +132,7 @@ sudo python3 -m ensurepip
 sudo yum -y install python3-devel
 sudo yum -y install python3-tools
 # Install pip support for Python 2
-sudo yum -y install python-pip
+sudo yum -y install python2-pip
 # Install Git
 sudo yum -y install git
 # Install GNS3 dependencies
@@ -144,7 +155,6 @@ sudo python3 -m pip install gns3-server --upgrade
 sudo python3 -m pip install gns3-gui --upgrade
 sudo python3 -m pip install sip # For PyQT; used to bind C++ classes with Python
 sudo python3 -m pip install pyqt5
-sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm # needed to install PuTTY and qemu
 sudo yum -y install putty # Get from epel
 # KVM: A Linux kernel module that interacts with the virtualization features of the processor.
 # QEMU: Virtualization software that emulates virtual processors and peripherals.
@@ -153,9 +163,9 @@ sudo yum -y install qemu # Get from epel / Not qemu-kvm https://fedoraproject.or
 # Install the Dynamips Cisco Emulator
 cd /tmp || exit
 git clone https://github.com/GNS3/dynamips.git
-cd dynamips || exit
-mkdir build
-cd build/ || exit
+cd /tmp/dynamips || exit
+mkdir -p /tmp/dynamips/build
+cd /tmp/dynamips/build/ || exit
 cmake .. -DDYNAMIPS_CODE=stable
 make
 sudo make install
@@ -163,38 +173,38 @@ sudo make install
 cd /tmp || exit
 sudo yum -y install svn
 svn checkout http://svn.code.sf.net/p/vpcs/code/trunk vpcs
-cd vpcs/src || exit
+cd /tmp/vpcs/src || exit
 ./mk.sh 64
 sudo install -m 755 vpcs /usr/local/bin
 # Install ubridge to connect Ethernet, TAP interfaces, and UDP tunnels, as well as capture packets.
 cd /tmp || exit
 git clone https://github.com/GNS3/ubridge.git
-cd ubridge || exit
+cd /tmp/ubridge || exit
 make
 sudo make install
-cd ~ || exit
+cd ~/ || exit
 # Get router image and configuration file
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
+wget -nc -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
+wget -nc -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
 # Used to create interfaces to connect the host to GNS3
 sudo yum -y install bridge-utils
 # Install modules to control interactions with external devices
-sudo yum -y install pexpect # (For Python 2.7+)
+sudo python2 -m pip install pexpect # (For Python 2.7+)
 sudo python3 -m pip install pexpect # (For Python 3.6+)
-sudo yum -y install paramiko
+sudo python2 -m pip install paramiko # (For Python 2.7+)
+sudo python3 -m pip install paramiko # (For Python 3.6+)
 sudo yum -y install ansible
 # Install Selenium for Firefox
 sudo yum -y install firefox
-sudo yum install Xvfb # virtual display driver that allows Firefox to send output to a virtual display
 python3 -m pip install selenium
-wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
+wget -nc https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
-wget -P ~/ https://raw.githubusercontent.com/garciart/network-automation/master/gns3_run
+wget -nc -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_run
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_run
 sudo mv ~/gns3_run /usr/bin/
-# Required for the demos
+# Required for the labs
 sudo yum -y install telnet
 sudo yum -y install tftp tftp-server*
 sudo yum -y install ntp
@@ -207,6 +217,8 @@ sudo yum -y install openssh-server
 sudo yum -y install mod_ssl openssl
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
+sudo yum -y autoremove
+sudo yum -y clean all
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 ```

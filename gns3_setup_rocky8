@@ -42,11 +42,13 @@ sudo yum -y install putty # Get from epel
 # QEMU: Virtualization software that emulates virtual processors and peripherals.
 # QEMU-KVM: Type 1 hypervisor that runs in kernel space and QEMU: type 2 hypervisor that runs in user space
 # sudo yum -y install qemu # Replaced by qemu-kvm in /usr/libexec
+sudo yum -y install qemu-kvm
+sudo ln -s /usr/libexec/qemu-kvm /usr/bin/qemu-kvm
 # Install the Dynamips Cisco Emulator
 cd /tmp || exit
 git clone https://github.com/GNS3/dynamips.git
 cd /tmp/dynamips || exit
-mkdir build
+mkdir -p /tmp/dynamips/build
 cd /tmp/dynamips/build/ || exit
 cmake .. -DDYNAMIPS_CODE=stable
 make
@@ -69,8 +71,8 @@ make
 sudo make install
 cd ~/ || exit
 # Get router image and configuration file
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
-wget -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
+wget -nc -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/37xx/3745/c3745-adventerprisek9-mz.124-25d.bin # Cisco 3745
+wget -nc -P ~/GNS3/images/IOS http://tfr.org/cisco-ios/7200/c7200-a3jk9s-mz.124-25d.bin # Cisco 7206
 # Used to create interfaces to connect the host to GNS3
 sudo yum -y install bridge-utils
 # Install modules to control interactions with external devices
@@ -82,10 +84,10 @@ sudo yum -y install ansible
 # Install Selenium for Firefox
 sudo yum -y install firefox
 python3 -m pip install selenium
-wget https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
+wget -nc https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz --directory-prefix ~/Downloads
 sudo tar -xzf ~/Downloads/geckodriver-v0.30.0-linux64.tar.gz -C /usr/local/bin/
 # Get the script that creates a tap/loopback interface in Linux and launches GNS3
-wget -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_rocky8_run
+wget -nc -P ~/ https://raw.githubusercontent.com/garciart/Automation/master/gns3_rocky8_run
 # Make the start-up script executable and place it in /usr/bin
 sudo chmod 755 ~/gns3_rocky8_run
 sudo mv ~/gns3_rocky8_run /usr/bin/
@@ -103,6 +105,8 @@ sudo yum -y install openssh-server
 sudo yum -y install mod_ssl openssl
 sudo mkdir -p /var/lib/tftpboot
 sudo chmod 777 /var/lib/tftpboot
+sudo yum -y autoremove
+sudo yum -y clean all
 # Optional - Modify vimrc file
 echo -e "\"My preferred vim defaults\nset tabstop=4\nset softtabstop=4\nset expandtab\nset shiftwidth=4\nset smarttab" > ~/.vimrc
 echo -e "Setup complete. Review the output of this script and fix any errors.\nRemember to reboot before starting GNS3."
