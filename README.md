@@ -31,6 +31,8 @@ This tutorial is broken down into several parts:
 - [Setting up the Environment](#setting-up-the-environment "Setting up the Environment")
 - [Adding a Device](#adding-a-device "Adding a Device")
 - [Your First Exercise](#your-first-exercise "Your First Exercise")
+- [PS: Easy Start Script](#ps-easy-start-script) "PS: Easy Start Script")
+- [PPS: RHEL8 and Rocky](#pps-rhel8-and-rocky) "PPS: RHEL8 and Rocky")
 
 -----
 
@@ -1004,7 +1006,9 @@ sudo ip link delete br0 # Remove the bridge
 sudo systemctl restart network # Check your OS; may use service networking restart
 ```
 
-## Post Script:
+---
+
+## PS: Easy Start Script
 
 As I stated before, when you installed GNS3 with my script, it added an interactive, executable script named ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") to the ```/usr/bin``` folder. Now that you have learned how to set up the network environment for GNS3 manually, I recommend you use ["gns3_run"](gns3_run "Automated GNS3 configuration and executable") from now on to start GNS3. Simply type in ```gns3_run``` in a Terminal, and select the isolated Ethernet interface; enter your password, if prompted:
 
@@ -1047,8 +1051,15 @@ By the way, do not run the script as ```sudo```, or GNS3 will incorrectly attemp
 
 ![GNS3 server start error](img/ps-error3.png)
 
-## Post-Post Script:
+---
 
-Using RHEL 8 or Rocky? Check out ["gns3_setup_rocky8"](gns3_setup_rocky8 "Automated GNS3 setup for Rocky OS") and ["gns3_rocky8_run"](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")!
+## PPS: RHEL8 and Rocky
 
-Good luck!
+I have included updated setup and run scripts for RHEL 8 or Rocky:
+
+- [gns3_setup_rocky8](gns3_setup_rocky8 "Automated GNS3 setup for Rocky OS")
+- [gns3_rocky8_run](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")!
+
+Some differences include substituting ```chrony``` for ```ntp``` during setup; creating and using a virtual network interface, instead of using an internal network; and adding an additional TAP. If you already have a real interface named ```eth2```, change the name of the dummy interface to one of your choice.
+
+***Good luck!***

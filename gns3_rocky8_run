@@ -23,10 +23,13 @@ sudo ip tuntap add tap0 mode tap # Create the tap
 sudo ip link set tap0 up # Enable the tap
 sudo ip link set tap0 master br0 # Connect the tap to the bridge
 
-# Add another tap, for flexibility
-sudo ip tuntap add tap1 mode tap # Create the tap
-sudo ip link set tap1 up # Enable the tap
-sudo ip link set tap1 master br0 # Connect the tap to the bridge
+# Add two more taps, for flexibility
+sudo ip tuntap add tap1 mode tap
+sudo ip tuntap add tap2 mode tap
+sudo ip link set tap1 up
+sudo ip link set tap2 up
+sudo ip link set tap1 master br0
+sudo ip link set tap2 master br0
 
 # Configure the isolated Ethernet network adapter
 sudo ip address flush dev "$host_interface" # Clear out any old adapter IP address
@@ -50,6 +53,8 @@ gns3 # Start GNS3
 echo
 echo -e "Resetting the network..."
 echo "$s_pass" | sudo -S ip link set "$host_interface" down &> /dev/null
+sudo ip link set tap2 down
+sudo ip link delete tap2
 sudo ip link set tap1 down
 sudo ip link delete tap1
 sudo ip link set tap0 down
