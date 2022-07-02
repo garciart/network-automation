@@ -1058,7 +1058,7 @@ By the way, do not run the script as ```sudo```, or GNS3 will incorrectly attemp
 I have included updated setup and run scripts for RHEL 8 or Rocky:
 
 - [gns3_setup_rocky8](gns3_setup_rocky8 "Automated GNS3 setup for Rocky OS")
-- [gns3_rocky8_run](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")!
+- [gns3_rocky8_run](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")
 
 Some differences include substituting ```chrony``` for ```ntp``` during setup; creating and using a virtual network interface, instead of using an internal network; and adding an additional TAP. If you already have a real interface named ```eth2```, change the name of the dummy interface to one of your choice.
 
