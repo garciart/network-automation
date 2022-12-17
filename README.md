@@ -1009,7 +1009,7 @@ Some differences include substituting ```chrony``` for ```ntp``` during setup; c
 
 ## PPPS: Using a Virtual Machine
 
-If you are using Windows, or you do not want or cannot install GNS3 natively, you can use a virtual machine.
+If you are using Windows, or you do not want to or cannot install GNS3 natively, you can use a virtual machine.
 
 To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download").
 
