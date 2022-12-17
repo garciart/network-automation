@@ -31,8 +31,9 @@ This tutorial is broken down into several parts:
 - [Setting up the Environment](#setting-up-the-environment "Setting up the Environment")
 - [Adding a Device](#adding-a-device "Adding a Device")
 - [Your First Exercise](#your-first-exercise "Your First Exercise")
-- [PS: Easy Start Script](#ps-easy-start-script) "PS: Easy Start Script")
-- [PPS: RHEL8 and Rocky](#pps-rhel8-and-rocky) "PPS: RHEL8 and Rocky")
+- [PS: Easy Start Script](#ps-easy-start-script "PS: Easy Start Script")
+- [PPS: RHEL8 and Rocky](#pps-rhel8-and-rocky "PPS: RHEL8 and Rocky")
+- [PPPS: Using a Virtual Machine](#ppps-using-a-virtual-machine "PPPS: Using a Virtual Machine")
 
 -----
 
@@ -48,65 +49,7 @@ Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installa
 
 >**NOTE** - I picked CentOS for this tutorial because I use Red Hat Linux (RHEL) and CentOS quite a bit, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS. It was fun, and the process helped me learn GNS3's dependencies. In addition, many companies and government agencies, such as Northrup Grumman and NASA, use RHEL, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
-To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download") and install it in a virtual machine. If you are not familiar with creating virtual machines, I recommend you review the instructions on the following sites:
-
-- [Oracle VM VirtualBox User Manual](https://www.virtualbox.org/manual/ "Oracle VM VirtualBox User Manual")
-
-- [VMware Workstation Player Documentation](https://docs.vmware.com/en/VMware-Workstation-Player/index.html "VMware Workstation Player Documentation")
-
-- [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
-
-Regardless of the hypervisor you use, make sure you:
-
-1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
-
-![Memory size](img/a00.png "Settings -> Memory size")
- 
-2. Allocate at least **20 GB** of hard disk space for your machine (e.g., in VirtualBox...):
-
-![File location and size](img/a01.png "Settings -> File location and size")**
-
-3. Allocate **two** processors for your machine and ensure that you enable Nested Intel VT-x/EPT or AMD-V/RVI (e.g., in VirtualBox...):
-
-![Settings -> System](img/a02.png "Settings -> System")
-
-4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
-
->**NOTE** - If your operating system supports it, you can create a "dummy" interface instead. Open a Terminal, and enter the following commands to create an Ethernet network interface named **eth2**:
-> 
->```
->sudo -S modprobe dummy
->sudo ip link add eth2 type dummy
-># Ensure fake MAC address starts with an even octet
->sudo ifconfig eth2 hw ether 12:FE:34:DC:56:BA
->sudo ip link set dev eth2 up
->```
-
-![Network Settings](img/a03.png "Settings -> Network")
-
-In VMWare, you can make all the above changes to your VM in **Settings**:
-
-![Settings](img/a04.png)
-
-In Virtual Machine Manager, you can make all the above changes to your VM in **Virtual Machine Details**:
-
-![Settings](img/a04a.png)
-
-Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
-
-```sudo yum -y upgrade```
-
->**NOTE** - If you are using VirtualBox, I recommend installing their Guest Additions software suite, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the software on the Guest Additions' ISO:
->
->```
->sudo yum -y install epel-release
->sudo yum -y install make gcc kernel-headers kernel-devel perl dkms bzip2
->sudo reboot now
->```
->
->Do not forget to reboot your VM again after running the software on the Guest Additions' ISO.
-
-Next, open a Terminal and install git:
+Open a Terminal and install git:
 
 ```sudo yum -y install git```
 
@@ -1061,5 +1004,71 @@ I have included updated setup and run scripts for RHEL 8 or Rocky:
 - [gns3_rocky8_run](gns3_rocky8_run "Automated GNS3 configuration and executable for Rocky OS")
 
 Some differences include substituting ```chrony``` for ```ntp``` during setup; creating and using a virtual network interface, instead of using an internal network; and adding an additional TAP. If you already have a real interface named ```eth2```, change the name of the dummy interface to one of your choice.
+
+---
+
+## PPPS: Using a Virtual Machine
+
+If you are using Windows, or you do not want or cannot install GNS3 natively, you can use a virtual machine.
+
+To get started, download the latest ISO image of CentOS 7 from [the CentOS download page](https://www.centos.org/download/ "Download").
+
+Next, if you are not familiar with creating virtual machines, I recommend you review the instructions on the following sites:
+
+- [Oracle VM VirtualBox User Manual](https://www.virtualbox.org/manual/ "Oracle VM VirtualBox User Manual")
+
+- [VMware Workstation Player Documentation](https://docs.vmware.com/en/VMware-Workstation-Player/index.html "VMware Workstation Player Documentation")
+
+- [Getting Started with Virtual Machine Manager](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_getting_started_guide/chap-virtualization_manager-introduction "Getting Started with Virtual Machine Manager")
+
+Regardless of the hypervisor you use, make sure you:
+
+1. Allocate **2048 MB** of RAM for your machine (e.g., in VirtualBox...):
+
+![Memory size](img/a00.png "Settings -> Memory size")
+ 
+2. Allocate at least **20 GB** of hard disk space for your machine (e.g., in VirtualBox...):
+
+![File location and size](img/a01.png "Settings -> File location and size")**
+
+3. Allocate **two** processors for your machine and ensure that you enable Nested Intel VT-x/EPT or AMD-V/RVI (e.g., in VirtualBox...):
+
+![Settings -> System](img/a02.png "Settings -> System")
+
+4. Add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** in VMWare or attaching it to an **Internal Network** in VirtualBox (shown):
+
+>**NOTE** - If your operating system supports it, you can create a "dummy" interface instead. Open a Terminal, and enter the following commands to create an Ethernet network interface named **eth2**:
+> 
+>```
+>sudo -S modprobe dummy
+>sudo ip link add eth2 type dummy
+># Ensure fake MAC address starts with an even octet
+>sudo ifconfig eth2 hw ether 12:FE:34:DC:56:BA
+>sudo ip link set dev eth2 up
+>```
+
+![Network Settings](img/a03.png "Settings -> Network")
+
+In VMWare, you can make all the above changes to your VM in **Settings**:
+
+![Settings](img/a04.png)
+
+In Virtual Machine Manager, you can make all the above changes to your VM in **Virtual Machine Details**:
+
+![Settings](img/a04a.png)
+
+Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
+
+```sudo yum -y upgrade```
+
+>**NOTE** - If you are using VirtualBox, I recommend installing their Guest Additions software suite, which will make interacting with your VM easier, by adding features like cut-and-paste, shared folders, etc. Check out Aaron Kili's great article, ["Install VirtualBox Guest Additions in CentOS, RHEL & Fedora."](https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/ "Install VirtualBox Guest Additions in CentOS, RHEL & Fedora") Just remember to execute the following commands in a Terminal before running the software on the Guest Additions' ISO:
+>
+>```
+>sudo yum -y install epel-release
+>sudo yum -y install make gcc kernel-headers kernel-devel perl dkms bzip2
+>sudo reboot now
+>```
+>
+>Do not forget to reboot your VM again after running the software on the Guest Additions' ISO.
 
 ***Good luck!***
