@@ -1059,6 +1059,10 @@ In Virtual Machine Manager, you can make all the above changes to your VM in **V
 
 ![Settings](img/a04a.png)
 
+In Hyper-V Manager, you can make all the above changes to your VM in **Settings**:
+
+![Settings](img/a04c.png)
+
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
 ```sudo yum -y upgrade```
