@@ -1061,7 +1061,7 @@ In Virtual Machine Manager, you can make all the above changes to your VM in **V
 
 In Hyper-V Manager, you can make all the above changes to your VM in **Settings**:
 
-![Settings](img/a04c.png)
+![Settings](img/a04b.png)
 
 Once you have finished creating your virtual machine, spin it up, and update and upgrade the OS.
 
