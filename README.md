@@ -49,6 +49,8 @@ Installing GNS3 on [Windows](https://docs.gns3.com/docs/getting-started/installa
 
 >**NOTE** - I picked CentOS for this tutorial because I use Red Hat Linux (RHEL) and CentOS quite a bit, and I could not find a tutorial that captured all the steps to get GNS3 working on a Fedora family OS. It was fun, and the process helped me learn GNS3's dependencies. In addition, many companies and government agencies, such as Northrup Grumman and NASA, use RHEL, since it is a trusted OS which is [Protection Profile (PP) compliant](https://www.commoncriteriaportal.org/products/ "Certified Common Criteria Products").
 
+>**NOTE** - If you are using Windows, or you do not want to or cannot install GNS3 natively, you can use a virtual machine. See the post-post-post-script, [PPPS: Using a Virtual Machine](#ppps-using-a-virtual-machine "PPPS: Using a Virtual Machine"), for details.
+
 Open a Terminal and install git:
 
 ```sudo yum -y install git```
