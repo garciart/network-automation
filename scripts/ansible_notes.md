@@ -716,9 +716,9 @@ Open a browser and navigate to control.rgtest.net. At the login screen, login wi
 
 ## TODO
 
-Do https://mu-kong.medium.com/ansible-playbook-deploy-the-public-key-to-remote-hosts-da3f3b4b5481
-Run through http://redhatgov.io/workshops/ansible_tower_azure/
+Run through http://redhatgov.io/workshops
 
+https://mu-kong.medium.com/ansible-playbook-deploy-the-public-key-to-remote-hosts-da3f3b4b5481?
 
 | VM Name            | Description               | Username   | Domain                | IPv4 Address |
 | ------------------ | ------------------------- | ---------- | --------------------- | ------------ |
