@@ -59,20 +59,19 @@ The Ansible Automation Platform (AAP) requires RHEL 8.4 or greater. Your control
 id control
 ```
 
+  a. If the **control** user account exists, make it an administrator:
 
-    a. If the **control** user account exists, make it an administrator:
+  ```
+  sudo usermod -aG wheel control
+  ```
 
-    ```
-    sudo usermod -aG wheel control
-    ```
+  b. If the **control** user account does not exist, create the account and switch to it:
 
-    b. If the **control** user account does not exist, create the account and switch to it:
-
-    ```
-    # sudo useradd  --comment "Ansible Control Node Account" --create-home -groups wheel control
-    sudo useradd -c "Ansible Control Node Account" -m -G wheel control
-    echo <desired password> | sudo passwd control --stdin
-    ```
+  ```
+  # sudo useradd  --comment "Ansible Control Node Account" --create-home -groups wheel control
+  sudo useradd -c "Ansible Control Node Account" -m -G wheel control
+  echo <desired password> | sudo passwd control --stdin
+  ```
 
 3. Switch to the **control** user account:
 
