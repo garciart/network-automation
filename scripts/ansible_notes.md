@@ -59,6 +59,7 @@ The Ansible Automation Platform (AAP) requires RHEL 8.4 or greater. Your control
 id control
 ```
 
+
     a. If the **control** user account exists, make it an administrator:
 
     ```
