@@ -11,6 +11,7 @@ This tutorial will walk you through using Ansible and Ansible Automation Platfor
 - [Create Your First Playbook](#create-your-first-playbook)
 - [Create a Remote Node](#create-a-remote-node)
 - [Run Playbooks against the Remote Node](#run-playbooks-against-the-remote-node)
+- [Ansible Roles](#ansible-roles)
 - [Enable SSH Key-Based Authentication](#enable-ssh-key-based-authentication)
 - [Encrypt Files with Ansible Vault](#encrypt-files-with-ansible-vault)
 - [Install the Ansible Automation Platform](#install-the-ansible-automation-platform)
@@ -796,6 +797,191 @@ In this section, you will use a virtual remote node to test your Ansible playboo
     ```
 
 6. Run the remaining playbooks and check for errors.
+
+----
+
+## Ansible Roles
+
+"Don't repeat yourself", or *DRY*, is a key software development principle. My rule is, that if you have to use the same block of code, or run the same set of commands more than once, put it in a function, a method, a class, or in its own script.
+
+Ansible allows you to do the same thing, and a lot more, with **roles**. 
+
+1. Create and navigate to a sub-directory named "roles" in your Ansible directory:
+
+	```
+	mkdir ~/Ansible/roles
+	cd ~/Ansible/roles
+	```
+
+2. [Ansible Galaxy](https://galaxy.ansible.com/ "Ansible Galaxy") is "Ansible’s official hub for sharing Ansible content", and it contains a collection of roles and other useful items. In some respects, it is like a cross between a collection of repositories, such as GitHub, and a package manager, like yum. The [ansible-galaxy](https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html) command allows you to interact with Ansible Galaxy, as well as perform other tasks. One of those tasks is initializing a role and its directory structure. Do that now for the `say_hello_role`:
+
+	```
+	ansible-galaxy init say_hello_role
+	```
+
+3. Navigate to the role's directory and take a look at its contents:
+
+	```
+	cd ~/Ansible/roles/say_hello_role
+	ls -l
+	```
+
+    **Output:**
+
+	```
+	drwxrwxr-x. 2 control control   22 Jan 23 16:08 defaults
+	drwxrwxr-x. 2 control control    6 Jan 23 16:08 files
+	drwxrwxr-x. 2 control control   22 Jan 23 16:08 handlers
+	drwxrwxr-x. 2 control control   22 Jan 23 16:08 meta
+	-rw-rw-r--. 1 control control 1328 Jan 23 16:08 README.md
+	drwxrwxr-x. 2 control control   22 Jan 23 16:09 tasks
+	drwxrwxr-x. 2 control control    6 Jan 23 16:08 templates
+	drwxrwxr-x. 2 control control   39 Jan 23 16:08 tests
+	drwxrwxr-x. 2 control control   22 Jan 23 16:08 vars
+	```
+
+4. When you use a role, Ansible will look in these directories for common values (**defaults**), file names (**files**), what to do (**tasks**), etc. Many of these directories contain a `main.yml` file, which is the first place Ansible will look for instructions. Navigate to the **tasks** directory and open the `main.yml` file:
+
+	```
+	cd tasks
+	vim main.yml
+	```
+
+5. Press **[i]**, and enter the following YAML code:
+
+	```
+	---
+	# tasks file for say_hello_role
+
+	- name: Say Hello using the ansible.builtin.debug module
+	  ansible.builtin.debug:
+		msg: Hello, World!
+	```
+
+6. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+7. Return to the your Ansible directory and create a playbook, named `say_hello_role_test.yml`:
+
+	```
+	cd ~/Ansible
+	vim say_hello_role_test.yml
+	```
+
+8. Press **[i]**, and enter the following YAML code:
+
+	```
+	---
+
+	- name: say_hello_role test
+	  hosts: all
+	  roles:
+	  - say_hello_role
+	```
+
+9. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+10. Run the playbook:
+
+	```
+	ansible-playbook say_hello_role_test.yml
+	```
+
+	**Output:**
+
+	```
+	PLAY [say_hello_role test] ***************************************************************************************************************************************************************
+
+	TASK [Gathering Facts] *******************************************************************************************************************************************************************
+	ok: [control]
+	ok: [remote]
+
+	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+	ok: [control] => {
+		"msg": "Hello, World!"
+	}
+	ok: [remote] => {
+		"msg": "Hello, World!"
+	}
+
+	PLAY RECAP *******************************************************************************************************************************************************************************
+	control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+	remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
+	```
+
+11. You can also run a role anywhere in a playbook, or even more than once, using the [ansible.builtin.include_role](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_role_module.html) module. Reopen the playbook:
+
+	```
+	vim say_hello_role_test.yml
+	```
+
+8. Press **[i]**, and replace the YAML code:
+
+	```
+	---
+
+	- name: say_hello_role test
+	  hosts: all
+	  tasks:
+	  - name: Say Hello
+		ansible.builtin.include_role:
+		  name: say_hello_role
+	  - name: Respond
+		ansible.builtin.debug:
+		  msg: "What?"
+	  - name: Say Hello again
+		ansible.builtin.include_role:
+		  name: say_hello_role
+	```
+
+9. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+10. Run the playbook:
+
+	```
+	ansible-playbook say_hello_role_test.yml
+	```
+
+	**Output:**
+	
+	```
+	PLAY [say_hello_role test] ***************************************************************************************************************************************************************
+
+	TASK [Gathering Facts] *******************************************************************************************************************************************************************
+	ok: [remote]
+	ok: [control]
+
+	TASK [Say Hello] *************************************************************************************************************************************************************************
+
+	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+	ok: [remote] => {
+		"msg": "Hello, World!"
+	}
+	ok: [control] => {
+		"msg": "Hello, World!"
+	}
+
+	TASK [Respond] ***************************************************************************************************************************************************************************
+	ok: [remote] => {
+		"msg": "What?"
+	}
+	ok: [control] => {
+		"msg": "What?"
+	}
+
+	TASK [Say Hello again] *******************************************************************************************************************************************************************
+
+	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+	ok: [control] => {
+		"msg": "Hello, World!"
+	}
+	ok: [remote] => {
+		"msg": "Hello, World!"
+	}
+
+	PLAY RECAP *******************************************************************************************************************************************************************************
+	control                    : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+	remote                     : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+	```
 
 ----
 
