@@ -1,6 +1,6 @@
-# Ansible and Ansible Automation Platform Setup
+# Ansible and Ansible Automation Platform Tutorial
 
-This tutorial will walk you through installing Ansible and Ansible Automation Platform on a virtual control node.
+This tutorial will walk you through using Ansible and Ansible Automation Platform using a virtual network.
 
 - [Prerequisites](#prerequisites)
 - [Create the Virtual Machine](#create-the-virtual-machine)
@@ -35,6 +35,9 @@ For more information on AAP requirements, see https://access.redhat.com/document
 
 ## Create the Virtual Machine
 
+> **NOTE** - Since the focus of this tutorial is using Ansible, and for the sake of brevity, I will avoid going into great detail on how to create virtual machines or install operating systems. In addition, the links provided in this section are maintained y their respective companies, and contain the latest instructions for creating a VM or installing RHEL 8.
+
+
 1. Create a virtual machine, named *"ansible_control"*, per the hypervisor's instructions:
 
    - [Oracle VM VirtualBox User Manual](https://www.virtualbox.org/manual/ "Oracle VM VirtualBox User Manual")
@@ -46,8 +49,6 @@ For more information on AAP requirements, see https://access.redhat.com/document
    - At least two (2) CPUs.
    - At least 8192 MB RAM for installation of AAP, and 4096 MB RAM for operation.
    - At least 40 GB of hard drive space. If you are separating your drive into multiple partitions, you must allocate at least 20 GB to `/var`.
-
-   > **NOTE** - Since the focus of this tutorial is using Ansible, and for the sake of brevity, I will avoid going into great detail on how to create virtual machines or install operating systems. In addition, the links provided in this section are maintained y their respective companies, and contain the latest instructions for creating a VM or installing RHEL 8.
 
 3. However, before you start the VM, go to its network settings, and change the network connection to **Bridged Adapter**. This will allow the VM to access the host, the Internet, and other VM's.
 
@@ -67,19 +68,19 @@ For more information on AAP requirements, see https://access.redhat.com/document
     id control
     ```
 
-- If the **control** user account exists, make it an administrator:
+   - If the **control** user account exists, make it an administrator:
 
-    ```
-    sudo usermod -aG wheel control
-    ```
+       ```
+       sudo usermod -aG wheel control
+       ```
 
-- If the **control** user account does not exist, create the account and switch to it:
+   - If the **control** user account does not exist, create the account and switch to it:
 
-    ```
-    # sudo useradd  --comment "Ansible Control Node Account" --create-home -groups wheel control
-    sudo useradd -c "Ansible Control Node Account" -m -G wheel control
-    echo <desired password> | sudo passwd control --stdin
-    ```
+       ```
+       # sudo useradd  --comment "Ansible Control Node Account" --create-home -groups wheel control
+       sudo useradd -c "Ansible Control Node Account" -m -G wheel control
+       echo <desired password> | sudo passwd control --stdin
+       ```
 
 3. Switch to the **control** user account:
 
@@ -97,7 +98,7 @@ For more information on AAP requirements, see https://access.redhat.com/document
     > **NOTE** - The IPv4 address and its netmask will appear after the Internet Protocol version 4 family identifier, **inet**. For example:
     >
     > ```
-    > inet 192.168.0.x  netmask 255.255.255.0  broadcast 192.168.0.x
+    > inet 192.168.0.XX  netmask 255.255.255.0  broadcast 192.168.0.XX
     > ```
 
 5. If no IPv4 address appears, set an IPv4 address using the following command:
@@ -201,7 +202,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     > nautilus
     > ```
     >
-    > Select the Guest Additions' ISO and run the software. You can also run the software from the command line (in my case, the command was `sudo ./run/media/control/VBox_GAs_6.1.38/autorun.sh`).
+    > Select the Guest Additions' ISO and run the software. You can also access the ISO from its mount point (`/media`, `/mnt`, etc.), and run the software from the command line (in my case, the command was `sudo ./run/media/control/VBox_GAs_6.1.38/autorun.sh`).
     >
     > Do not forget to reboot the control node again after installing the software.
 
@@ -231,7 +232,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     ansible --version
     ```
 
-5. Test Ansible by pinging the localhost using Ansible's **ping** module:
+5. Test Ansible by pinging the localhost, using the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module:
 
     > **NOTE** - Ansible's built-in **ping** module is not the same as Linux ping; it does not send out Internet Control Message Protocol (ICMP) packets. Instead, the module checks that it can connect to a node, using SSH, and determine the Python version installed on the node.
 
@@ -240,7 +241,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     ansible -m ping localhost
     ```
 
-	**Output:**
+    **Output:**
 
     ```
     localhost | SUCCESS => {
@@ -281,7 +282,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
         control:
           ansible_host: <your IPv4 address>
           ansible_connection: ssh
-          ansible_ssh_user: control
+          ansible_user: control
           ansible_ssh_pass: <the control node password>
     ```
 
@@ -299,37 +300,40 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     [defaults]
     # Set the location for the correct Python 3 version
     interpreter_python = /usr/bin/python3
-    # Stop host key checking, as well as populating the known_hosts file, for now
+
+    # Stop host key checking, as well as populating the ~/.ssh/known_hosts file, for now
     # https://docs.ansible.com/ansible/2.5/user_guide/intro_getting_started.html#host-key-checking
     host_key_checking = False
+
+    # Use the local inventory file, instead of the default /etc/hosts file
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#avoiding-security-risks-with-ansible-cfg-in-the-current-directory
     inventory = ~/Ansible/inventory.yml
     ```
 
 12. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-13. Test Ansible by listing your nodes:
+13. Ensure Ansible can read the inventory file:
 
     ```
     # ansible all --list-hosts --inventory ~/Ansible/inventory.yml
     ansible all --list-hosts -i ~/Ansible/inventory.yml
     ```
 
-14. Test Ansible by running Ansible's **ping** module:
+14. Test connectivity, using the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module:
 
     ```
-    # ansible all --module-name ping --inventory ~/Ansible/inventory.yml
+    # ansible all --module-name ansible.builtin.ping --inventory ~/Ansible/inventory.yml
     ansible all -m ping -i ~/Ansible/inventory.yml
     ```
 
-15. Test Ansible by running an ad-hoc command:
+15. Run some ad-hoc commands, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module:
 
     ```
     # ansible all --args "ping -c 4 8.8.8.8"
     ansible all -a "ping -c 4 8.8.8.8"
-    # ansible all --module-name command --args "ping -c 4 8.8.8.8"
+    # ansible all --module-name ansible.builtin.command --args "ping -c 4 8.8.8.8"
     ansible all -m command -a "ping -c 4 8.8.8.8"
-    # ansible all --module-name command --args "uptime"
+    # ansible all --module-name ansible.builtin.command --args "uptime"
     ansible all -m command -a "uptime"
     ```
 
@@ -337,7 +341,9 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
 
 ## Create Your First Playbook
 
-For your first playbook, you will say "Hello, World!", using the ansible.builtin.debug module
+For your first playbook, you will say "Hello, World!", using the [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) module.
+
+> **NOTE** - Ansible playbooks use the YAML data-serialization language. Since the focus of this tutorial is using Ansible, and for the sake of brevity, I will avoid going into great detail on how to write YAML code. However, there are many YAML tutorials and resources available online. For example, Ansible provides a primer on [YAML Syntax](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html).
 
 1. Create the playbook:
 
@@ -354,7 +360,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
       hosts: control
       tasks:
       - name: Say Hello using the ansible.builtin.debug module
-        debug:
+        ansible.builtin.debug:
           msg: Hello, World!
     ```
 
@@ -366,7 +372,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ansible-playbook ~/Ansible/first_playbook.yml
     ```
 
-	**Output:**
+    **Output:**
 
     ```
     PLAY [First playbook] *********************************************************************************************************************************************************************************************
@@ -383,7 +389,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     ```
 
-    > **NOTE** - Ansible uses a custom format for output, as written in its [default.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/callback/default.py) script. To change the format output, use the **stdout_callback** setting in your `ansible.cfg` file:
+    > **NOTE** - Ansible uses a custom format for output, as written in its [default.py](https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/callback/default.py) script. To change the format output, add a **stdout_callback** setting in your `ansible.cfg` file:
     >
     > ```
     > # To format playbook results
@@ -426,14 +432,14 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     > TASK [Say Hello using the ansible.builtin.debug module] **********************************************************************************************************************************
     > ok: [remote] =>
     >   msg: Hello, World!
-
+    >
     > PLAY RECAP *******************************************************************************************************************************************************************************
     > remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     > ```
     >
     > However, for this tutorial, you will use Ansible's default format.
 
-5. Ansible performed a task that you did not explicitly ask it to do: it gathered *facts* about the node. Create another playbook to display these facts:
+5. Huh? Ansible performed a task that you did not explicitly ask it to do: it gathered *facts* about the node first. Create another playbook to display these facts:
 
     ```
     sudo vim ~/Ansible/second_playbook.yml
@@ -448,7 +454,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
       hosts: control
       tasks:
       - name: Print the facts, nothing but the facts
-        debug:
+        ansible.builtin.debug:
           var: ansible_facts
     ```
 
@@ -460,7 +466,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ansible-playbook ~/Ansible/second_playbook.yml
     ```
 
-9. That is a lot of facts! However, you can reference any of these facts, as well as restricted Ansible variables, in your playbooks. Create another playbook to display these facts and variables:
+9. To save space, I won't show the output, but that is a lot of facts! However, you can reference any of these facts, as well as restricted Ansible variables, in your playbooks. Create another playbook to display these facts and variables:
 
     ```
     sudo vim ~/Ansible/third_playbook.yml
@@ -472,24 +478,24 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ---
 
     - name: Third playbook
-      hosts: control
+      hosts: all
       tasks:
       - name: Print a fact, without titles
-        debug:
+        ansible.builtin.debug:
           var: ansible_facts.env.SSH_CLIENT
 
       - name: Print a magic variable, without titles
-        debug:
+        ansible.builtin.debug:
           var: ansible_host
 
       - name: Print only certain facts and variables, with and without titles
-        debug:
+        ansible.builtin.debug:
           msg:
           - Hostname - {{ ansible_facts.hostname }}
           - "{{ ansible_facts.env.SSH_CLIENT }}"
 
-      - name: Print environment variables
-        debug:
+      - name: Print an environment variable
+        ansible.builtin.debug:
           msg:
           - Home directory - {{ lookup('env', 'HOME') }}
           - "{{ hostvars['control'].ansible_default_ipv4.address }}"
@@ -513,7 +519,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
 
     TASK [Print a fact, without titles] *******************************************************************************************************************************************************************************
     ok: [control] => {
-        "ansible_facts.env.SSH_CLIENT": "192.168.0.29 42554 22"
+        "ansible_facts.env.SSH_CLIENT": "192.168.0.XX XXXXX 22"
     }
 
     TASK [Print a magic variable, without titles] *********************************************************************************************************************************************************************
@@ -525,7 +531,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ok: [control] => {
         "msg": [
             "Hostname - control",
-            "192.168.0.29 42554 22"
+            "192.168.0.XX XXXXX 22"
         ]
     }
 
@@ -533,7 +539,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ok: [control] => {
         "msg": [
             "Home directory - /home/control",
-            "192.168.0.29"
+            "192.168.0.XX"
         ]
     }
 
@@ -541,13 +547,13 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     control                    : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     ```
 
-13. Now, create a playbook that uses modules and perform the following tasks:
+13. Now, create a playbook that uses modules and performs the following tasks:
 
-    - Ping the control node using the ansible.builtin.ping module, and save the result
-    - Print the result of the ansible.builtin.ping module, using the ansible.builtin.debug module
-    - Ping the control node using the ansible.builtin.command module and the Linux ping command, and save the result
-    - Print the result of the ansible.builtin.command module, using the ansible.builtin.debug module
-    - Print the results of the last two commands
+    - Ping the control node using the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module, and save the result.
+    - Print the result of the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module, using the [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) module.
+    - Ping the control node using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module and the Linux ***ping*** command, and save the result.
+    - Print the result of the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module, using the [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) module.
+    - Print the results of the last two commands, using the [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) module.
 
     ```
     sudo vim ~/Ansible/fourth_playbook.yml
@@ -559,26 +565,26 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ---
 
     - name: Fourth playbook
-      hosts: control
+      hosts: all
       tasks:
       - name: Ping the control node using the ansible.builtin.ping module, and save the result
-        ping:
+        ansible.builtin.ping:
         register: ansible_ping_result
 
       - name: Print the result of the ansible.builtin.ping module, using the ansible.builtin.debug module
-        debug:
+        ansible.builtin.debug:
           var: ansible_ping_result
 
       - name: Ping the control node using the ansible.builtin.command module and the Linux ping command, and save the result
-        command: 'ping -c 4 "{{ ansible_host }}"'
+        ansible.builtin.command: 'ping -c 4 "{{ ansible_host }}"'
         register: icmp_ping_result
 
       - name: Print the result of the ansible.builtin.command module, using the ansible.builtin.debug module
-        debug:
+        ansible.builtin.debug:
           var: icmp_ping_result
 
       - name: Print the results of the last two commands
-        debug:
+        ansible.builtin.debug:
           msg:
           - "{{ ansible_ping_result }}"
           - "{{ icmp_ping_result }}"
@@ -633,13 +639,13 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
             "start": "2023-01-17 23:30:03.592279",
             "stderr": "",
             "stderr_lines": [],
-            "stdout": "PING control (192.168.0.29) 56(84) bytes of data.\n64 bytes from control (192.168.0.29): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.29): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.29): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.29): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
+            "stdout": "PING control (192.168.0.XX) 56(84) bytes of data.\n64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
             "stdout_lines": [
-                "PING control (192.168.0.29) 56(84) bytes of data.",
-                "64 bytes from control (192.168.0.29): icmp_seq=1 ttl=64 time=0.048 ms",
-                "64 bytes from control (192.168.0.29): icmp_seq=2 ttl=64 time=0.083 ms",
-                "64 bytes from control (192.168.0.29): icmp_seq=3 ttl=64 time=0.050 ms",
-                "64 bytes from control (192.168.0.29): icmp_seq=4 ttl=64 time=0.056 ms",
+                "PING control (192.168.0.XX) 56(84) bytes of data.",
+                "64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms",
+                "64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms",
+                "64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms",
+                "64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms",
                 "",
                 "--- control ping statistics ---",
                 "4 packets transmitted, 4 received, 0% packet loss, time 3060ms",
@@ -672,13 +678,13 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
                 "start": "2023-01-17 23:30:03.592279",
                 "stderr": "",
                 "stderr_lines": [],
-                "stdout": "PING control (192.168.0.29) 56(84) bytes of data.\n64 bytes from control (192.168.0.29): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.29): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.29): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.29): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
+                "stdout": "PING control (192.168.0.XX) 56(84) bytes of data.\n64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
                 "stdout_lines": [
-                    "PING control (192.168.0.29) 56(84) bytes of data.",
-                    "64 bytes from control (192.168.0.29): icmp_seq=1 ttl=64 time=0.048 ms",
-                    "64 bytes from control (192.168.0.29): icmp_seq=2 ttl=64 time=0.083 ms",
-                    "64 bytes from control (192.168.0.29): icmp_seq=3 ttl=64 time=0.050 ms",
-                    "64 bytes from control (192.168.0.29): icmp_seq=4 ttl=64 time=0.056 ms",
+                    "PING control (192.168.0.XX) 56(84) bytes of data.",
+                    "64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms",
+                    "64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms",
+                    "64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms",
+                    "64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms",
                     "",
                     "--- control ping statistics ---",
                     "4 packets transmitted, 4 received, 0% packet loss, time 3060ms",
@@ -745,7 +751,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
         control:
           ansible_host: <the control node IPv4 address>
           ansible_connection: ssh
-          ansible_ssh_user: control
+          ansible_user: control
           ansible_ssh_pass: <the control node password>
 
     remote_nodes:
@@ -753,7 +759,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
         remote:
           ansible_host: <the remote node IPv4 address>
           ansible_connection: ssh
-          ansible_ssh_user: remote
+          ansible_user: remote
           ansible_ssh_pass: <the remote node password>
     ```
 
@@ -797,15 +803,20 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 Your inventory contains passwords in plain text, which is not good. Ansible prefers that you use SSH keys as authentication credentials when accessing remote nodes, and you can use Ansible to set up SSH key-based authentication on both the control node and remote node.
 
-The `enable_ssh_key_auth` playbook performs the following tasks:
+Your `enable_ssh_key_auth` playbook will perform the following tasks:
 
-- It checks if a public key file already exists.
-- If the public key file does not exist, it generates both a private key file (id_rsa) and a public key file (id_rsa.pub).
-- It reads the RSA public key from the public key file and places the key in a **fact** that is accessible to all *tasks* within the playbook (similar to a global variable).
-- It connects to each node listed in *hosts* and creates an `authorized_keys` file within the `.ssh` directory of the SSH user.
-- To prevent other users from accessing the file, it sets the `authorized_keys` file's permissions to read-write by the owner only. This action also prevents SSH password prompts when using SSH keys.
-- It adds the RSA public key to the `authorized_keys` file.
-- It displays the contents of the `authorized_keys` file.
+- It will check if a public key file already exists in the control node, using the [ansible.builtin.stat](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/stat_module.html) module.
+- If the public key file does not exist, it will generate both a private key file (*id_rsa*) and a public key file (*id_rsa.pub*) for the control node, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module.
+- It will get and display the fingerprint and the ASCII art representation of the key, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) and [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) modules.
+- It will save the fingerprint and the ASCII art representation of the key in `~/.ssh/randomart`, using the [ansible.builtin.copy](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html) module.
+- It will *lookup* the RSA public key in the control node's public key file, and it will place the key in a **fact** that is accessible to all the remaining tasks in the playbook (similar to a global variable), using the [ansible.builtin.set_fact](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_fact_module.html) module.
+- It will connect to each node listed in `hosts:` and create an `.ssh` directory of each SSH user, if the directory does not exist, using the [ansible.builtin.file](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html) module.
+- It will connect to each node listed in `hosts:` and create an `authorized_keys` file within the `.ssh` directory of each SSH user, if the file does not exist, using the [ansible.builtin.file](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html) module. In addition, to prevent other users from accessing the file, it will set the `authorized_keys` file's permissions to read-write by the owner only (i.e., `rw-------` or `0600`). This action will also prevent SSH password prompts when using SSH keys.
+- It will add the RSA public key to the `authorized_keys` file, if the key is not already there, using the [ansible.builtin.lineinfile](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html) module.
+- It will get the contents of each `authorized_keys` file, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module.
+- It will display the contents of each `authorized_keys` file, using the [ansible.builtin.debug](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) module.
+
+Let's get started!
 
 1. Create the playbook:
 
@@ -823,15 +834,15 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
       tasks:
       - name: Check if the public key of the control node exists
         ansible.builtin.stat:
-          path: "/home/{{ ansible_ssh_user }}/.ssh/id_rsa.pub"
+          path: "/home/{{ ansible_user }}/.ssh/id_rsa.pub"
         register: file_facts
 
       - name: Generate SSH keys
-        ansible.builtin.shell: 'ssh-keygen -f ~/.ssh/id_rsa -N "" -q'
+        ansible.builtin.command: 'ssh-keygen -f ~/.ssh/id_rsa -N "" -q'
         when: not file_facts.stat.exists
 
       - name: Get the fingerprint and the ASCII art representation of the key
-        ansible.builtin.shell: 'ssh-keygen -f ~/.ssh/id_rsa -lv'
+        ansible.builtin.command: 'ssh-keygen -f ~/.ssh/id_rsa -lv'
         register: randomart
 
       - name: Display the fingerprint and the ASCII art representation of the key
@@ -840,8 +851,8 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
 
       - name: Save the fingerprint and the ASCII art representation of the key
         ansible.builtin.copy:
-          content: "{{ randomart.stdout_lines }}"
-          dest: "/home/{{ ansible_ssh_user }}/.ssh/randomart"
+          content: "{{ randomart.stdout }}\n"
+          dest: "/home/{{ ansible_user }}/.ssh/randomart"
 
     - name: Upload the public key of the control node to each node
       hosts: control, remote
@@ -852,25 +863,25 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
 
       - name: Create the .ssh directory if it does not exist
         ansible.builtin.file:
-          path: "/home/{{ ansible_ssh_user }}/.ssh"
+          path: "/home/{{ ansible_user }}/.ssh"
           state: directory
 
       - name: Create the authorized_keys file in the .ssh directory if it does not exist
         ansible.builtin.file:
-          path: "/home/{{ ansible_ssh_user }}/.ssh/authorized_keys"
+          path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
           state: touch
-          owner: "{{ ansible_ssh_user }}"
-          group: "{{ ansible_ssh_user }}"
+          owner: "{{ ansible_user }}"
+          group: "{{ ansible_user }}"
           mode: "0600"
 
       - name: Add the public key of the control node to the authorized_keys file if not present
         ansible.builtin.lineinfile:
           state: present
-          path: "/home/{{ ansible_ssh_user }}/.ssh/authorized_keys"
+          path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
           line: "{{ control_public_key }}"
 
       - name: Get the contents of the authorized_keys file
-        ansible.builtin.command: "cat '/home/{{ ansible_ssh_user }}/.ssh/authorized_keys'"
+        ansible.builtin.command: "cat '~/.ssh/authorized_keys'"
         register: command_output
 
       - name: Display the contents of the authorized_keys file (to ensure the control node public key is the same for all files)
@@ -983,7 +994,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
         control:
           ansible_host: <the control node IPv4 address>
           ansible_connection: ssh
-          ansible_ssh_user: control
+          ansible_user: control
           # ansible_ssh_pass: <the control node password>
 
     remote_nodes:
@@ -991,7 +1002,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
         remote:
           ansible_host: <the remote node IPv4 address>
           ansible_connection: ssh
-          ansible_ssh_user: remote
+          ansible_user: remote
           # ansible_ssh_pass: <the remote node password>
     ```
 
@@ -1016,8 +1027,8 @@ However, you can protect your inventory file, through encryption using **Ansible
 2. Enter and confirm a password when prompted.
 
     ```
-    New Vault password: 
-    Confirm New Vault password: 
+    New Vault password:
+    Confirm New Vault password:
     ```
 
 3. Display the contents of your inventory file:
@@ -1050,11 +1061,11 @@ However, you can protect your inventory file, through encryption using **Ansible
 7. Enter your inventory file's Ansible Vault password when prompted.
 
     ```
-    Vault password: 
+    Vault password:
     ```
 
 8. The playbook will run. However, to allow you easily add nodes for practice, decrypt your inventory file:
-	
+
     ```
     ansible-vault decrypt inventory.yml
     ```
@@ -1062,7 +1073,7 @@ However, you can protect your inventory file, through encryption using **Ansible
 9. Enter your inventory file's Ansible Vault password when prompted.
 
     ```
-    Vault password: 
+    Vault password:
     ```
 
 10. Instead of encrypting a whole file, you can also encrypt specific items, such as passwords. Create an encrypted version of the remote node password:
@@ -1074,12 +1085,12 @@ However, you can protect your inventory file, through encryption using **Ansible
 11. Enter and confirm a password when prompted.
 
     ```
-    New Vault password: 
-    Confirm New Vault password: 
+    New Vault password:
+    Confirm New Vault password:
     ```
 
     **Output:**
-	
+
     ```
     remote_node_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
@@ -1111,7 +1122,7 @@ However, you can protect your inventory file, through encryption using **Ansible
 16. Enter your inventory file's Ansible Vault password when prompted.
 
     ```
-    Vault password: 
+    Vault password:
     ```
 
 17. The playbook will run. However, edit your Ansible inventory file again and replace the encrypted string with the plain text value for now.
