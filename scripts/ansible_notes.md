@@ -797,7 +797,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 Your inventory contains passwords in plain text, which is not good. Ansible prefers that you use SSH keys as authentication credentials when accessing remote nodes, and you can use Ansible to set up SSH key-based authentication on both the control node and remote node.
 
-The `generate_an_upload_ssh_keys` playbook performs the following tasks:
+The `enable_ssh_key_auth` playbook performs the following tasks:
 
 - It checks if a public key file already exists.
 - If the public key file does not exist, it generates both a private key file (id_rsa) and a public key file (id_rsa.pub).
