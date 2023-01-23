@@ -122,7 +122,7 @@ For more information on AAP requirements, see https://access.redhat.com/document
     <your IPv4 address>   control     control.example.net
     ```
 
-8. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+8. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 9. Open your `hostname` file for editing:
 
@@ -136,7 +136,7 @@ For more information on AAP requirements, see https://access.redhat.com/document
     control.example.net
     ```
 
-11. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+11. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 12. Reboot the control node to incorporate the changes:
 
@@ -240,7 +240,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     ansible -m ping localhost
     ```
 
-	- **Output:**
+	**Output:**
 
     ```
     localhost | SUCCESS => {
@@ -271,7 +271,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
 
     > **NOTE** - To make life easy, use *inventory.yml* for your inventory of nodes, instead of *hosts*, to avoid naming conflicts with other files named *hosts*.
 
-8. Press [i], and enter the following YAML code:
+8. Press **[i]**, and enter the following YAML code:
 
     ```
     ---
@@ -285,7 +285,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
           ansible_ssh_pass: <the control node password>
     ```
 
-9. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+9. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 10. Create an Ansible configuration file:
 
@@ -293,7 +293,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     sudo vim ~/Ansible/ansible.cfg
     ```
 
-11. Press [i], and enter the following YAML code:
+11. Press **[i]**, and enter the following YAML code:
 
     ```
     [defaults]
@@ -306,7 +306,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     inventory = ~/Ansible/inventory.yml
     ```
 
-12. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+12. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 13. Test Ansible by listing your nodes:
 
@@ -345,7 +345,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     sudo vim ~/Ansible/first_playbook.yml
     ```
 
-2. Press [i], and enter the following YAML code:
+2. Press **[i]**, and enter the following YAML code:
 
     ```
     ---
@@ -358,7 +358,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
           msg: Hello, World!
     ```
 
-3. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+3. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 4. Run the playbook:
 
@@ -366,7 +366,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ansible-playbook ~/Ansible/first_playbook.yml
     ```
 
-	- **Output:**
+	**Output:**
 
     ```
     PLAY [First playbook] *********************************************************************************************************************************************************************************************
@@ -439,7 +439,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     sudo vim ~/Ansible/second_playbook.yml
     ```
 
-6. Press [i], and enter the following YAML code:
+6. Press **[i]**, and enter the following YAML code:
 
     ```
     ---
@@ -452,7 +452,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
           var: ansible_facts
     ```
 
-7. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+7. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 8. Run the playbook:
 
@@ -466,7 +466,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     sudo vim ~/Ansible/third_playbook.yml
     ```
 
-10. Press [i], and enter the following YAML code:
+10. Press **[i]**, and enter the following YAML code:
 
     ```
     ---
@@ -495,7 +495,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
           - "{{ hostvars['control'].ansible_default_ipv4.address }}"
     ```
 
-11. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+11. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 12. Run the playbook:
 
@@ -503,7 +503,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ansible-playbook ~/Ansible/third_playbook.yml
     ```
 
-    - **Output:**
+    **Output:**
 
     ```
     PLAY [Third playbook] *********************************************************************************************************************************************************************************************
@@ -553,7 +553,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     sudo vim ~/Ansible/fourth_playbook.yml
     ```
 
-14. Press [i], and enter the following YAML code:
+14. Press **[i]**, and enter the following YAML code:
 
     ```
     ---
@@ -584,7 +584,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
           - "{{ icmp_ping_result }}"
     ```
 
-15. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+15. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 16. Run the playbook:
 
@@ -592,7 +592,7 @@ For your first playbook, you will say "Hello, World!", using the ansible.builtin
     ansible-playbook ~/Ansible/fourth_playbook.yml
     ```
 
-    - **Output:**
+    **Output:**
 
     ```
     PLAY [Fourth playbook] ********************************************************************************************************************************************************************************************
@@ -729,13 +729,13 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 ## Run Playbooks against the Remote Node
 
-1. Edit the Ansible inventory file:
+1. Edit your Ansible inventory file:
 
     ```
     sudo vim ~/Ansible/inventory.yml
     ```
 
-2. Press [i], and add the remote node information to the file:
+2. Press **[i]**, and add the remote node information to the file:
 
     ```
     ---
@@ -757,7 +757,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
           ansible_ssh_pass: <the remote node password>
     ```
 
-3. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+3. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 4. Change the target nodes in the playbooks from `control` to `remote` using the Linux stream editor:
 
@@ -772,7 +772,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
     ansible-playbook first_playbook.yml
     ```
 
-    - **Output:**
+    **Output:**
 
     ```
     PLAY [First playbook] **********************************************************************************
@@ -801,7 +801,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
 
 - It checks if a public key file already exists.
 - If the public key file does not exist, it generates both a private key file (id_rsa) and a public key file (id_rsa.pub).
-- It reads the the RSA public key from the public key file and places the key in a **fact** that is accessible to all *tasks* within the playbook (similar to a global variable).
+- It reads the RSA public key from the public key file and places the key in a **fact** that is accessible to all *tasks* within the playbook (similar to a global variable).
 - It connects to each node listed in *hosts* and creates an `authorized_keys` file within the `.ssh` directory of the SSH user.
 - To prevent other users from accessing the file, it sets the `authorized_keys` file's permissions to read-write by the owner only. This action also prevents SSH password prompts when using SSH keys.
 - It adds the RSA public key to the `authorized_keys` file.
@@ -813,7 +813,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
     sudo vim ~/Ansible/enable_ssh_key_auth.yml
     ```
 
-2. Press [i], and add the remote node information to the file:
+2. Press **[i]**, and add the remote node information to the file:
 
     ```
     ---
@@ -878,7 +878,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
           var: command_output.stdout_lines
     ```
 
-3. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+3. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 4. Run the playbook:
 
@@ -886,7 +886,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
     ansible-playbook ~/Ansible/enable_ssh_key_auth.yml
     ```
 
-    - **Output:**
+    **Output:**
 
     ```
     PLAY [Generate SSH keys for the control node, if they do not exist] **********************************************************************************************************************
@@ -967,13 +967,13 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
     remote                     : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     ```
 
-5.  Edit the Ansible inventory file:
+5.  Edit your Ansible inventory file:
 
     ```
     sudo vim ~/Ansible/inventory.yml
     ```
 
-6. Press [i], and comment out the passwords:
+6. Press **[i]**, and comment out the passwords:
 
     ```
     ---
@@ -995,7 +995,7 @@ The `enable_ssh_key_auth` playbook performs the following tasks:
           # ansible_ssh_pass: <the remote node password>
     ```
 
-7. Save the file by pressing [Esc], then [:]. Enter "wq" at the **":"** prompt.
+7. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 8. Run the first four playbooks again. They should work the same as before, even without a password.
 
@@ -1009,104 +1009,112 @@ However, you can protect your inventory file, through encryption using **Ansible
 
 1. Encrypt the `inventory.yml`:
 
-	```
-	ansible-vault encrypt inventory.yml
-	```
+    ```
+    ansible-vault encrypt inventory.yml
+    ```
 
 2. Enter and confirm a password when prompted.
 
-	```
-	New Vault password: 
-	Confirm New Vault password: 
-	```
+    ```
+    New Vault password: 
+    Confirm New Vault password: 
+    ```
 
 3. Display the contents of your inventory file:
 
-	```
-	cat ~/Ansible/inventory.yml
-	```
+    ```
+    cat ~/Ansible/inventory.yml
+    ```
 
-	- **Output:**
+    **Output:**
 
-	```
-	$ANSIBLE_VAULT;1.1;AES256
-	0123456789....
-	```
+    ```
+    $ANSIBLE_VAULT;1.1;AES256
+    0123456789....
+    ```
 
 4. Attempt to run a playbook:
 
-	```
-	ansible-playbook first_playbook.yml
-	```
+    ```
+    ansible-playbook first_playbook.yml
+    ```
 
 5. Since the playbook cannot read the encrypted inventory file, it will state that it is `"skipping: no hosts matched"` and `"[WARNING]:  * Failed to parse /home/control/Ansible/inventory.yml with auto plugin: Attempting to decrypt but no vault secrets found"`.
 
 6. Run the playbook again, but ask it to prompt you for your inventory file's Ansible Vault password:
 
-	```
-	ansible-playbook first_playbook.yml --ask-vault-pass
-	```
+    ```
+    ansible-playbook first_playbook.yml --ask-vault-pass
+    ```
 
 7. Enter your inventory file's Ansible Vault password when prompted.
 
-	```
-	Vault password: 
+    ```
+    Vault password: 
     ```
 
 8. The playbook will run. However, to allow you easily add nodes for practice, decrypt your inventory file:
 	
-	```
-	ansible-vault decrypt inventory.yml
-	```
+    ```
+    ansible-vault decrypt inventory.yml
+    ```
 
 9. Enter your inventory file's Ansible Vault password when prompted.
 
-	```
-	Vault password: 
+    ```
+    Vault password: 
     ```
 
 10. Instead of encrypting a whole file, you can also encrypt specific items, such as passwords. Create an encrypted version of the remote node password:
 
-	```
-	ansible-vault encrypt_string "<the remote node password>" --name "remote_node_password"
-	```
+    ```
+    ansible-vault encrypt_string "<the remote node password>" --name "remote_node_password"
+    ```
 
 11. Enter and confirm a password when prompted.
 
-	```
-	New Vault password: 
-	Confirm New Vault password: 
-	```
-
-	- **Output:**
-	
-	```
-	remote_node_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          0123456789...
-	```
-
-12. Replace the remote node's `ansible_ssh_pass` value with the encrypted string:
-
-	```
-	ansible_ssh_pass: !vault |
-	  $ANSIBLE_VAULT;1.1;AES256
-	  0123456789...
-	```
-
-13. Run the playbook again and ask it to prompt you for an Ansible Vault password that will decrypt the `ansible_ssh_pass` value:
-
-	```
-	ansible-playbook first_playbook.yml --ask-vault-pass
-	```
-
-14. Enter your inventory file's Ansible Vault password when prompted.
-
-	```
-	Vault password: 
+    ```
+    New Vault password: 
+    Confirm New Vault password: 
     ```
 
-15. The playbook will run. However, replace the encrypted string with the plain text value for now.
+    **Output:**
+	
+    ```
+    remote_node_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          0123456789...
+    ```
+
+12. Edit your Ansible inventory file:
+
+    ```
+    sudo vim ~/Ansible/inventory.yml
+    ```
+
+13. Press **[i]**, and replace the remote node's `ansible_ssh_pass` value with the encrypted string:
+
+    ```
+    ansible_ssh_pass: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      0123456789...
+    ```
+
+14. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+15. Run the playbook again and ask it to prompt you for an Ansible Vault password that will decrypt the `ansible_ssh_pass` value:
+
+    ```
+    ansible-playbook first_playbook.yml --ask-vault-pass
+    ```
+
+16. Enter your inventory file's Ansible Vault password when prompted.
+
+    ```
+    Vault password: 
+    ```
+
+17. The playbook will run. However, edit your Ansible inventory file again and replace the encrypted string with the plain text value for now.
 
 > **NOTE** - You do not need to delete the encrypted string. It is not stored anywhere right now.
 
