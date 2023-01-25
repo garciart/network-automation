@@ -12,8 +12,9 @@ This tutorial will walk you through using Ansible and Ansible Automation Platfor
 - [Create a Remote Node](#create-a-remote-node)
 - [Run Playbooks against the Remote Node](#run-playbooks-against-the-remote-node)
 - [Ansible Roles](#ansible-roles)
-- [Enable SSH Key-Based Authentication](#enable-ssh-key-based-authentication)
 - [Encrypt Files with Ansible Vault](#encrypt-files-with-ansible-vault)
+- [Enable SSH Key-Based Authentication](#enable-ssh-key-based-authentication)
+- [Elevated Privileges and Ansible](#elevated-privileges-and-ansible)
 - [Install the Ansible Automation Platform](#install-the-ansible-automation-platform)
 - [Notes](#notes)
 
@@ -301,6 +302,9 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     [defaults]
     # Set the location for the correct Python 3 version
     interpreter_python = /usr/bin/python3
+
+    # Add a local log file
+    log_path = ~/Ansible/ansible.log
 
     # Stop host key checking, as well as populating the ~/.ssh/known_hosts file, for now
     # https://docs.ansible.com/ansible/2.5/user_guide/intro_getting_started.html#host-key-checking
@@ -736,7 +740,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 ## Run Playbooks against the Remote Node
 
-1. Edit your Ansible inventory file:
+1. Open your Ansible inventory file for editing:
 
     ```
     sudo vim ~/Ansible/inventory.yml
@@ -804,184 +808,303 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 "Don't repeat yourself", or *DRY*, is a key software development principle. My rule is, that if you have to use the same block of code, or run the same set of commands more than once, put it in a function, a method, a class, or in its own script.
 
-Ansible allows you to do the same thing, and a lot more, with **roles**. 
+Ansible allows you to do the same thing, and a lot more, with **roles**.
 
 1. Create and navigate to a sub-directory named "roles" in your Ansible directory:
 
-	```
-	mkdir ~/Ansible/roles
-	cd ~/Ansible/roles
-	```
+    ```
+    mkdir ~/Ansible/roles
+    cd ~/Ansible/roles
+    ```
 
 2. [Ansible Galaxy](https://galaxy.ansible.com/ "Ansible Galaxy") is "Ansible’s official hub for sharing Ansible content", and it contains a collection of roles and other useful items. In some respects, it is like a cross between a collection of repositories, such as GitHub, and a package manager, like yum. The [ansible-galaxy](https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html) command allows you to interact with Ansible Galaxy, as well as perform other tasks. One of those tasks is initializing a role and its directory structure. Do that now for the `say_hello_role`:
 
-	```
-	ansible-galaxy init say_hello_role
-	```
+    ```
+    ansible-galaxy init say_hello_role
+    ```
 
 3. Navigate to the role's directory and take a look at its contents:
 
-	```
-	cd ~/Ansible/roles/say_hello_role
-	ls -l
-	```
+    ```
+    cd ~/Ansible/roles/say_hello_role
+    ls -l
+    ```
 
     **Output:**
 
-	```
-	drwxrwxr-x. 2 control control   22 Jan 23 16:08 defaults
-	drwxrwxr-x. 2 control control    6 Jan 23 16:08 files
-	drwxrwxr-x. 2 control control   22 Jan 23 16:08 handlers
-	drwxrwxr-x. 2 control control   22 Jan 23 16:08 meta
-	-rw-rw-r--. 1 control control 1328 Jan 23 16:08 README.md
-	drwxrwxr-x. 2 control control   22 Jan 23 16:09 tasks
-	drwxrwxr-x. 2 control control    6 Jan 23 16:08 templates
-	drwxrwxr-x. 2 control control   39 Jan 23 16:08 tests
-	drwxrwxr-x. 2 control control   22 Jan 23 16:08 vars
-	```
+    ```
+    drwxrwxr-x. 2 control control   22 Jan 23 16:08 defaults
+    drwxrwxr-x. 2 control control    6 Jan 23 16:08 files
+    drwxrwxr-x. 2 control control   22 Jan 23 16:08 handlers
+    drwxrwxr-x. 2 control control   22 Jan 23 16:08 meta
+    -rw-rw-r--. 1 control control 1328 Jan 23 16:08 README.md
+    drwxrwxr-x. 2 control control   22 Jan 23 16:09 tasks
+    drwxrwxr-x. 2 control control    6 Jan 23 16:08 templates
+    drwxrwxr-x. 2 control control   39 Jan 23 16:08 tests
+    drwxrwxr-x. 2 control control   22 Jan 23 16:08 vars
+    ```
 
 4. When you use a role, Ansible will look in these directories for common values (**defaults**), file names (**files**), what to do (**tasks**), etc. Many of these directories contain a `main.yml` file, which is the first place Ansible will look for instructions. Navigate to the **tasks** directory and open the `main.yml` file:
 
-	```
-	cd tasks
-	vim main.yml
-	```
+    ```
+    cd tasks
+    vim main.yml
+    ```
 
 5. Press **[i]**, and enter the following YAML code:
 
-	```
-	---
-	# tasks file for say_hello_role
+    ```
+    ---
+    # tasks file for say_hello_role
 
-	- name: Say Hello using the ansible.builtin.debug module
-	  ansible.builtin.debug:
-		msg: Hello, World!
-	```
+    - name: Say Hello using the ansible.builtin.debug module
+      ansible.builtin.debug:
+        msg: Hello, World!
+    ```
 
 6. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-7. Return to the your Ansible directory and create a playbook, named `say_hello_role_test.yml`:
+7. Return to your Ansible directory and create a playbook, named `say_hello_role_test.yml`:
 
-	```
-	cd ~/Ansible
-	vim say_hello_role_test.yml
-	```
+    ```
+    cd ~/Ansible
+    vim say_hello_role_test.yml
+    ```
 
 8. Press **[i]**, and enter the following YAML code:
 
-	```
-	---
+    ```
+    ---
 
-	- name: say_hello_role test
-	  hosts: all
-	  roles:
-	  - say_hello_role
-	```
+    - name: say_hello_role test
+      hosts: all
+      roles:
+      - say_hello_role
+    ```
 
 9. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 10. Run the playbook:
 
-	```
-	ansible-playbook say_hello_role_test.yml
-	```
+    ```
+    ansible-playbook say_hello_role_test.yml
+    ```
 
-	**Output:**
+    **Output:**
 
-	```
-	PLAY [say_hello_role test] ***************************************************************************************************************************************************************
+    ```
+    PLAY [say_hello_role test] ***************************************************************************************************************************************************************
 
-	TASK [Gathering Facts] *******************************************************************************************************************************************************************
-	ok: [control]
-	ok: [remote]
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [control]
+    ok: [remote]
 
-	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
-	ok: [control] => {
-		"msg": "Hello, World!"
-	}
-	ok: [remote] => {
-		"msg": "Hello, World!"
-	}
+    TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+    ok: [control] => {
+        "msg": "Hello, World!"
+    }
+    ok: [remote] => {
+        "msg": "Hello, World!"
+    }
 
-	PLAY RECAP *******************************************************************************************************************************************************************************
-	control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-	remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
-	```
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    ```
 
 11. You can also run a role anywhere in a playbook, or even more than once, using the [ansible.builtin.include_role](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_role_module.html) module. Reopen the playbook:
 
-	```
-	vim say_hello_role_test.yml
-	```
+    ```
+    vim say_hello_role_test.yml
+    ```
 
 8. Press **[i]**, and replace the YAML code:
 
-	```
-	---
+    ```
+    ---
 
-	- name: say_hello_role test
-	  hosts: all
-	  tasks:
-	  - name: Say Hello
-		ansible.builtin.include_role:
-		  name: say_hello_role
-	  - name: Respond
-		ansible.builtin.debug:
-		  msg: "What?"
-	  - name: Say Hello again
-		ansible.builtin.include_role:
-		  name: say_hello_role
-	```
+    - name: say_hello_role test
+      hosts: all
+      tasks:
+      - name: Say Hello
+        ansible.builtin.include_role:
+          name: say_hello_role
+      - name: Respond
+        ansible.builtin.debug:
+          msg: "What?"
+      - name: Say Hello again
+        ansible.builtin.include_role:
+          name: say_hello_role
+    ```
 
 9. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
 10. Run the playbook:
 
-	```
-	ansible-playbook say_hello_role_test.yml
-	```
+    ```
+    ansible-playbook say_hello_role_test.yml
+    ```
 
-	**Output:**
-	
-	```
-	PLAY [say_hello_role test] ***************************************************************************************************************************************************************
+    **Output:**
 
-	TASK [Gathering Facts] *******************************************************************************************************************************************************************
-	ok: [remote]
-	ok: [control]
+    ```
+    PLAY [say_hello_role test] ***************************************************************************************************************************************************************
 
-	TASK [Say Hello] *************************************************************************************************************************************************************************
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [remote]
+    ok: [control]
 
-	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
-	ok: [remote] => {
-		"msg": "Hello, World!"
-	}
-	ok: [control] => {
-		"msg": "Hello, World!"
-	}
+    TASK [Say Hello] *************************************************************************************************************************************************************************
 
-	TASK [Respond] ***************************************************************************************************************************************************************************
-	ok: [remote] => {
-		"msg": "What?"
-	}
-	ok: [control] => {
-		"msg": "What?"
-	}
+    TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+    ok: [remote] => {
+        "msg": "Hello, World!"
+    }
+    ok: [control] => {
+        "msg": "Hello, World!"
+    }
 
-	TASK [Say Hello again] *******************************************************************************************************************************************************************
+    TASK [Respond] ***************************************************************************************************************************************************************************
+    ok: [remote] => {
+        "msg": "What?"
+    }
+    ok: [control] => {
+        "msg": "What?"
+    }
 
-	TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
-	ok: [control] => {
-		"msg": "Hello, World!"
-	}
-	ok: [remote] => {
-		"msg": "Hello, World!"
-	}
+    TASK [Say Hello again] *******************************************************************************************************************************************************************
 
-	PLAY RECAP *******************************************************************************************************************************************************************************
-	control                    : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-	remote                     : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-	```
+    TASK [say_hello_role : Say Hello using the ansible.builtin.debug module] *****************************************************************************************************************
+    ok: [control] => {
+        "msg": "Hello, World!"
+    }
+    ok: [remote] => {
+        "msg": "Hello, World!"
+    }
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    remote                     : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    ```
+
+----
+
+## Encrypt Files with Ansible Vault
+
+Right now, your inventory file contains the SSH passwords for your nodes in plain text. In another section, you will learn how to fix this using SSH Key-Based Authentication. However, even with password-less authentication, there may be times that you must store credentials in your inventory file or elsewhere. You can protect these files and credentials by encrypting them, using **Ansible Vault**.
+
+1. Encrypt the `inventory.yml`:
+
+    ```
+    ansible-vault encrypt inventory.yml
+    ```
+
+2. Enter and confirm a password when prompted.
+
+    ```
+    New Vault password:
+    Confirm New Vault password:
+    ```
+
+3. Display the contents of your inventory file:
+
+    ```
+    cat ~/Ansible/inventory.yml
+    ```
+
+    **Output:**
+
+    ```
+    $ANSIBLE_VAULT;1.1;AES256
+    0123456789....
+    ```
+
+4. Attempt to run a playbook:
+
+    ```
+    ansible-playbook first_playbook.yml
+    ```
+
+5. Since the playbook cannot read the encrypted inventory file, it will state that it is `"skipping: no hosts matched"` and `"[WARNING]:  * Failed to parse /home/control/Ansible/inventory.yml with auto plugin: Attempting to decrypt but no vault secrets found"`.
+
+6. Run the playbook again, but ask it to prompt you for your inventory file's Ansible Vault password:
+
+    ```
+    ansible-playbook first_playbook.yml --ask-vault-pass
+    ```
+
+7. Enter your inventory file's Ansible Vault password when prompted.
+
+    ```
+    Vault password:
+    ```
+
+8. The playbook will run. However, to allow you easily add nodes for practice, decrypt your inventory file:
+
+    ```
+    ansible-vault decrypt inventory.yml
+    ```
+
+9. Enter your inventory file's Ansible Vault password when prompted.
+
+    ```
+    Vault password:
+    ```
+
+10. Instead of encrypting a whole file, you can also encrypt specific items, such as passwords. Create an encrypted version of the remote node password:
+
+    ```
+    ansible-vault encrypt_string "<the remote node password>" --name "remote_node_password"
+    ```
+
+11. Enter and confirm a password when prompted.
+
+    ```
+    New Vault password:
+    Confirm New Vault password:
+    ```
+
+    **Output:**
+
+    ```
+    remote_node_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          0123456789...
+    ```
+
+12. Open your Ansible inventory file for editing:
+
+    ```
+    sudo vim ~/Ansible/inventory.yml
+    ```
+
+13. Press **[i]**, and replace the remote node's `ansible_ssh_pass` value with the encrypted string:
+
+    ```
+    ansible_ssh_pass: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      0123456789...
+    ```
+
+14. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+15. Run the playbook again and ask it to prompt you for an Ansible Vault password that will decrypt the `ansible_ssh_pass` value:
+
+    ```
+    ansible-playbook first_playbook.yml --ask-vault-pass
+    ```
+
+16. Enter your inventory file's Ansible Vault password when prompted.
+
+    ```
+    Vault password:
+    ```
+
+17. The playbook will run. However, open your Ansible inventory file for editing again and replace the encrypted string with the plain text value for now.
+
+> **NOTE** - Unless you save the string to a file, you cannot decrypt encrypted string, and you do not need to delete encrypted strings. Ansible does not store strings.
+
+For more information about Ansible Vault, see https://docs.ansible.com/ansible/latest/vault_guide/vault.html.
 
 ----
 
@@ -1164,13 +1287,13 @@ Let's get started!
     remote                     : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     ```
 
-5.  Edit your Ansible inventory file:
+5.  Open your Ansible inventory file for editing:
 
     ```
     sudo vim ~/Ansible/inventory.yml
     ```
 
-6. Press **[i]**, and comment out the passwords:
+6. Press **[i]**, and remove the `ansible_ssh_pass:` entries:
 
     ```
     ---
@@ -1181,7 +1304,6 @@ Let's get started!
           ansible_host: <the control node IPv4 address>
           ansible_connection: ssh
           ansible_user: control
-          # ansible_ssh_pass: <the control node password>
 
     remote_nodes:
       hosts:
@@ -1189,133 +1311,211 @@ Let's get started!
           ansible_host: <the remote node IPv4 address>
           ansible_connection: ssh
           ansible_user: remote
-          # ansible_ssh_pass: <the remote node password>
     ```
 
 7. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-8. Run the first four playbooks again. They should work the same as before, even without a password.
+8. Run the first four playbooks again. They should work the same as before, even without passwords. By the way, this is an excellent example of a playbook that can be turned into a role.
 
 ----
 
-## Encrypt Files with Ansible Vault
+## Elevated Privileges and Ansible
 
-There may be times that you cannot use SSH Key-Based Authentication. The obvious example is the first time you connect to a remote node, but there are also some network devices that cannot store SSH keys. In those cases, and others, you will have to store the password in your inventory file.
-
-However, you can protect your inventory file, through encryption using **Ansible Vault**.
-
-1. Encrypt the `inventory.yml`:
+1. Create a playbook named `sudo_demo.yml`:
 
     ```
-    ansible-vault encrypt inventory.yml
+    sudo vim ~/Ansible/sudo_demo.yml
     ```
 
-2. Enter and confirm a password when prompted.
+2. Press **[i]**, and enter the following YAML code:
 
     ```
-    New Vault password:
-    Confirm New Vault password:
+    ---
+
+    - name: Use elevated privileges to run a command
+      hosts: all
+      tasks:
+      - name: Update, but do not upgrade, installed packages
+        ansible.builtin.yum:
+          name: '*'
+          state: latest
+          update_only: true
     ```
 
-3. Display the contents of your inventory file:
+3. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+4. Run the playbook, but limit its actions to the control node:
 
     ```
-    cat ~/Ansible/inventory.yml
-    ```
-
-    **Output:**
-
-    ```
-    $ANSIBLE_VAULT;1.1;AES256
-    0123456789....
-    ```
-
-4. Attempt to run a playbook:
-
-    ```
-    ansible-playbook first_playbook.yml
-    ```
-
-5. Since the playbook cannot read the encrypted inventory file, it will state that it is `"skipping: no hosts matched"` and `"[WARNING]:  * Failed to parse /home/control/Ansible/inventory.yml with auto plugin: Attempting to decrypt but no vault secrets found"`.
-
-6. Run the playbook again, but ask it to prompt you for your inventory file's Ansible Vault password:
-
-    ```
-    ansible-playbook first_playbook.yml --ask-vault-pass
-    ```
-
-7. Enter your inventory file's Ansible Vault password when prompted.
-
-    ```
-    Vault password:
-    ```
-
-8. The playbook will run. However, to allow you easily add nodes for practice, decrypt your inventory file:
-
-    ```
-    ansible-vault decrypt inventory.yml
-    ```
-
-9. Enter your inventory file's Ansible Vault password when prompted.
-
-    ```
-    Vault password:
-    ```
-
-10. Instead of encrypting a whole file, you can also encrypt specific items, such as passwords. Create an encrypted version of the remote node password:
-
-    ```
-    ansible-vault encrypt_string "<the remote node password>" --name "remote_node_password"
-    ```
-
-11. Enter and confirm a password when prompted.
-
-    ```
-    New Vault password:
-    Confirm New Vault password:
+    ansible-playbook ~/Ansible/sudo_demo.yml --limit control
     ```
 
     **Output:**
 
     ```
-    remote_node_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          0123456789...
+    PLAY [Use elevated privileges to run a command] ******************************************************************************************************************************************
+
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [control]
+
+    TASK [Update, but do not upgrade, installed packages] ************************************************************************************************************************************
+    fatal: [control]: FAILED! => {"changed": false, "msg": "This command has to be run under the root user.", "results": []}
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
     ```
 
-12. Edit your Ansible inventory file:
+    Notice the message, "`This command has to be run under the root user`". You are trying to run `yum update`, instead of `sudo yum update`.
+
+5. Open the playbook for editing:
+
+    ```
+    sudo vim ~/Ansible/sudo_demo.yml
+    ```
+
+6. Press **[i]**, and add the line `become: true` before `tasks:`:
+
+    ```
+    hosts: control
+    become: true
+    tasks:
+    ```
+
+7. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+
+8. Run the playbook again:
+
+    ```
+    ansible-playbook ~/Ansible/sudo_demo.yml --limit control
+    ```
+
+    **Output:**
+
+    ```
+    PLAY [Use elevated privileges to run a command] ******************************************************************************************************************************************
+
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    fatal: [control]: FAILED! => {"msg": "Missing sudo password"}
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=0    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+    ```
+
+    Notice the message, "`Missing sudo password`". You are trying to run `sudo yum update`, but you did not supply a password.
+
+9. Run the playbook again, but add the `--ask-become-pass` or `-K` option. The **control** user is an administrator, so enter their password when prompted:
+
+    > **NOTE** - This may take a few seconds to a few minutes, depending on how up-to-date is the system.
+
+    ```
+    ansible-playbook ~/Ansible/sudo_demo.yml --limit control -K
+    ```
+
+    **Output:**
+
+    ```
+    BECOME password:
+    PLAY [Use elevated privileges to run a command] ******************************************************************************************************************************************
+
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [control]
+
+    TASK [Update, but do not upgrade, installed packages] ************************************************************************************************************************************
+    ok: [control]
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    ```
+
+    The playbook ran with no errors.
+
+10. Run the playbook again, but remove the `--limit` option, so the playbook will run against all nodes (keep the `-K` option). Enter the **control** user's password when prompted:
+
+    ```
+    ansible-playbook ~/Ansible/sudo_demo.yml -K
+    ```
+
+    **Output:**
+
+    ```
+    BECOME password:
+
+    PLAY [Use elevated privileges to run a command] ******************************************************************************************************************************************
+
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [control]
+    fatal: [remote]: FAILED! => {"msg": "Incorrect sudo password"}
+
+    TASK [Update, but do not upgrade, installed packages] ************************************************************************************************************************************
+    ok: [control]
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    remote                     : ok=0    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+    ```
+
+    The **control** user password does not work for the **remote** user.
+
+11. Open your Ansible inventory file for editing:
 
     ```
     sudo vim ~/Ansible/inventory.yml
     ```
 
-13. Press **[i]**, and replace the remote node's `ansible_ssh_pass` value with the encrypted string:
+12. Press **[i]**, and add an `ansible_become_password:` entry to each node:
 
     ```
-    ansible_ssh_pass: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      0123456789...
+    ---
+
+    control_nodes:
+      hosts:
+        control:
+          ansible_host: <the control node IPv4 address>
+          ansible_connection: ssh
+          ansible_user: control
+          ansible_become_password: <the control node password>
+
+    remote_nodes:
+      hosts:
+        remote:
+          ansible_host: <the remote node IPv4 address>
+          ansible_connection: ssh
+          ansible_user: remote
+          ansible_become_password: <the remote node password>
     ```
 
-14. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+13. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-15. Run the playbook again and ask it to prompt you for an Ansible Vault password that will decrypt the `ansible_ssh_pass` value:
+14. Run the playbook again, but remove the `-K` option (you will not be prompted for a password):
 
-    ```
-    ansible-playbook first_playbook.yml --ask-vault-pass
-    ```
-
-16. Enter your inventory file's Ansible Vault password when prompted.
+    > **NOTE** - This may take a few seconds to a few minutes, depending on how up-to-date is the system.
 
     ```
-    Vault password:
+    ansible-playbook ~/Ansible/sudo_demo.yml
     ```
 
-17. The playbook will run. However, edit your Ansible inventory file again and replace the encrypted string with the plain text value for now.
+    **Output:**
 
-> **NOTE** - You do not need to delete the encrypted string. It is not stored anywhere right now.
+    ```
+    PLAY [Use elevated privileges to run a command] ******************************************************************************************************************************************
 
-For more information about Ansible Vault, see https://docs.ansible.com/ansible/latest/vault_guide/vault.html.
+    TASK [Gathering Facts] *******************************************************************************************************************************************************************
+    ok: [control]
+    ok: [remote]
+
+    TASK [Update, but do not upgrade, installed packages] ************************************************************************************************************************************
+    ok: [control]
+    ok: [remote]
+
+    PLAY RECAP *******************************************************************************************************************************************************************************
+    control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    ```
+
+    The playbook ran with no errors.
+
+
+15. Remember, to protect plain-text passwords, you can encrypt the strings, or the entire file, using **Ansible Vault**.
 
 ----
 
@@ -1375,3 +1575,4 @@ For more information about Ansible Vault, see https://docs.ansible.com/ansible/l
 3. While the free and open source AlmaLinux and Rocky 8 operating systems are bug-for-bug compatible versions of RHEL 8, neither can run Ansible Tower nor AAP.
 4. The Ansible command-line-interface (CLI) can run on most versions of Linux (including the Windows Subsystem for Linux), as long as Python 3.9 or greater is installed on the host.
 5. Remote nodes can use most operating systems, including Debian, Windows, and macOS, and network device operating systems, such as Cisco, Palo Alto, etc.
+
