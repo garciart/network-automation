@@ -52,7 +52,9 @@ For more information on AAP requirements, see https://access.redhat.com/document
    - At least 8192 MB RAM for installation of AAP, and 4096 MB RAM for operation.
    - At least 40 GB of hard drive space. If you are separating your drive into multiple partitions, you must allocate at least 20 GB to `/var`.
 
-3. However, before you start the VM, go to its network settings, and change the network connection to **Bridged Adapter**. This will allow the VM to access the host, the Internet, and other VM's.
+3. However, before you start the VM, add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** (VMWare) or attaching it to an **Internal Network** (VirtualBox, shown). This will allow you to use static Internet Protocol version 4 (IPv4) addresses in your Ansible inventories, which we will create later.
+
+![Settings -> Network](https://github.com/garciart/network-automation/raw/master/img/a03.png "Settings -> Network")
 
 4. Start the VM. When prompted for the location of the installation media, navigate to the location of the RHEL 8 ISO, and select the ISO.
 
@@ -90,64 +92,108 @@ For more information on AAP requirements, see https://access.redhat.com/document
     exec su - control
     ```
 
-4. Get the IPv4 address and netmask of the Ethernet interface you will use to configure remote nodes with Ansible:
+4. Ansible maintains a listing, or an *inventory*, of devices and their Internet Protocol (IP) version 4 addresses. However, if a device is set up to receive its IPv4 address from a Dynamic Host Configuration Protocol (DHCP) server, its IPv4 address may change from what is listed in the inventory. Therefore, for this tutorial, you will use these **static** IPv4 addresses for your devices:
+
+    | VM Name            | Description               | Username   | Domain                 | IPv4 Address |
+    | ------------------ | ------------------------- | ---------- | ---------------------- | ------------ |
+    | ansible_control    | RHEL 8.6 Control Node     | control    | control.example.net    | 192.168.1.10 |
+    | ansible_remote     | RHEL 8.6 Remote Node      | remote     | remote.example.net     | 192.168.1.20 |
+
+5. Get the names of the control node's Ethernet network adapters:
 
     ```
     # ifconfig | grep --extended-regexp "^e[mnt]" --after-context=2
     ifconfig | grep -E "^e[mnt]" -A 2
     ```
 
-    > **NOTE** - The IPv4 address and its netmask will appear after the Internet Protocol version 4 family identifier, **inet**. For example:
-    >
-    > ```
-    > inet 192.168.0.XX  netmask 255.255.255.0  broadcast 192.168.0.XX
-    > ```
+6. Look for the Ethernet network adapter that does not have an IPv4 address. In my case, it was `enp0s8`, but your adapter's name may be different:
 
-5. If no IPv4 address appears, set an IPv4 address using the following command:
+	```
+	enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+			inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+			inet6 fe80::a00:27ff:fe84:6b5f  prefixlen 64  scopeid 0x20<link>
+	--
+	enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+			ether 08:00:27:b4:ee:23  txqueuelen 1000  (Ethernet)
+			RX packets 0  bytes 0 (0.0 B)
+	```
+
+7. Create a connection named **control** and add a static IPv4 address to the unassigned Ethernet network adapter:
+
+	```
+	sudo nmcli con add con-name remote ifname <the unassigned Ethernet network adapter name> type ethernet
+	sudo nmcli con modify remote ipv4.method manual ipv4.address 192.168.1.10/24 ipv4.gateway 192.168.1.0
+	sudo nmcli con up remote
+	```
+
+8. View the new connection's interface configuration file:
 
     ```
-    sudo ifconfig <open Ethernet interface> <desired IPv4 address> netmask <desired subnet mask>
+    cat /etc/sysconfig/network-scripts/ifcfg-control
     ```
 
-6. Open your `hosts` file for editing:
+9. Ensure the following lines are in the file:
+
+    ```
+    BOOTPROTO=static
+    IPADDR=192.168.1.10
+    GATEWAY=192.168.1.0
+    NETMASK=255.255.255.0
+	PREFIX=24
+    ```
+
+10. Restart the network:
+
+	```
+	sudo nmcli connection reload
+	sudo systemctl restart NetworkManager.service
+	```
+
+11. Ensure you can connect to the Internet:
+
+	``` 
+	ping -c 4 8.8.8.8
+	```
+
+12. Open your `hosts` file for editing:
 
     ```
     sudo vim /etc/hosts
     ```
 
-7. Replace the localhost domain with a unique, but intuitive domain name (e.g., `control.example.net`, etc.) for both the localhost IPv4 address (`127.0.0.1`) and IPv6 address (`::1`). In addition, add information for your Ethernet IPv4 address:
+13. Press **[i]**, and replace the localhost domain with a unique, but intuitive domain name (e.g., `control.example.net`, etc.) for both the localhost IPv4 address (`127.0.0.1`) and IPv6 address (`::1`). In addition, add your Ethernet network adapter's IPv4 address, the name of the control user, and the domain name:
 
-    > **NOTE** - In this tutorial, you will only create one control node. However, if you needed more than one control node, you can create and use a naming convention for control nodes, such as `control_1`, etc.
+    > **NOTE** - In this tutorial, you will only create one control node. However, if you needed more than one control node, you can create and use a naming convention for control nodes, such as `control_01`, etc.
 
     ```
-    127.0.0.1             localhost   control.example.net
-    ::1                   localhost   control.example.net
-    <your IPv4 address>   control     control.example.net
+    127.0.0.1      localhost   control.example.net
+    ::1            localhost   control.example.net
+    192.168.1.10   control     control.example.net
     ```
 
-8. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+14. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-9. Open your `hostname` file for editing:
+15. Open your `hostname` file for editing:
 
     ```
     sudo vim /etc/hostname
     ```
 
-10. Replace the hostname of the control node with the new domain name:
+16. Press **[i]**, and replace the hostname of the control node with the new domain name:
 
     ```
     control.example.net
     ```
 
-11. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
+17. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-12. Reboot the control node to incorporate the changes:
+18. Reboot the control node to incorporate the changes:
 
     ```
     sudo reboot now
     ```
 
-13. Once the control node has finished rebooting, log in using the **control** user account.
+19. Once the control node has finished rebooting, log in using the **control** user account.
 
     > **NOTE** - Clear out any "Welcome" dialog windows that may appear.
 
@@ -155,14 +201,14 @@ For more information on AAP requirements, see https://access.redhat.com/document
 
 ## Register the Control Node
 
-To update the control node, as well as to use Ansible Tower or the Ansible Automation Platform, you must have a RedHat subscription.
+To update the control node, as well as to use Ansible Tower or the Ansible Automation Platform, you must have a Red Hat subscription.
 
 1. Open a Terminal.
 
 2. Register the control node. Enter your Red Hat password when prompted:
 
     ```
-    sudo subscription-manager register --username <RedHat subscription username>
+    sudo subscription-manager register --username <Red Hat subscription username>
     ```
 
 3. Once you have registered the control node, pull the subscription data from the server, and set the control node to automatically attach any compatible or related subscriptions:
@@ -282,7 +328,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     control_nodes:
       hosts:
         control:
-          ansible_host: <your IPv4 address>
+          ansible_host: 192.168.1.10
           ansible_connection: ssh
           ansible_user: control
           ansible_ssh_pass: <the control node password>
@@ -524,7 +570,7 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
 
     TASK [Print a fact, without titles] *******************************************************************************************************************************************************************************
     ok: [control] => {
-        "ansible_facts.env.SSH_CLIENT": "192.168.0.XX XXXXX 22"
+        "ansible_facts.env.SSH_CLIENT": "192.168.1.10 XXXXX 22"
     }
 
     TASK [Print a magic variable, without titles] *********************************************************************************************************************************************************************
@@ -536,7 +582,7 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
     ok: [control] => {
         "msg": [
             "Hostname - control",
-            "192.168.0.XX XXXXX 22"
+            "192.168.1.10 XXXXX 22"
         ]
     }
 
@@ -544,7 +590,7 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
     ok: [control] => {
         "msg": [
             "Home directory - /home/control",
-            "192.168.0.XX"
+            "10.0.2.15"
         ]
     }
 
@@ -644,13 +690,13 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
             "start": "2023-01-17 23:30:03.592279",
             "stderr": "",
             "stderr_lines": [],
-            "stdout": "PING control (192.168.0.XX) 56(84) bytes of data.\n64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
+            "stdout": "PING control (192.168.1.10) 56(84) bytes of data.\n64 bytes from control (192.168.1.10): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.1.10): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.1.10): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.1.10): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
             "stdout_lines": [
-                "PING control (192.168.0.XX) 56(84) bytes of data.",
-                "64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms",
-                "64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms",
-                "64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms",
-                "64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms",
+                "PING control (192.168.1.10) 56(84) bytes of data.",
+                "64 bytes from control (192.168.1.10): icmp_seq=1 ttl=64 time=0.048 ms",
+                "64 bytes from control (192.168.1.10): icmp_seq=2 ttl=64 time=0.083 ms",
+                "64 bytes from control (192.168.1.10): icmp_seq=3 ttl=64 time=0.050 ms",
+                "64 bytes from control (192.168.1.10): icmp_seq=4 ttl=64 time=0.056 ms",
                 "",
                 "--- control ping statistics ---",
                 "4 packets transmitted, 4 received, 0% packet loss, time 3060ms",
@@ -683,13 +729,13 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
                 "start": "2023-01-17 23:30:03.592279",
                 "stderr": "",
                 "stderr_lines": [],
-                "stdout": "PING control (192.168.0.XX) 56(84) bytes of data.\n64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
+                "stdout": "PING control (192.168.1.10) 56(84) bytes of data.\n64 bytes from control (192.168.1.10): icmp_seq=1 ttl=64 time=0.048 ms\n64 bytes from control (192.168.1.10): icmp_seq=2 ttl=64 time=0.083 ms\n64 bytes from control (192.168.1.10): icmp_seq=3 ttl=64 time=0.050 ms\n64 bytes from control (192.168.1.10): icmp_seq=4 ttl=64 time=0.056 ms\n\n--- control ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3060ms\nrtt min/avg/max/mdev = 0.048/0.059/0.083/0.015 ms",
                 "stdout_lines": [
-                    "PING control (192.168.0.XX) 56(84) bytes of data.",
-                    "64 bytes from control (192.168.0.XX): icmp_seq=1 ttl=64 time=0.048 ms",
-                    "64 bytes from control (192.168.0.XX): icmp_seq=2 ttl=64 time=0.083 ms",
-                    "64 bytes from control (192.168.0.XX): icmp_seq=3 ttl=64 time=0.050 ms",
-                    "64 bytes from control (192.168.0.XX): icmp_seq=4 ttl=64 time=0.056 ms",
+                    "PING control (192.168.1.10) 56(84) bytes of data.",
+                    "64 bytes from control (192.168.1.10): icmp_seq=1 ttl=64 time=0.048 ms",
+                    "64 bytes from control (192.168.1.10): icmp_seq=2 ttl=64 time=0.083 ms",
+                    "64 bytes from control (192.168.1.10): icmp_seq=3 ttl=64 time=0.050 ms",
+                    "64 bytes from control (192.168.1.10): icmp_seq=4 ttl=64 time=0.056 ms",
                     "",
                     "--- control ping statistics ---",
                     "4 packets transmitted, 4 received, 0% packet loss, time 3060ms",
@@ -726,7 +772,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
    >
    > For more information about cloning, see https://docs.oracle.com/en/virtualization/virtualbox/6.1/user/Introduction.html#clone.
 
-2. Prepare the remote node, per the instructions in [Prepare the Control Node](#prepare-the-control-node). However, replace "remote" with "control" in all instances.
+2. Prepare the remote node, per the instructions in [Prepare the Control Node](#prepare-the-control-node). However, replace "remote" with "control" in all instances, and the IPv4 address with `192.168.1.20`.
 
    > **NOTE** - If you cloned *ansible_control*, once you have rebooted the remote node:
    >
@@ -754,7 +800,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
     control_nodes:
       hosts:
         control:
-          ansible_host: <the control node IPv4 address>
+          ansible_host: 192.168.1.10
           ansible_connection: ssh
           ansible_user: control
           ansible_ssh_pass: <the control node password>
@@ -762,7 +808,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
     remote_nodes:
       hosts:
         remote:
-          ansible_host: <the remote node IPv4 address>
+          ansible_host: 192.168.1.20
           ansible_connection: ssh
           ansible_user: remote
           ansible_ssh_pass: <the remote node password>
@@ -770,7 +816,7 @@ In this section, you will use a virtual remote node to test your Ansible playboo
 
 3. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-4. Change the target nodes in the playbooks from `control` to `remote` using the Linux stream editor:
+4. Change the target nodes in the playbooks from `control` to `remote`, using the Linux stream editor:
 
     ```
     # sed --in-place 's/hosts: control/hosts: remote/g' ~/Ansible/*_playbook.yml
@@ -1301,14 +1347,14 @@ Let's get started!
     control_nodes:
       hosts:
         control:
-          ansible_host: <the control node IPv4 address>
+          ansible_host: 192.168.1.10
           ansible_connection: ssh
           ansible_user: control
 
     remote_nodes:
       hosts:
         remote:
-          ansible_host: <the remote node IPv4 address>
+          ansible_host: 192.168.1.20
           ansible_connection: ssh
           ansible_user: remote
     ```
@@ -1470,7 +1516,7 @@ Let's get started!
     control_nodes:
       hosts:
         control:
-          ansible_host: <the control node IPv4 address>
+          ansible_host: 192.168.1.10
           ansible_connection: ssh
           ansible_user: control
           ansible_become_password: <the control node password>
@@ -1478,7 +1524,7 @@ Let's get started!
     remote_nodes:
       hosts:
         remote:
-          ansible_host: <the remote node IPv4 address>
+          ansible_host: 192.168.1.20
           ansible_connection: ssh
           ansible_user: remote
           ansible_become_password: <the remote node password>
@@ -1541,8 +1587,8 @@ Let's get started!
     ...
     pg_password='<control password>'
     ...
-    registry_username='<RedHat subscription username>'
-    registry_password='<RedHat subscription password>'
+    registry_username='<Red Hat subscription username>'
+    registry_password='<Red Hat subscription password>'
     ...
     automationhub_admin_password='<control password>'
     ...
@@ -1575,4 +1621,3 @@ Let's get started!
 3. While the free and open source AlmaLinux and Rocky 8 operating systems are bug-for-bug compatible versions of RHEL 8, neither can run Ansible Tower nor AAP.
 4. The Ansible command-line-interface (CLI) can run on most versions of Linux (including the Windows Subsystem for Linux), as long as Python 3.9 or greater is installed on the host.
 5. Remote nodes can use most operating systems, including Debian, Windows, and macOS, and network device operating systems, such as Cisco, Palo Alto, etc.
-
