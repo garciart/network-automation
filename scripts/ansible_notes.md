@@ -359,6 +359,10 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     # Use the local inventory file, instead of the default /etc/hosts file
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#avoiding-security-risks-with-ansible-cfg-in-the-current-directory
     inventory = ~/Ansible/inventory.yml
+    
+    	
+    # Format playbook results (default, yaml, json, etc.)
+    stdout_callback = default
     ```
 
 12. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
