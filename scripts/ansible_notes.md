@@ -108,23 +108,23 @@ For more information on AAP requirements, see https://access.redhat.com/document
 
 6. Look for the Ethernet network adapter that does not have an IPv4 address. In my case, it was `enp0s8`, but your adapter's name may be different:
 
-	```
-	enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-			inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
-			inet6 fe80::a00:27ff:fe84:6b5f  prefixlen 64  scopeid 0x20<link>
-	--
-	enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-			ether 08:00:27:b4:ee:23  txqueuelen 1000  (Ethernet)
-			RX packets 0  bytes 0 (0.0 B)
-	```
+    ```
+    enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+            inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+            inet6 fe80::a00:27ff:fe84:6b5f  prefixlen 64  scopeid 0x20<link>
+    --
+    enp0s8: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+            ether 08:00:27:b4:ee:23  txqueuelen 1000  (Ethernet)
+            RX packets 0  bytes 0 (0.0 B)
+    ```
 
 7. Create a connection named **control** and add a static IPv4 address to the unassigned Ethernet network adapter:
 
-	```
-	sudo nmcli con add con-name control ifname <the unassigned Ethernet network adapter name> type ethernet
-	sudo nmcli con modify control ipv4.method manual ipv4.address 192.168.1.10/24 ipv4.gateway 192.168.1.0
-	sudo nmcli con up control
-	```
+    ```
+    sudo nmcli con add con-name control ifname <the unassigned Ethernet network adapter name> type ethernet
+    sudo nmcli con modify control ipv4.method manual ipv4.address 192.168.1.10/24 ipv4.gateway 192.168.1.0
+    sudo nmcli con up control
+    ```
 
 8. View the new connection's interface configuration file:
 
@@ -139,21 +139,21 @@ For more information on AAP requirements, see https://access.redhat.com/document
     IPADDR=192.168.1.10
     GATEWAY=192.168.1.0
     NETMASK=255.255.255.0
-	PREFIX=24
+    PREFIX=24
     ```
 
 10. Restart the network:
 
-	```
-	sudo nmcli connection reload
-	sudo systemctl restart NetworkManager.service
-	```
+    ```
+    sudo nmcli connection reload
+    sudo systemctl restart NetworkManager.service
+    ```
 
 11. Ensure you can connect to the Internet:
 
-	``` 
-	ping -c 4 8.8.8.8
-	```
+    ```
+    ping -c 4 8.8.8.8
+    ```
 
 12. Open your `hosts` file for editing:
 
@@ -359,29 +359,34 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     # Use the local inventory file, instead of the default /etc/hosts file
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#avoiding-security-risks-with-ansible-cfg-in-the-current-directory
     inventory = ~/Ansible/inventory.yml
-    
-    	
+
     # Format playbook results (default, yaml, json, etc.)
     stdout_callback = default
     ```
 
 12. Save the file by pressing **[Esc]**, then **[:]**. Enter "wq" at the **":"** prompt.
 
-13. Ensure Ansible can read the inventory file:
+13. Just in case `sudo` gave control to `root`, give ownership of the directory and its files to `control`:
+
+    ```
+    sudo chown -R control:control ~/Ansible
+    ```
+
+14. Ensure Ansible can read the inventory file:
 
     ```
     # ansible all --list-hosts --inventory ~/Ansible/inventory.yml
     ansible all --list-hosts -i ~/Ansible/inventory.yml
     ```
 
-14. Test connectivity, using the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module:
+15. Test connectivity, using the [ansible.builtin.ping](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) module:
 
     ```
     # ansible all --module-name ansible.builtin.ping --inventory ~/Ansible/inventory.yml
     ansible all -m ping -i ~/Ansible/inventory.yml
     ```
 
-15. Run some ad-hoc commands, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module:
+16. Run some ad-hoc commands, using the [ansible.builtin.command](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html) module:
 
     ```
     # ansible all --args "ping -c 4 8.8.8.8"
