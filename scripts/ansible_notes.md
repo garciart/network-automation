@@ -121,9 +121,9 @@ For more information on AAP requirements, see https://access.redhat.com/document
 7. Create a connection named **control** and add a static IPv4 address to the unassigned Ethernet network adapter:
 
 	```
-	sudo nmcli con add con-name remote ifname <the unassigned Ethernet network adapter name> type ethernet
-	sudo nmcli con modify remote ipv4.method manual ipv4.address 192.168.1.10/24 ipv4.gateway 192.168.1.0
-	sudo nmcli con up remote
+	sudo nmcli con add con-name control ifname <the unassigned Ethernet network adapter name> type ethernet
+	sudo nmcli con modify control ipv4.method manual ipv4.address 192.168.1.10/24 ipv4.gateway 192.168.1.0
+	sudo nmcli con up control
 	```
 
 8. View the new connection's interface configuration file:
@@ -457,17 +457,17 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
     > PLAY [First playbook] ********************************************************************************************************************************************************************
     >
     > TASK [Gathering Facts] *******************************************************************************************************************************************************************
-    > ok: [remote]
+    > ok: [control]
     >
     > TASK [Say Hello using the ansible.builtin.debug module] **********************************************************************************************************************************
-    > ok: [remote] => {}
+    > ok: [control] => {}
     >
     > MSG:
     >
     > Hello, World!
     >
     > PLAY RECAP *******************************************************************************************************************************************************************************
-    > remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    > control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     > ```
     >
     > You can also use standard file formats, such as JSON and YAML, which is useful if you have to export a playbook's results:
@@ -482,14 +482,14 @@ For your first playbook, you will say "Hello, World!", using the [ansible.builti
     > PLAY [First playbook] ********************************************************************************************************************************************************************
     >
     > TASK [Gathering Facts] *******************************************************************************************************************************************************************
-    > ok: [remote]
+    > ok: [control]
     >
     > TASK [Say Hello using the ansible.builtin.debug module] **********************************************************************************************************************************
-    > ok: [remote] =>
+    > ok: [control] =>
     >   msg: Hello, World!
     >
     > PLAY RECAP *******************************************************************************************************************************************************************************
-    > remote                     : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+    > control                    : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
     > ```
     >
     > However, for this tutorial, you will use Ansible's default format.
