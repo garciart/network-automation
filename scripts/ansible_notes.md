@@ -255,7 +255,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     >
     > ```
     > sudo subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
-    > sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    > sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm --nogpgcheck
     > sudo yum -y install make gcc kernel-headers kernel-devel perl dkms bzip2 git
     > sudo reboot now
     > ```
