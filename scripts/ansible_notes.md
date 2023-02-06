@@ -1635,7 +1635,7 @@ Let's get started!
     > **NOTE** - Since you will be working with the GNOME Graphical User Interface (GUI) and Firefox, you may want to install the **GNOME Tweaks** application. This will allow you to customize the GUI to your preferences, such as restoring the Minimize and Maximize buttons in window title bars, etc.:
     >
     > ```
-    > sudo subscription-manager repos --enable=rhel-8-for-x86_64-appstream-rpms
+    > sudo subscription-manager repos --enable=rhel-8-for-x86_64-appstream-rpms --nogpgcheck
     > sudo dnf -y install gnome-tweaks
     > ```
     >
