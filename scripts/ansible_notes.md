@@ -52,6 +52,23 @@ For more information on AAP requirements, see https://access.redhat.com/document
    - At least 8192 MB RAM for installation of AAP, and 4096 MB RAM for operation.
    - At least 40 GB of hard drive space. If you are separating your drive into multiple partitions, you must allocate at least 20 GB to `/var`.
 
+   My recommended partitioning scheme is based on the [RHEL 8 Recommended partitioning scheme] (https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/performing_a_standard_rhel_8_installation/index#recommended-partitioning-scheme_partitioning-reference "Performing a standard RHEL 8 installation"), the [Red Hat Enterprise Linux 8 STIG](https://public.cyber.mil/stigs/downloads/?_dl_facet_stigs=unix-linux "Red Hat Enterprise Linux 8 STIG"), and the [](https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.2/html/red_hat_ansible_automation_platform_installation_guide/index):
+
+   | Mount Point:   | Desired Capacity: |                                                      |
+   | -------------- | ----------------- | ---------------------------------------------------- |
+   | /home          | 1 GiB             | STIG and RHEL recommendation                         |
+   | /var/log       | 5 GiB             | STIG recommendation                                  |
+   | /var/log/audit | 10 GiB            | STIG recommendation                                  |
+   | /var/tmp       | 1 GiB             | STIG recommendation                                  |
+   | /              | 10 GiB            | RHEL recommendation                                  |
+   | /tmp           | 1 GiB             | STIG recommendation                                  |
+   | /var           | 20 GiB            | STIG recommendation and AAP Service Node requirement |
+   | /var/lib       | 20 GiB            | AAP Database Node requirement                        |
+   | /boot          | 1 GiB             | RHEL recommendation                                  |
+   | swap           | 8 GiB             | RHEL recommendation                                  |
+
+   Add 13 GiB of unallocated space, for a total of 80 GiB.
+
 3. However, before you start the VM, add another network interface to your machine. Make it private and isolate it from the outside world, by connecting it to a **LAN segment** (VMWare) or attaching it to an **Internal Network** (VirtualBox, shown). This will allow you to use static Internet Protocol version 4 (IPv4) addresses in your Ansible inventories, which we will create later.
 
 ![Settings -> Network](https://github.com/garciart/network-automation/raw/master/img/a03.png "Settings -> Network")
@@ -216,6 +233,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     ```
     sudo subscription-manager refresh
     sudo subscription-manager auto-attach --enable
+	sudo subscription-manager facts --update
     ```
 
     > **NOTE** - You can check if the control node was registered at https://access.redhat.com/management/systems.
@@ -276,6 +294,8 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
 4. Install Ansible:
 
     ```
+	sudo subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+    sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm --nogpgcheck
     sudo yum -y install ansible
     ansible --version
     ```
@@ -304,7 +324,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     > sudo python3 -m pip install --user argcomplete
     > ```
 
-6. [To avoid exposing your inventories, playbooks, etc., to anyone with administrator privileges](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#avoiding-security-risks-with-ansible-cfg-in-the-current-directory), do not use the default `/etc/asible` directory. Instead, create an Ansible sub-directory in your Home directory, then navigate to it (if prompted, enter your password):
+6. [To avoid exposing your inventories, playbooks, etc., to anyone with administrator privileges](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#avoiding-security-risks-with-ansible-cfg-in-the-current-directory), do not use the default `/etc/ansible` directory. Instead, create an Ansible sub-directory in your Home directory, then navigate to it (if prompted, enter your password):
 
     ```
     # sudo mkdir --parents ~/Ansible
