@@ -255,7 +255,7 @@ To update the control node, as well as to use Ansible Tower or the Ansible Autom
     >
     > ```
     > sudo subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
-    > sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm --nogpgcheck
+    > sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
     > sudo yum -y install make gcc kernel-headers kernel-devel perl dkms bzip2 git
     > sudo reboot now
     > ```
@@ -1635,7 +1635,7 @@ Let's get started!
     > **NOTE** - Since you will be working with the GNOME Graphical User Interface (GUI) and Firefox, you may want to install the **GNOME Tweaks** application. This will allow you to customize the GUI to your preferences, such as restoring the Minimize and Maximize buttons in window title bars, etc.:
     >
     > ```
-    > sudo subscription-manager repos --enable=rhel-8-for-x86_64-appstream-rpms --nogpgcheck
+    > sudo subscription-manager repos --enable=rhel-8-for-x86_64-appstream-rpms
     > sudo dnf -y install gnome-tweaks
     > ```
     >
