@@ -1,6 +1,6 @@
 # Installing and Partitioning RHEL 8
 
-**NOTE** - Also check out similar instructions for Rocky at https://docs.rockylinux.org/books/disa_stig/disa_stig_part1/, that I found after writing this!
+**NOTE** - Also check out similar instructions for Rocky at https://docs.rockylinux.org/books/disa_stig/disa_stig_part1/!
 
 I based this Red Hat Enterprise Linux (RHEL) installation and partitioning guide on the recommendations listed in [Performing a standard RHEL 8 installation, of the RHEL 8 Product Documentation](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/performing_a_standard_rhel_8_installation), [Appendix E, *Partitioning reference*, of the Red Hat Enterprise Linux 8 System Design Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/system_design_guide/partitioning-reference_system-design-guide) and the [Defense Information Systems Agency (DISA) Security Technical Implementation Guide (STIG)](https://ncp.nist.gov/checklist/980).
 
@@ -18,23 +18,23 @@ You will also need an Internet connection and an active [Red Hat Developer accou
 
 1. When the installer starts, at the **Welcome** screen, select your language and click on **Continue**:
 
-    pic
+pic
 
 2. At the **Installation Summary** screen, under **System**, select **Installation Destination**:
 
-    pic
+pic
 
 3. At the  **Installation Destination** screen, change the **Storage Configuration** to **Custom**, and click on **Done**:
 
-    pic
+pic
 
 4. The **Manual Partitioning** screen wil appear:
 
-    pic
+pic
 
 5. Add the following mount points, by clicking on **+**, filling the appropriate textboxes, and clicking on **Add mount point**:
 
-    pic
+pic
 
    > **NOTE** - These partitions and sizes are based on the [RHEL 8 Recommended partitioning scheme] (https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/performing_a_standard_rhel_8_installation/index#recommended-partitioning-scheme_partitioning-reference "Performing a standard RHEL 8 installation") and the Defense Information Systems Agency (DISA) Security Technical Implementation Guide (STIG):
    >
@@ -50,33 +50,33 @@ You will also need an Internet connection and an active [Red Hat Developer accou
 
    | Mount Point:   | Desired Capacity: | Group: | Total: | Notes:                                                                          |
    | -------------- | :---------------: | ------ |:-----: | ------------------------------------------------------------------------------- |
-   | /              | 20 GiB            | System | 20 GiB | RHEL recommendation is 10 GiB, but you will need more to create an bootable ISO |
-   | /boot          | 1 GiB             | System | 21 GiB | RHEL recommendation                                                             |
-   | /boot/efi      | 200 MiB           | System | 21.2 GiB | RHEL recommendation                                                             |
-   | /home          | 1 GiB             | Data   | 22.2 GiB | RHEL and STIG recommendation                                                    |
-   | /var           | 3 GiB             | System | 25.2 GiB | STIG recommendation                                                             |
-   | /var/log       | 5 GiB             | Data   | 30.2 GiB | STIG recommendation                                                             |
-   | /var/log/audit | 10 GiB            | Data   | 40.2 GiB | STIG recommendation                                                             |
-   | /var/tmp       | 1 GiB             | Data   | 41.2 GiB | STIG recommendation                                                             |
-   | swap           | 4 GiB             | System | 45.2 GiB | Based on the system's RAM. See [Appendix E, *Partitioning reference*, of the RHEL 8 System Design Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/system_design_guide/partitioning-reference_system-design-guide), for details |
-   | /tmp           | 1 GiB             | System | 46.2 GiB | STIG recommendation                                                             |
-   | /usr           | 10 GiB            | System | 56.2 GiB | RHEL recommendation (5 GiB w/o a GUI)                                           |
+   | /              | 20 GiB            | System | 10 GiB | RHEL recommendation is 10 GiB, but you will need more to create an bootable ISO |
+   | /boot          | 1 GiB             | System | 11 GiB | RHEL recommendation                                                             |
+   | /boot/efi      | 200 MiB           | System | 11.2 GiB | RHEL recommendation                                                             |
+   | /home          | 1 GiB             | Data   | 12.2 GiB | RHEL and STIG recommendation                                                    |
+   | /var           | 3 GiB             | System | 15.2 GiB | STIG recommendation                                                             |
+   | /var/log       | 5 GiB             | Data   | 20.2 GiB | STIG recommendation                                                             |
+   | /var/log/audit | 10 GiB            | Data   | 30.2 GiB | STIG recommendation                                                             |
+   | /var/tmp       | 1 GiB             | Data   | 31.2 GiB | STIG recommendation                                                             |
+   | swap           | 4 GiB             | System | 35.2 GiB | Based on the system's RAM. See [Appendix E, *Partitioning reference*, of the RHEL 8 System Design Guide](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/system_design_guide/partitioning-reference_system-design-guide), for details |
+   | /tmp           | 1 GiB             | System | 36.2 GiB | STIG recommendation                                                             |
+   | /usr           | 10 GiB            | System | 46.2 GiB | RHEL recommendation (5 GiB w/o a GUI)                                           |
 
    You should have approximately 3.8 GiB of available space remaining after adding the partitions.
 
-    pic
+pic
 
 6. Once you have created the partitions, select each one, with the exception of `/boot` and `/boot/efi`, and ensure their **Device Type** is **LVM** and the **Encrypt** checkbox is selected:
 
    > **NOTE** - This actions satisfies DISA STIG SV-230224r809268_rule, *All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection*.
 
-    pic
+pic
 
    Click on **Update Settings** to commit the change.
 
 7. Click on **Done** when finished. The **Disk Encryption Passphrase** dialog will appear:
 
-    pic
+pic
 
 8. Enter a STIG-compliant passphrase:
 
@@ -84,39 +84,39 @@ You will also need an Internet connection and an active [Red Hat Developer accou
    - At least one uppercase, lowercase, number, and special character (use dashes (-), periods (.), or underscores ( ) only, to avoid using reserved special characters, such as operators (|), comment identifiers (#, !, etc.), or email address delimiters (@), which may cause transfers to fail).
    - No more than 4 characters of the same type consecutively.
 
-    pic
+pic
 
    Click on **Save Passphrase** when finished.
 
 9. The **Summary of Changes** dialog will appear. If everything is correct, click on **Accept Changes**:
 
-    pic
+pic
 
 10. When you return to the **Installation Summary** screen, under **System**, select **KDUMP**:
 
-    pic
+pic
 
 11. Uncheck the **Enable kdump** checkbox, then click on **Done**:
 
     > **NOTE** - This actions satisfies DISA STIG SV-230310r627750_rule, RHEL 8 must disable kernel dumps unless needed.
 	
-    pic
+pic
 
 12. When you return to the **Installation Summary** screen, under **User Settings**, select **Root Password**:
 
-    pic
+pic
 
 13. When the **Root Password** screen appears, enter a **temporary** passphrase. When you apply the STIG, the system will ask you to change your password when you first log in:
 
     > **NOTE** - Disregard any warnings stating that your temporary passphrase failed a check; you will change it to a STIG-compliant password when you first log in. Click on **Done** twice to confim the temporary passphrase.
 
-    pic
+pic
 
     Click on **Done** when finished.
 
 14. When you return to the **Installation Summary** screen, under **User Settings**, select **User Creation**:
 
-    pic
+pic
 
 15. When the **Create User** screen appears:
 
@@ -136,47 +136,47 @@ You will also need an Internet connection and an active [Red Hat Developer accou
 	> sudo usermod -aG vboxsf <user name>
 	> ```
 
-    pic
+pic
 
 15. When you return to the **Installation Summary** screen, under **System**, select **Security Policy**:
 
-    pic
+pic
 
 16. At the **Security Policy** screen, scroll thorugh the available profiles and click on the **DISA STIG with GUI for Red Hat Enterprise Linux**:
 
-    pic
+pic
 
 17. Click on **Select Profile**. Look at the **Changes that were done or need to be done** listing; the system will make these changes during installation, so the system complies with the DISA STIG:
 
-    pic
+pic
 
     Click on **Done** when finished.
 
 18. To implement the security policy during installation and perform updates, you need an active [Red Hat Developer account](http://access.redhat.management "Red Hat Developer account"). However, you must first onfigure your network connection. Once you return to the **Installation Summary** screen, under **System**, select **Network and Host Name**.
 
-    pic
+pic
 
 19. At the **Network and Host Name** screen, select your Ethernet controller and turn it on. 
 
-    pic
+pic
 
     > **NOTE** - You can also change your host name, from the default and generic `localhost.localdomain`, to something more intuitive, such as `r8-stig-gui.dev`. Remember, the host name should only contain lower case alphanumeric characters and hyphens.
 
-    pic
+pic
 
     > **NOTE** - Depending on your organization's requirements, you may have to modify your network connection, such as adding a static IPv4 connection. However, for this tutorial, continue to use the Dynamic Host Configuration Protocol (DHCP) service.
 	
-    pic
+pic
 
     Take note of the controller's IPv4 address (you can use it later to connect to the VM via Secure Shell (SSH)), and click on **Done** when finished.
 
 20. Once you return to the **Installation Summary** screen, under **Software**, select **Connect to Red Hat**.
 
-    pic
+pic
 
 21. Enter your Red Hat credentials you use to access your subscription. You may also check **Set System Purpose** and enter the system's role, software licensing agreement (SLA) type, and how you will use the system.
 
-    pic
+pic
 
     Click on **Register**. After a few minutes, the wizard will let you know the system has been properly subscribed.
 	
@@ -188,7 +188,7 @@ You will also need an Internet connection and an active [Red Hat Developer accou
     sudo subscription-manager auto-attach --enable
     ```
 
-    pic
+pic
 
     > **NOTE** - You can check if the system was registered at https://access.redhat.com/management/systems.
 
