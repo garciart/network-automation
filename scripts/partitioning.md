@@ -112,7 +112,7 @@ pic
 
 pic
 
-    Click on **Done** when finished.
+   Click on **Done** when finished.
 
 14. When you return to the **Installation Summary** screen, under **User Settings**, select **User Creation**:
 
